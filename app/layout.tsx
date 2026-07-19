@@ -9,13 +9,29 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://avergara13.github.io"),
-  title: { default: "Angel Vergara — Portfolio", template: "%s" },
-  description: "Implementation, operations systems, and human-controlled AI workflow portfolio by Angel Vergara.",
+  title: { default: "Angel Vergara — Implementation & Onboarding", template: "%s" },
+  description: "Bilingual hospitality operations leader and implementation-focused systems builder with shipped product and workflow-delivery proof.",
+  alternates: { canonical: "/" },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
-  openGraph: { type: "website", title: "Angel Vergara — Systems people can actually use.", description: "Shipped products, practical implementation systems, and human-controlled AI workflows.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems people can actually use." }] },
-  twitter: { card: "summary_large_image", title: "Angel Vergara — Systems people can actually use.", description: "Shipped products, practical implementation systems, and human-controlled AI workflows.", images: ["/og.png"] },
+  robots: { index: true, follow: true },
+  openGraph: { type: "website", url: "/", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems teams can actually adopt." }] },
+  twitter: { card: "summary_large_image", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.", images: ["/og.png"] },
+};
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Angel Vergara",
+  url: "https://avergara13.github.io/",
+  email: "mailto:avergara13@me.com",
+  jobTitle: "Implementation and Onboarding Specialist",
+  knowsLanguage: ["English", "Spanish"],
+  sameAs: [
+    "https://linkedin.com/in/angel-vergara-83861540",
+    "https://github.com/avergara13",
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${geistSans.variable} ${geistMono.variable}`}><a className="skip-link" href="#main">Skip to main content</a><SiteHeader />{children}<SiteFooter /></body></html>;
+  return <html lang="en"><body className={`${geistSans.variable} ${geistMono.variable}`}><a className="skip-link" href="#main">Skip to main content</a><SiteHeader />{children}<SiteFooter /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} /></body></html>;
 }

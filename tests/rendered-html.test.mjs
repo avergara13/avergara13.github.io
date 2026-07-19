@@ -1,91 +1,110 @@
 import assert from "node:assert/strict";
-import { access, readFile, readdir } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
-const developmentPreviewMeta =
-  /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const templateRoot = new URL("../", import.meta.url);
-const previewRoot = new URL("../app/_sites-preview/", import.meta.url);
+const root = new URL("../", import.meta.url);
+const output = new URL("../out/", import.meta.url);
 
-async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
+const readOutput = (path) => readFile(new URL(path, output), "utf8");
 
-  return worker.fetch(
-    new Request("http://localhost/", {
-      headers: { accept: "text/html" },
-    }),
-    {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
-  );
-}
+test("home leads with recruiter-first positioning and an above-fold resume action", async () => {
+  const html = await readOutput("index.html");
 
-test("server-renders the starter loading skeleton", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-
-  const html = await response.text();
-  assert.match(html, developmentPreviewMeta);
-  assert.match(html, /<title>Your site is taking shape<\/title>/i);
-  assert.match(html, /Building your site/);
-  assert.match(html, /Your site is taking shape/);
-  assert.match(
-    html,
-    /Your first version will appear here automatically when it’s ready\./,
-  );
-  assert.doesNotMatch(html, /Codex/);
-  assert.match(html, /react-loading-skeleton/);
-  assert.match(html, /role="status"/);
+  assert.match(html, /Bilingual operations leader building systems teams can actually adopt\./);
+  assert.match(html, /Download implementation resume/);
+  assert.match(html, /Angel_Vergara_Resume_Implementation_Onboarding\.pdf/);
+  assert.match(html, /Featured live product/);
+  assert.match(html, /Public proof boundary/);
+  assert.match(html, /href="\/hiring\/"/);
+  assert.match(html, /aria-controls="primary-navigation"/);
+  assert.match(html, /aria-label="Open navigation menu"/);
 });
 
-test("keeps the loading skeleton scoped and disposable", async () => {
-  const [preview, css, page, layout, packageJson, files] = await Promise.all([
-    readFile(new URL("SkeletonPreview.tsx", previewRoot), "utf8"),
-    readFile(new URL("preview.css", previewRoot), "utf8"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../package.json", import.meta.url), "utf8"),
-    readdir(previewRoot),
+test("public pages do not expose the private application system or the unfeatured product repository", async () => {
+  const pages = await Promise.all([
+    readOutput("index.html"),
+    readOutput("resume/index.html"),
+    readOutput("hiring/index.html"),
+    readOutput("work/resale-scanner-pro/index.html"),
+  ]);
+  const html = pages.join("\n");
+
+  assert.doesNotMatch(html, /application-kit|Application quickstart|Cover-letter kit|application-dashboard/i);
+  assert.doesNotMatch(html, /github\.com\/avergara13\/resale-scanner-pro/i);
+  assert.doesNotMatch(html, /15\+ years|FIU · CIA · Valencia/i);
+});
+
+test("resume links are explicit and the recommended lane is unmistakable", async () => {
+  const html = (await readOutput("resume/index.html")).replaceAll("<!-- -->", "");
+
+  assert.match(html, /Recommended first choice/);
+  assert.match(html, /Download Implementation &amp; Onboarding resume \(PDF\)/);
+  assert.match(html, /Download Business Systems &amp; Operations resume \(PDF\)/);
+  assert.match(html, /Download AI Workflow &amp; Automation resume \(PDF\)/);
+  assert.match(html, /href="\/hiring\/"/);
+});
+
+test("hiring brief provides role fit, proof sequence, and direct contact", async () => {
+  const html = await readOutput("hiring/index.html");
+
+  assert.match(html, /Where the evidence converts fastest\./);
+  assert.match(html, /Implementation &amp; onboarding/i);
+  assert.match(html, /Business systems &amp; operations/i);
+  assert.match(html, /Technical customer success/i);
+  assert.match(html, /Resale Scanner Pro case study/);
+  assert.match(html, /mailto:avergara13@me\.com/);
+});
+
+test("search metadata is complete and canonical", async () => {
+  const [home, resume, hiring, caseStudy, robots, sitemap] = await Promise.all([
+    readOutput("index.html"),
+    readOutput("resume/index.html"),
+    readOutput("hiring/index.html"),
+    readOutput("work/resale-scanner-pro/index.html"),
+    readOutput("robots.txt"),
+    readOutput("sitemap.xml"),
   ]);
 
-  assert.deepEqual(files.sort(), ["SkeletonPreview.tsx", "preview.css"]);
-  assert.match(preview, /from "react-loading-skeleton"/);
-  assert.match(preview, /baseColor="#eceae7"/);
-  assert.match(preview, /highlightColor="#f9f8f6"/);
-  assert.match(preview, /duration=\{2\.8\}/);
-  assert.match(preview, /sites-skeleton-search-placeholder/);
-  assert.match(packageJson, /"react-loading-skeleton": "3\.5\.0"/);
+  assert.match(home, /rel="canonical" href="https:\/\/avergara13\.github\.io\/"/);
+  assert.match(resume, /rel="canonical" href="https:\/\/avergara13\.github\.io\/resume\/"/);
+  assert.match(hiring, /rel="canonical" href="https:\/\/avergara13\.github\.io\/hiring\/"/);
+  assert.match(caseStudy, /rel="canonical" href="https:\/\/avergara13\.github\.io\/work\/resale-scanner-pro\/"/);
+  assert.match(home, /application\/ld\+json/);
+  assert.match(home, /"@type":"Person"/);
+  assert.match(robots, /Sitemap: https:\/\/avergara13\.github\.io\/sitemap\.xml/);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/hiring\//);
+});
 
-  const shellIndex = preview.indexOf('className="sites-skeleton-shell"');
-  const statusIndex = preview.indexOf('className="sites-skeleton-status"');
-  assert.ok(shellIndex >= 0 && statusIndex > shellIndex);
-  assert.match(css, /position:\s*fixed/);
-  assert.match(css, /inset:\s*0/);
-  assert.match(css, /opacity:\s*0\.52/);
-  assert.match(css, /prefers-reduced-motion:\s*reduce/);
-  assert.doesNotMatch(css, /#020617|canvas|pets|progress/i);
-  assert.doesNotMatch(
-    preview,
-    /loading-spinner|status-mark|status-progress|canvas|cookie|random/i,
-  );
+test("private application artifacts are absent from source and export", async () => {
+  const paths = [
+    "public/downloads/Angel_Vergara_Application_Quickstart.pdf",
+    "public/downloads/Angel_Vergara_Cover_Letter_Kit.pdf",
+    "public/images/portfolio/application-dashboard.png",
+    "out/downloads/Angel_Vergara_Application_Quickstart.pdf",
+    "out/downloads/Angel_Vergara_Cover_Letter_Kit.pdf",
+    "out/images/portfolio/application-dashboard.png",
+    "out/application-kit/index.html",
+  ];
 
-  assert.match(page, /export const metadata:\s*Metadata/);
-  assert.match(page, /"codex-preview": "development"/);
-  assert.match(page, /<SkeletonPreview \/>/);
-  assert.match(layout, /title:\s*"Starter Project"/);
-  assert.doesNotMatch(layout, /codex-preview|_sites-preview|themeColor|\bViewport\b/);
-  assert.doesNotMatch(css, /(^|\s)(html|body)\s*\{/m);
+  for (const path of paths) {
+    await assert.rejects(access(new URL(path, root)), undefined, `${path} must not exist`);
+  }
+});
 
-  await assert.rejects(
-    access(new URL("public/_sites-preview", templateRoot)),
-  );
+test("downloadable resumes use the audited, conservative evidence spine", async () => {
+  const generator = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
+  const files = [
+    "public/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf",
+    "public/downloads/Angel_Vergara_Resume_Business_Systems_Operations.pdf",
+    "public/downloads/Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
+  ];
+
+  assert.match(generator, /BILINGUAL HOSPITALITY OPERATIONS LEADER \| IMPLEMENTATION & ONBOARDING/);
+  assert.match(generator, /OPERATIONS-TO-AI WORKFLOW BUILDER \| SHIPPED PRODUCT & GOVERNED SYSTEMS/);
+  assert.doesNotMatch(generator, /15\+ years|Cafe Linger|bookkeeping support|Valencia Community College|github\.com\/avergara13\/resale-scanner-pro/i);
+
+  for (const path of files) {
+    const details = await stat(new URL(path, root));
+    assert.ok(details.size > 4_000, `${path} should be a complete PDF`);
+  }
 });

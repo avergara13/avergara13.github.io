@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export type Project = {
@@ -27,11 +28,8 @@ const projectData: Record<string, Project> = {
     dek: "A mobile-first decision system that turns a thrift-store photo into a structured resale workflow: identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
     status: "Public and operational",
     statusTone: "green",
-    proof: ["Photo → decision", "Human gates", "Market evidence", "Live app + source"],
-    links: [
-      { label: "Open live product", href: "https://resale-scanner-pro-production.up.railway.app", primary: true },
-      { label: "View public repository", href: "https://github.com/avergara13/resale-scanner-pro" },
-    ],
+    proof: ["Photo → decision", "Human gates", "Market evidence", "Live product"],
+    links: [{ label: "Open live product", href: "https://resale-scanner-pro-production.up.railway.app", primary: true }],
     workflow: [
       { number: "01", title: "Capture", copy: "Photograph the item and start a session." },
       { number: "02", title: "Identify", copy: "Extract likely brand, model, category, and condition." },
@@ -133,7 +131,7 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
           ["/images/rsp/sold.png", "Outcome tracking", "Sold evidence closes the loop."],
         ].map(([src, label, caption]) => (
           <figure className="phone" key={src}>
-            <img src={src} alt={`${project.title} ${label} screen`} />
+            <Image src={src} alt={`${project.title} ${label} screen`} width={780} height={1688} sizes="(max-width: 620px) 46vw, 28vw" />
             <figcaption><b>{label}</b><span>{caption}</span></figcaption>
           </figure>
         ))}
@@ -144,8 +142,8 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
   if (project.slug === "sous-chef" && kind === "screens") {
     return (
       <div className="sous-visual">
-        <img className="sous-desktop" src="/images/sous-chef/desktop.png" alt="Sous Chef desktop application showing recipe and culinary workspace" />
-        <img className="sous-mobile" src="/images/sous-chef/mobile.png" alt="Sous Chef mobile application" />
+        <Image className="sous-desktop" src="/images/sous-chef/desktop.png" alt="Sous Chef desktop application showing recipe and culinary workspace" width={1440} height={1000} sizes="(max-width: 620px) 75vw, 900px" />
+        <Image className="sous-mobile" src="/images/sous-chef/mobile.png" alt="Sous Chef mobile application" width={390} height={913} sizes="(max-width: 620px) 130px, 260px" />
       </div>
     );
   }
