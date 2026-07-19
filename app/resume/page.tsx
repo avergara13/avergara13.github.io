@@ -27,10 +27,44 @@ const lanes = [
 ];
 
 export default function ResumePage() {
+  const [recommended, ...alternates] = lanes;
+
   return <main id="main">
-    <section className="subpage-hero"><div className="shell"><p className="eyebrow">Resume suite · Employer-ready evidence</p><h1>One career.<br />Three clear views.</h1><p className="lede">Start with the implementation and onboarding resume. Use an alternate only when the role’s first screen genuinely calls for a different proof order.</p><div className="actions"><a className="button primary" href="/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf" download>Download recommended resume (PDF) <span aria-hidden="true">↓</span></a></div></div></section>
-    <section className="resume-lane-section"><div className="shell lane-stack">{lanes.map((lane) => <article className={`lane-card ${lane.tone}`} key={lane.number}><div className="lane-number">{lane.number}</div><div><span className="status-dot">{lane.fit}</span><h2>{lane.title}</h2><p>{lane.proof}</p><ul>{lane.roles.map((role) => <li key={role}>{role}</li>)}</ul></div><div className="lane-download"><div className="resume-paper large-paper" aria-hidden="true"><b>Angel Vergara</b><span>{lane.title}</span><i></i><i></i><i></i><i></i><i></i><i></i></div><a className="button primary" href={`/downloads/${lane.file}`} download>Download {lane.title} resume (PDF) <span aria-hidden="true">↓</span></a></div></article>)}</div></section>
-    <section className="truth-section dark-section"><div className="shell split-head"><div><p className="eyebrow">The shared evidence spine</p><h2>Truth stays fixed across every lane.</h2></div><div className="truth-grid"><div><b>Hospitality operations</b><span>Frontline leadership, training, inventory, and service systems</span></div><div><b>English / Español</b><span>Bilingual communication and training</span></div><div><b>Shipped product</b><span>Resale Scanner Pro live and available for review</span></div><div><b>Implementation focus</b><span>Discovery, configuration, adoption, evidence, and recovery</span></div></div></div></section>
-    <section className="materials-section"><div className="shell application-grid"><div><p className="eyebrow">For hiring teams</p><h2>Need the short version?</h2><p>Use the hiring-team brief for role fit, working style, the recommended proof sequence, and direct contact information.</p></div><div className="application-links"><Link href="/hiring"><span>Open the hiring-team brief</span><span>→</span></Link><Link href="/work/resale-scanner-pro"><span>Review the featured case study</span><span>→</span></Link><a href="mailto:avergara13@me.com"><span>Contact Angel</span><span>→</span></a></div></div></section>
+    <section className="subpage-hero resume-hero">
+      <div className="shell resume-hero-grid">
+        <div>
+          <p className="eyebrow">Recommended resume</p>
+          <h1>Start with implementation and onboarding.</h1>
+          <p className="lede">This is the strongest first screen for hospitality technology, SaaS onboarding, customer training, configuration, and adoption roles.</p>
+          <div className="actions"><a className="button primary" href={`/downloads/${recommended.file}`} download>Download recommended resume (PDF) <span aria-hidden="true">↓</span></a></div>
+        </div>
+        <aside className="recommended-resume-summary">
+          <span className="status-dot">{recommended.fit}</span>
+          <h2>{recommended.title}</h2>
+          <p>{recommended.proof}</p>
+          <ul>{recommended.roles.slice(0, 3).map((role) => <li key={role}>{role}</li>)}</ul>
+        </aside>
+      </div>
+    </section>
+
+    <section className="alternate-resume-section">
+      <div className="shell">
+        <div className="split-head"><div><p className="eyebrow">Role-specific alternatives</p><h2>Use an alternate only when the job calls for it.</h2></div><p>The experience stays consistent. These versions change the proof order for a systems-first or workflow-automation screen.</p></div>
+        <div className="alternate-resume-grid">
+          {alternates.map((lane) => <article className={`alternate-resume-card ${lane.tone}`} key={lane.number}>
+            <div className="lane-number">{lane.number}</div>
+            <div><span className="card-tag">{lane.fit}</span><h2>{lane.title}</h2><p>{lane.proof}</p><ul>{lane.roles.slice(0, 3).map((role) => <li key={role}>{role}</li>)}</ul></div>
+            <a className="button" href={`/downloads/${lane.file}`} download>Download {lane.title} resume (PDF) <span aria-hidden="true">↓</span></a>
+          </article>)}
+        </div>
+      </div>
+    </section>
+
+    <section className="resume-close dark-section">
+      <div className="shell application-grid">
+        <div><p className="eyebrow light-eyebrow">Next step</p><h2>Continue with proof or start a conversation.</h2><p>Review the shipped product for delivery evidence, or use the hiring brief for the fastest role-fit summary.</p></div>
+        <div className="application-links"><Link href="/work/resale-scanner-pro"><span>Review Resale Scanner Pro</span><span>→</span></Link><Link href="/hiring"><span>Open the hiring-team brief</span><span>→</span></Link><a href="mailto:avergara13@me.com"><span>Email Angel</span><span>→</span></a></div>
+      </div>
+    </section>
   </main>;
 }

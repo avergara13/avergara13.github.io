@@ -42,7 +42,6 @@ export function SiteHeader() {
         </button>
         <div id="primary-navigation" className={`navlinks ${isOpen ? "is-open" : ""}`}>
           <Link href="/#work" onClick={closeMenu}>Work</Link>
-          <Link href="/#experience" onClick={closeMenu}>Experience</Link>
           <Link href="/resume" onClick={closeMenu}>Resume</Link>
           <Link href="/hiring" onClick={closeMenu}>For hiring teams</Link>
           <Link href="/#contact" onClick={closeMenu}>Contact</Link>

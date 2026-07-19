@@ -23,12 +23,6 @@ export const metadata: Metadata = {
 
 const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
 
-const resumeLanes = [
-  { title: "Implementation & Onboarding", copy: "Hospitality technology, SaaS onboarding, customer training, configuration, adoption, and implementation support.", href: implementationResume, tone: "cobalt", recommended: true },
-  { title: "Business Systems & Operations", copy: "Process discovery, requirements, reporting, workforce optimization, operations intelligence, and systems analysis.", href: "/downloads/Angel_Vergara_Resume_Business_Systems_Operations.pdf", tone: "ink" },
-  { title: "AI Workflow & Automation", copy: "Operations-to-AI workflow building, human review, product delivery, recovery logic, and technical documentation.", href: "/downloads/Angel_Vergara_Resume_AI_Workflow_Automation.pdf", tone: "copper" },
-];
-
 const proofItems = [
   ["English + Spanish", "Bilingual communication"],
   ["Operations → systems", "Workflow translation"],
@@ -78,21 +72,29 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="career-bridge-section" aria-labelledby="career-bridge-title">
+      <section id="experience" className="career-bridge-section" aria-labelledby="career-bridge-title">
         <div className="shell career-bridge-grid">
           <div>
-            <p className="eyebrow">Career bridge</p>
+            <p className="eyebrow">Operations to systems</p>
             <h2 id="career-bridge-title">I learned systems by running the work they have to support.</h2>
           </div>
           <div className="career-bridge-copy">
             <p>My path into implementation and systems work started on restaurant floors and in kitchens, where adoption is not theoretical: training has to hold, handoffs have to survive rushes, and tools have to help people make the next decision.</p>
             <p>Progressing from hands-on culinary roles to executive chef and general manager taught me to translate operating pressure into clearer workflows, visible ownership, and usable systems.</p>
-            <div className="career-bridge-proof" aria-label="Transferable operating strengths">
-              <span>Operator perspective</span>
-              <span>Training under pressure</span>
-              <span>Human-centered implementation</span>
-            </div>
           </div>
+        </div>
+        <div className="shell operations-translation" aria-label="How operations experience translates into systems work">
+          <article>
+            <p className="eyebrow">Operating reality</p>
+            <h3>Messy handoffs, hidden exceptions, and pressure that exposes weak systems.</h3>
+            <ul><li>Inventory and vendor pressure</li><li>Training and staffing variability</li><li>Cost, quality, and readiness signals</li></ul>
+          </article>
+          <span aria-hidden="true">→</span>
+          <article>
+            <p className="eyebrow">Systems response</p>
+            <h3>Clear workflows, visible ownership, and human-controlled automation.</h3>
+            <ul><li>Requirements and process mapping</li><li>Training, configuration, and adoption</li><li>Evidence, recovery, and reporting</li></ul>
+          </article>
         </div>
       </section>
 
@@ -127,34 +129,33 @@ export default function Home() {
           <div className="project-grid">
             <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Governed AI-assisted work focused on scope, authority, evidence, and repair—without exposing private implementation details.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
-            <Link className="project-card office-card full-card" href="/work/office-chef"><div><span className="card-tag">Concept · simulated data</span><h3>The Office Chef</h3></div><div><span>Input</span><b>Invoices & vendor changes</b></div><div><span>Analysis</span><b>Food cost & menu margin</b></div><div><span>Output</span><b>Owner-ready operating brief</b></div></Link>
+          </div>
+          <Link className="concept-link" href="/work/office-chef">
+            <span><b>Additional concept:</b> The Office Chef · simulated data</span>
+            <span>Review supporting concept →</span>
+          </Link>
+        </div>
+      </section>
+
+      <section id="contact" className="review-section">
+        <div className="shell application-grid">
+          <div>
+            <p className="eyebrow light-eyebrow">Fast review path · Remote U.S. roles</p>
+            <h2>Resume. Strongest proof. Direct conversation.</h2>
+            <p>Start with the implementation resume, inspect the shipped product, then connect about the operating problem your team needs to solve.</p>
+            <div className="review-meta">
+              <Link href="/hiring">Hiring-team brief →</Link>
+              <a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+              <a href="https://github.com/avergara13" target="_blank" rel="noreferrer">GitHub ↗</a>
+            </div>
+          </div>
+          <div className="application-links">
+            <a href={implementationResume} download><span>Download the recommended resume</span><span>↓</span></a>
+            <Link href="/work/resale-scanner-pro"><span>Review Resale Scanner Pro</span><span>→</span></Link>
+            <a href="mailto:avergara13@me.com"><span>Email Angel</span><span>→</span></a>
           </div>
         </div>
       </section>
-
-      <section id="experience" className="experience-section">
-        <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Experience</p><h2>Operations first. Systems by necessity.</h2></div><p>The systems work is grounded in operating environments where training, inventory, vendors, quality, and customer experience have to work together every day.</p></div>
-          <div className="timeline">
-            <div className="year">Leadership</div><article><h3>Restaurant operations</h3><p>Led day-to-day hospitality work across production, purchasing, inventory, staff training, reporting, and customer experience.</p></article>
-            <div className="year">Delivery</div><article><h3>Kitchen and production systems</h3><p>Built repeatable routines for preparation, ordering, quality, team coordination, and service readiness.</p></article>
-            <div className="year">Foundation</div><article><h3>Culinary operations</h3><p>Progressed through hands-on culinary environments that made clear standards, practical training, and resilient workflows essential.</p></article>
-          </div>
-          <div className="translation-grid"><article><p className="eyebrow">Operating reality</p><h3>Messy handoffs, missing standards, hidden exceptions.</h3><ul><li>Inventory and vendor pressure</li><li>Training and staffing variability</li><li>Cost, quality, and readiness signals</li></ul></article><span aria-hidden="true">→</span><article><p className="eyebrow">Systems response</p><h3>Clear workflows, visible ownership, human-controlled automation.</h3><ul><li>Requirements and process mapping</li><li>Training, configuration, and adoption</li><li>Evidence, recovery, and reporting</li></ul></article></div>
-        </div>
-      </section>
-
-      <section id="resumes" className="resume-section">
-        <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Employer-ready resumes</p><h2>Start with implementation and onboarding.</h2></div><p>One recommended resume leads the experience. Two alternatives are available when the role’s first screen genuinely calls for a different proof order.</p></div>
-          <div className="resume-grid">{resumeLanes.map((lane) => <article className={`resume-card ${lane.tone} ${lane.recommended ? "recommended" : ""}`} key={lane.title}>{lane.recommended && <span className="resume-recommendation">Recommended</span>}<div className="resume-paper" aria-hidden="true"><b>Angel Vergara</b><span>{lane.title}</span><i></i><i></i><i></i><i></i></div><h3>{lane.title}</h3><p>{lane.copy}</p><a href={lane.href} download>Download {lane.title} resume (PDF) <span aria-hidden="true">↓</span></a></article>)}</div>
-          <div className="center-link"><Link className="button" href="/resume">Compare all resume options <span aria-hidden="true">→</span></Link></div>
-        </div>
-      </section>
-
-      <section className="hiring-section"><div className="shell application-grid"><div><p className="eyebrow light-eyebrow">For hiring teams</p><h2>A concise path from role fit to proof.</h2><p>Review the strongest-fit roles, working style, recommended proof sequence, and contact information—without exposing the private application workflow.</p></div><div className="application-links"><Link href="/hiring"><span>View the hiring-team brief</span><span>→</span></Link><Link href="/work/resale-scanner-pro"><span>Review the featured case study</span><span>→</span></Link><a href={implementationResume} download><span>Download the recommended resume</span><span>↓</span></a></div></div></section>
-
-      <section id="contact" className="contact-section"><div className="shell contact-grid"><div><p className="eyebrow">Remote U.S. roles · Orlando, Florida</p><h2>Let’s build systems people trust.</h2><a className="button ink-button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div><div className="contact-links"><a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer"><span>LinkedIn</span><span>↗</span></a><a href="https://github.com/avergara13" target="_blank" rel="noreferrer"><span>GitHub</span><span>↗</span></a><a href="mailto:avergara13@me.com"><span>avergara13@me.com</span><span>→</span></a></div></div></section>
     </main>
   );
 }

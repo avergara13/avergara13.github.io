@@ -36,25 +36,20 @@ const projectData: Record<string, Project> = {
     ],
     facts: [
       { label: "Role", value: "Product design, workflow architecture, implementation, and delivery" },
-      { label: "Status", value: "Public and operational" },
       { label: "Primary user", value: "Reseller making sourcing, pricing, and listing decisions" },
-      { label: "Technology", value: "React, TypeScript, Node, Postgres, AI and marketplace integrations" },
       { label: "Constraint", value: "Uncertainty stays visible and the operator keeps the final decision" },
       { label: "Delivered outcome", value: "Working public product with an evidence-focused employer case study" },
     ],
     workflow: [
       { number: "01", title: "Capture", copy: "Photograph the item and start a session." },
-      { number: "02", title: "Identify", copy: "Extract likely brand, model, category, and condition." },
-      { number: "03", title: "Research", copy: "Review comparable listings and recent sale signals." },
-      { number: "04", title: "Decide", copy: "Compare cost, fees, margin, and confidence." },
-      { number: "05", title: "Prepare", copy: "Generate a draft listing and photo checklist." },
-      { number: "06", title: "Publish", copy: "Move the approved listing into the marketplace." },
-      { number: "07", title: "Track", copy: "Record sold price and feed real outcomes back into judgment." },
+      { number: "02", title: "Research", copy: "Identify the item and review comparable market signals." },
+      { number: "03", title: "Decide", copy: "Compare cost, fees, margin, risk, and confidence." },
+      { number: "04", title: "Prepare", copy: "Create and approve the listing before publication." },
+      { number: "05", title: "Track", copy: "Record outcomes and feed evidence back into judgment." },
     ],
     sections: [
       { number: "02", label: "Shipped interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the public application. They show the live session, listing research, and sold-item evidence loop.", kind: "screens" },
       { number: "03", label: "Decision design", title: "Useful automation has a stopping rule.", copy: "The product is designed around a buy-or-pass decision, not around producing more output. Uncertainty remains visible and the operator stays in control.", kind: "decision" },
-      { number: "04", label: "System view", title: "A product workflow with an evidence spine.", copy: "The implementation joins capture, provider-assisted analysis, market signals, and persistent outcomes behind a mobile interface.", kind: "system" },
     ],
   },
   "loft-os": {
@@ -67,25 +62,20 @@ const projectData: Record<string, Project> = {
     proof: ["Scoped execution", "Human authority", "Evidence chain", "Repair loops"],
     facts: [
       { label: "Role", value: "Systems architecture, governance design, and operating-model documentation" },
-      { label: "Status", value: "Sanitized public case study" },
       { label: "Primary user", value: "Teams coordinating bounded AI-assisted work" },
-      { label: "System form", value: "Intake, scope, authority, evidence, repair, and closeout workflow" },
       { label: "Constraint", value: "Explain the operating pattern without exposing private implementation details" },
       { label: "Delivered outcome", value: "An inspectable employer-facing pattern for accountable delivery" },
     ],
     workflow: [
-      { number: "01", title: "Intake", copy: "Capture the request, owner, desired outcome, and context." },
-      { number: "02", title: "Scope", copy: "Define allowed surfaces, acceptance criteria, and red lines." },
-      { number: "03", title: "Execute", copy: "Change only the authorized, traceable surfaces." },
-      { number: "04", title: "Review", copy: "Inspect behavior, quality, and scope compliance." },
-      { number: "05", title: "Authorize", copy: "Keep high-impact decisions under explicit human control." },
-      { number: "06", title: "Evidence", copy: "Freeze tests, change evidence, and verification records." },
-      { number: "07", title: "Closeout", copy: "Reconcile state, ownership, and the next operating posture." },
+      { number: "01", title: "Intake & scope", copy: "Capture the request, owner, outcome, allowed surfaces, and red lines." },
+      { number: "02", title: "Execute", copy: "Change only the authorized, traceable surfaces." },
+      { number: "03", title: "Review", copy: "Inspect behavior, quality, and scope compliance." },
+      { number: "04", title: "Authorize", copy: "Keep high-impact decisions under explicit human control." },
+      { number: "05", title: "Close out", copy: "Freeze evidence, reconcile state, and confirm ownership." },
     ],
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
-      { number: "03", label: "Risk translation", title: "Turn operational risk into observable controls.", copy: "The architecture converts abstract governance goals into checks a delivery team can understand and repeat.", kind: "decision" },
-      { number: "04", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
+      { number: "03", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
     ],
   },
   "sous-chef": {
@@ -99,24 +89,20 @@ const projectData: Record<string, Project> = {
     links: [{ label: "View public repository", href: "https://github.com/avergara13/sous-chef-app", primary: true }],
     facts: [
       { label: "Role", value: "Product design, domain translation, and implementation" },
-      { label: "Status", value: "Public application repository" },
       { label: "Primary user", value: "Cooks organizing recipes, pantry context, and cooking sessions" },
-      { label: "Product surface", value: "Recipes, cookbooks, pantry signals, and session continuity" },
       { label: "Constraint", value: "Use culinary language and sequences that feel familiar to operators" },
       { label: "Delivered outcome", value: "Inspectable product work grounded in hospitality-domain judgment" },
     ],
     workflow: [
-      { number: "01", title: "Discover", copy: "Start with a dish, ingredient, cuisine, or cooking goal." },
-      { number: "02", title: "Create", copy: "Shape a structured recipe with ingredients and steps." },
-      { number: "03", title: "Organize", copy: "Save reusable work into cookbooks and personal collections." },
-      { number: "04", title: "Prepare", copy: "Connect recipes to pantry and shopping context." },
-      { number: "05", title: "Cook", copy: "Carry the recipe through a focused cooking session." },
-      { number: "06", title: "Remember", copy: "Preserve history so the next session begins with context." },
+      { number: "01", title: "Discover & create", copy: "Start with a cooking goal and shape a structured recipe." },
+      { number: "02", title: "Organize", copy: "Save reusable work into cookbooks and collections." },
+      { number: "03", title: "Prepare", copy: "Connect recipes to pantry and shopping context." },
+      { number: "04", title: "Cook", copy: "Carry the recipe through a focused cooking session." },
+      { number: "05", title: "Remember", copy: "Preserve history so the next session begins with context." },
     ],
     sections: [
       { number: "02", label: "Product surface", title: "A culinary workspace, not a chat box.", copy: "The interface gives recipes, cookbooks, pantry state, and cooking continuity visible places to live.", kind: "screens" },
       { number: "03", label: "Domain translation", title: "Operational experience becomes product judgment.", copy: "Years of kitchen leadership inform the information hierarchy, preparation sequence, and exception handling.", kind: "domain" },
-      { number: "04", label: "Employer relevance", title: "Implementation empathy grounded in real operators.", copy: "Sous Chef shows the ability to translate a familiar domain into structured requirements, a usable interface, and an inspectable public application.", kind: "system" },
     ],
   },
   "office-chef": {
@@ -129,24 +115,19 @@ const projectData: Record<string, Project> = {
     proof: ["Invoice intake", "Vendor deltas", "Food-cost review", "Owner briefing"],
     facts: [
       { label: "Role", value: "Product concept, workflow design, and future-state requirements" },
-      { label: "Status", value: "Concept in design with simulated data" },
       { label: "Primary user", value: "Restaurant owner or operator reviewing back-office signals" },
-      { label: "Product surface", value: "Invoice intake, vendor changes, cost analysis, and operating brief" },
       { label: "Constraint", value: "Demonstrate the workflow without implying a launch or customer deployment" },
       { label: "Delivered outcome", value: "Employer-facing concept showing discovery and requirements thinking" },
     ],
     workflow: [
-      { number: "01", title: "Collect", copy: "Bring invoices and vendor documents into one intake." },
-      { number: "02", title: "Normalize", copy: "Extract products, prices, units, and vendor context." },
-      { number: "03", title: "Compare", copy: "Surface price changes and unusual purchasing signals." },
-      { number: "04", title: "Analyze", copy: "Connect costs to inventory and menu-margin assumptions." },
-      { number: "05", title: "Review", copy: "Keep the operator responsible for exceptions and approvals." },
-      { number: "06", title: "Brief", copy: "Produce a concise operating summary with next actions." },
+      { number: "01", title: "Collect", copy: "Bring invoices into one intake and normalize vendor data." },
+      { number: "02", title: "Compare", copy: "Surface price changes and unusual purchasing signals." },
+      { number: "03", title: "Analyze & review", copy: "Connect costs to menu assumptions while keeping human approval." },
+      { number: "04", title: "Brief", copy: "Produce a concise operating summary with next actions." },
     ],
     sections: [
       { number: "02", label: "Operating problem", title: "Back-office signals arrive too late and in too many places.", copy: "The concept begins with the actual friction: invoice piles, price surprises, manual spreadsheets, and no shared daily picture.", kind: "domain" },
       { number: "03", label: "Concept dashboard", title: "Make the exception visible before it becomes a surprise.", copy: "The sample view uses simulated data to demonstrate a future-state operating experience without implying a launched product or customer deployment.", kind: "decision" },
-      { number: "04", label: "Employer relevance", title: "Discovery, requirements, and adoption thinking in one case.", copy: "The Office Chef shows how Angel maps an operating problem, defines a bounded workflow, and communicates a practical implementation direction.", kind: "system" },
     ],
   },
 };
@@ -252,25 +233,27 @@ export function ProjectCase({ project }: { project: Project }) {
         </div>
       </section>
 
-      <div className="case-proofbar"><div className="shell">{project.proof.map((item) => <div key={item}><b>{item}</b></div>)}</div></div>
-
-      <section id="project-facts" className="case-facts-section" aria-label={`${project.title} project facts`}>
+      <section id="project-facts" className="case-evidence-section" aria-label={`${project.title} evidence summary`}>
         <div className="shell">
+          <div className="case-evidence-head">
+            <p className="eyebrow">Evidence summary</p>
+            <div className="case-proof-list">{project.proof.map((item) => <span key={item}>{item}</span>)}</div>
+          </div>
           <div className="case-facts-grid">
             {project.facts.map((fact) => <div key={fact.label}><span>{fact.label}</span><b>{fact.value}</b></div>)}
           </div>
         </div>
       </section>
 
-      <section className="workflow-section dark-section">
+      <section id="workflow" className="workflow-section dark-section">
         <div className="shell">
           <div className="split-head"><div><p className="eyebrow">01 · Product workflow</p><h2>{project.slug === "resale-scanner-pro" ? "From uncertainty to an informed listing." : project.slug === "loft-os" ? "A workflow that knows when to stop." : project.slug === "sous-chef" ? "From inspiration to kitchen continuity." : "From paperwork to an operating signal."}</h2></div><p>The sequence separates observation, assisted work, and human judgment. Each stage produces usable context for the next.</p></div>
-          <div className="workflow-steps">{project.workflow.map((step, index) => <article className={index === 3 ? "active-step" : ""} key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div>
+          <div className="workflow-steps">{project.workflow.map((step, index) => <article className={index === Math.floor(project.workflow.length / 2) ? "active-step" : ""} key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div>
         </div>
       </section>
 
       {project.sections.map((section, index) => (
-        <section className={`case-section ${index === 1 ? "tinted-section" : ""} ${index === 2 ? "blue-section" : ""}`} key={section.number}>
+        <section className={`case-section ${index === 1 && section.kind !== "boundary" ? "tinted-section" : ""} ${section.kind === "boundary" ? "blue-section" : ""}`} key={section.number}>
           <div className="shell">
             <div className="split-head"><div><p className="eyebrow">{section.number} · {section.label}</p><h2>{section.title}</h2></div><p>{section.copy}</p></div>
             <SectionVisual project={project} kind={section.kind} />
@@ -278,8 +261,8 @@ export function ProjectCase({ project }: { project: Project }) {
         </section>
       ))}
 
-      <section className="employer-relevance">
-        <div className="shell centered-copy"><p className="eyebrow">Employer relevance</p><h2>{project.slug === "resale-scanner-pro" ? "Product thinking, workflow design, and hands-on delivery." : project.slug === "loft-os" ? "Architecture that survives contact with operations." : project.slug === "sous-chef" ? "Domain knowledge translated into usable software." : "Business-process discovery made tangible."}</h2><p>{project.title} demonstrates Angel’s ability to connect ambiguous operating work to clear requirements, visible decisions, practical controls, and an understandable delivery story.</p><div className="actions centered-actions"><Link className="button primary" href="/#work">View all work <span aria-hidden="true">→</span></Link><Link className="button" href="/resume">Choose a resume <span aria-hidden="true">→</span></Link></div></div>
+      <section id="next-step" className="case-next-step">
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the recommended resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
       </section>
     </main>
   );

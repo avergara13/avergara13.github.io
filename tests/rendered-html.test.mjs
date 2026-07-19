@@ -17,9 +17,12 @@ test("home leads with recruiter-first positioning and an above-fold resume actio
   assert.match(html, /Public proof boundary/);
   assert.match(html, /I learned systems by running the work they have to support./);
   assert.match(html, /executive chef and general manager/);
+  assert.match(html, /Fast review path/);
   assert.match(html, /href="\/hiring\/"/);
   assert.match(html, /aria-controls="primary-navigation"/);
   assert.match(html, /aria-label="Open navigation menu"/);
+  assert.doesNotMatch(html, />Experience<\/a>/);
+  assert.doesNotMatch(html, /Compare all resume options/);
 });
 
 test("public pages keep private application systems out while exposing the approved product repository", async () => {
@@ -42,28 +45,35 @@ test("case studies expose confirmed project facts without invented metrics", asy
   assert.match(html, /Product design, workflow architecture, implementation, and delivery/);
   assert.match(html, /Working public product with an evidence-focused employer case study/);
   assert.match(html, /View source repository/);
+  assert.match(html, /Evidence summary/);
+  assert.match(html, /Connect the proof to the role/);
+  assert.doesNotMatch(html, /A product workflow with an evidence spine/);
   assert.doesNotMatch(html, /customers|revenue|conversion rate|deployment count/i);
 });
 
 test("resume links are explicit and the recommended lane is unmistakable", async () => {
   const html = (await readOutput("resume/index.html")).replaceAll("<!-- -->", "");
 
+  assert.match(html, /Start with implementation and onboarding/);
   assert.match(html, /Recommended first choice/);
-  assert.match(html, /Download Implementation &amp; Onboarding resume \(PDF\)/);
+  assert.match(html, /Download recommended resume \(PDF\)/);
   assert.match(html, /Download Business Systems &amp; Operations resume \(PDF\)/);
   assert.match(html, /Download AI Workflow &amp; Automation resume \(PDF\)/);
   assert.match(html, /href="\/hiring\/"/);
+  assert.doesNotMatch(html, /The shared evidence spine|Need the short version/);
 });
 
 test("hiring brief provides role fit, proof sequence, and direct contact", async () => {
   const html = await readOutput("hiring/index.html");
 
-  assert.match(html, /Where the evidence converts fastest\./);
+  assert.match(html, /Where the experience converts fastest\./);
   assert.match(html, /Implementation &amp; onboarding/i);
   assert.match(html, /Business systems &amp; operations/i);
   assert.match(html, /Technical customer success/i);
-  assert.match(html, /Resale Scanner Pro case study/);
+  assert.match(html, /Recommended proof path/);
+  assert.match(html, /Resale Scanner Pro/);
   assert.match(html, /mailto:avergara13@me\.com/);
+  assert.doesNotMatch(html, /Recommended review path/);
 });
 
 test("search metadata is complete and canonical", async () => {
