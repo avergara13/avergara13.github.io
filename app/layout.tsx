@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://avergara13.github.io"),
   title: { default: "Angel Vergara — Portfolio", template: "%s" },
   description: "Implementation, operations systems, and human-controlled AI workflow portfolio by Angel Vergara.",
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
   openGraph: { type: "website", title: "Angel Vergara — Systems people can actually use.", description: "Shipped products, practical implementation systems, and human-controlled AI workflows.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems people can actually use." }] },
   twitter: { card: "summary_large_image", title: "Angel Vergara — Systems people can actually use.", description: "Shipped products, practical implementation systems, and human-controlled AI workflows.", images: ["/og.png"] },
 };
