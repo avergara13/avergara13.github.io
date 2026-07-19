@@ -10,7 +10,7 @@ const readOutput = (path) => readFile(new URL(path, output), "utf8");
 test("home leads with recruiter-first positioning and an above-fold resume action", async () => {
   const html = await readOutput("index.html");
 
-  assert.match(html, /Bilingual operations leader building systems teams can actually adopt\./);
+  assert.match(html, /Operations leader building systems teams can actually adopt\./);
   assert.match(html, /Download implementation resume/);
   assert.match(html, /Angel_Vergara_Resume_Implementation_Onboarding\.pdf/);
   assert.match(html, /Featured live product/);
@@ -118,9 +118,9 @@ test("downloadable resumes use the audited, conservative evidence spine", async 
     "public/downloads/Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
   ];
 
-  assert.match(generator, /BILINGUAL HOSPITALITY OPERATIONS LEADER \| IMPLEMENTATION & ONBOARDING/);
+  assert.match(generator, /HOSPITALITY OPERATIONS LEADER \| IMPLEMENTATION & ONBOARDING/);
   assert.match(generator, /OPERATIONS-TO-AI WORKFLOW BUILDER \| SHIPPED PRODUCT & GOVERNED SYSTEMS/);
-  assert.match(generator, /BUSINESS SYSTEMS & OPERATIONS/);
+  assert.match(generator, /"headline": "BUSINESS SYSTEMS & OPERATIONS LEADER"/);
   assert.match(generator, /Executive Chef, May-Dec 2018 \| General Manager, Jan 2019-Dec 2022/);
   assert.match(generator, /closure administration and independent consulting through Jan 2024/);
   assert.doesNotMatch(generator, /15\+ years|bookkeeping support|Valencia Community College|github\.com\/avergara13\/resale-scanner-pro/i);

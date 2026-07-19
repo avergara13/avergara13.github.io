@@ -52,7 +52,7 @@ EDUCATION = [
 RESUMES = [
     {
         "filename": "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
-        "headline": "BILINGUAL HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
+        "headline": "HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
         "profile": (
             "Bilingual hospitality operations leader and implementation-focused systems builder. "
             "Translates frontline complexity into clear workflows, usable tools, customer training, and accountable adoption. "
@@ -72,7 +72,7 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
-        "headline": "BILINGUAL OPERATIONS LEADER | BUSINESS SYSTEMS & OPERATIONS",
+        "headline": "BUSINESS SYSTEMS & OPERATIONS LEADER",
         "profile": (
             "Bilingual operations leader and systems builder who turns operating problems into clear requirements, workflows, and usable tools. "
             "Combines frontline hospitality judgment with process mapping, reporting, documentation, and hands-on product delivery."

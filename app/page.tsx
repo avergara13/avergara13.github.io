@@ -43,7 +43,7 @@ export default function Home() {
           <div className="hero-grid">
             <div className="hero-copy">
               <p className="eyebrow"><span className="desktop-only">Implementation & onboarding · operations systems</span><span className="mobile-only">Implementation & onboarding</span></p>
-              <h1 id="hero-title"><span className="desktop-only">Bilingual operations leader building systems teams can actually adopt.</span><span className="mobile-only">Operations leadership built for adoption.</span></h1>
+              <h1 id="hero-title"><span className="desktop-only">Operations leader building systems teams can actually adopt.</span><span className="mobile-only">Operations leadership built for adoption.</span></h1>
               <p className="lede"><span className="desktop-only">I turn frontline complexity into clear workflows, usable tools, and accountable implementation—grounded in hospitality operations and hands-on product building.</span><span className="mobile-only">Bilingual hospitality operator and systems builder turning frontline complexity into workflows teams can use.</span></p>
               <div className="actions hero-actions">
                 <a className="button primary" href={implementationResume} download>
