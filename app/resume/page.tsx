@@ -5,6 +5,19 @@ export const metadata: Metadata = {
   title: "Resumes — Angel Vergara",
   description: "Three ATS-readable resume lanes for implementation, business systems, and AI workflow roles.",
   alternates: { canonical: "/resume/" },
+  openGraph: {
+    type: "website",
+    url: "/resume/",
+    title: "Angel Vergara — Resume Suite",
+    description: "Three ATS-readable resume lanes with one consistent, evidence-backed career story.",
+    images: [{ url: "/og-resume.png", width: 1200, height: 630, alt: "Angel Vergara resume suite" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Angel Vergara — Resume Suite",
+    description: "Three ATS-readable resume lanes with one consistent, evidence-backed career story.",
+    images: ["/og-resume.png"],
+  },
 };
 
 const lanes = [

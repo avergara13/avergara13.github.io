@@ -28,11 +28,11 @@ LINE = colors.HexColor("#CED3DC")
 
 COMMON_EXPERIENCE = [
     (
-        "Hospitality Operations Leadership | Orlando, Florida",
+        "Cafe Linger | Executive Chef, May-Dec 2018 | General Manager, Jan 2019-Dec 2022",
         [
             "Led day-to-day work across production, purchasing, inventory, staff training, reporting, and customer experience.",
             "Built repeatable routines for ordering, preparation, quality, service readiness, and team handoffs.",
-            "Translated operating friction into clearer checklists, decision points, and practical systems for the team.",
+            "Continued paid closure administration and independent consulting through Jan 2024.",
         ],
     ),
     (
@@ -72,7 +72,7 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
-        "headline": "BILINGUAL OPERATIONS LEADER | BUSINESS SYSTEMS & ANALYSIS",
+        "headline": "BILINGUAL OPERATIONS LEADER | BUSINESS SYSTEMS & OPERATIONS",
         "profile": (
             "Bilingual operations leader and systems builder who turns operating problems into clear requirements, workflows, and usable tools. "
             "Combines frontline hospitality judgment with process mapping, reporting, documentation, and hands-on product delivery."

@@ -6,6 +6,19 @@ export const metadata: Metadata = {
   title: "Angel Vergara — Implementation & Onboarding",
   description: "Bilingual hospitality operations leader and implementation-focused systems builder with shipped product and workflow-delivery proof.",
   alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: "Angel Vergara — Systems teams can actually adopt.",
+    description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.",
+    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara — Systems teams can actually adopt." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Angel Vergara — Systems teams can actually adopt.",
+    description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.",
+    images: ["/og-home.png"],
+  },
 };
 
 const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
@@ -61,6 +74,24 @@ export default function Home() {
             <div><b>Recommended path</b><span>Resume → strongest case study → direct contact</span></div>
             <div><b>Clear labels</b><span>Live product · public source · concept</span></div>
             <div><b>Fast scan</b><span>Identity, fit, proof, and action above the fold</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="career-bridge-section" aria-labelledby="career-bridge-title">
+        <div className="shell career-bridge-grid">
+          <div>
+            <p className="eyebrow">Career bridge</p>
+            <h2 id="career-bridge-title">I learned systems by running the work they have to support.</h2>
+          </div>
+          <div className="career-bridge-copy">
+            <p>My path into implementation and systems work started on restaurant floors and in kitchens, where adoption is not theoretical: training has to hold, handoffs have to survive rushes, and tools have to help people make the next decision.</p>
+            <p>Progressing from hands-on culinary roles to executive chef and general manager taught me to translate operating pressure into clearer workflows, visible ownership, and usable systems.</p>
+            <div className="career-bridge-proof" aria-label="Transferable operating strengths">
+              <span>Operator perspective</span>
+              <span>Training under pressure</span>
+              <span>Human-centered implementation</span>
+            </div>
           </div>
         </div>
       </section>

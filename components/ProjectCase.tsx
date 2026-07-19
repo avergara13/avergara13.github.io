@@ -10,6 +10,7 @@ export type Project = {
   statusTone: "green" | "cobalt" | "copper";
   proof: string[];
   links?: { label: string; href: string; primary?: boolean }[];
+  facts: { label: string; value: string }[];
   workflow: { number: string; title: string; copy: string }[];
   sections: {
     number: string;
@@ -29,7 +30,18 @@ const projectData: Record<string, Project> = {
     status: "Public and operational",
     statusTone: "green",
     proof: ["Photo → decision", "Human gates", "Market evidence", "Live product"],
-    links: [{ label: "Open live product", href: "https://resale-scanner-pro-production.up.railway.app", primary: true }],
+    links: [
+      { label: "Open live product", href: "https://resale-scanner-pro-production.up.railway.app", primary: true },
+      { label: "View source repository", href: "https://github.com/avergara13/resale-scanner-pro" },
+    ],
+    facts: [
+      { label: "Role", value: "Product design, workflow architecture, implementation, and delivery" },
+      { label: "Status", value: "Public and operational" },
+      { label: "Primary user", value: "Reseller making sourcing, pricing, and listing decisions" },
+      { label: "Technology", value: "React, TypeScript, Node, Postgres, AI and marketplace integrations" },
+      { label: "Constraint", value: "Uncertainty stays visible and the operator keeps the final decision" },
+      { label: "Delivered outcome", value: "Working public product with an evidence-focused employer case study" },
+    ],
     workflow: [
       { number: "01", title: "Capture", copy: "Photograph the item and start a session." },
       { number: "02", title: "Identify", copy: "Extract likely brand, model, category, and condition." },
@@ -53,6 +65,14 @@ const projectData: Record<string, Project> = {
     status: "Sanitized by design",
     statusTone: "copper",
     proof: ["Scoped execution", "Human authority", "Evidence chain", "Repair loops"],
+    facts: [
+      { label: "Role", value: "Systems architecture, governance design, and operating-model documentation" },
+      { label: "Status", value: "Sanitized public case study" },
+      { label: "Primary user", value: "Teams coordinating bounded AI-assisted work" },
+      { label: "System form", value: "Intake, scope, authority, evidence, repair, and closeout workflow" },
+      { label: "Constraint", value: "Explain the operating pattern without exposing private implementation details" },
+      { label: "Delivered outcome", value: "An inspectable employer-facing pattern for accountable delivery" },
+    ],
     workflow: [
       { number: "01", title: "Intake", copy: "Capture the request, owner, desired outcome, and context." },
       { number: "02", title: "Scope", copy: "Define allowed surfaces, acceptance criteria, and red lines." },
@@ -77,6 +97,14 @@ const projectData: Record<string, Project> = {
     statusTone: "cobalt",
     proof: ["Domain-first UX", "Recipe workflows", "Pantry signals", "AI-assisted creation"],
     links: [{ label: "View public repository", href: "https://github.com/avergara13/sous-chef-app", primary: true }],
+    facts: [
+      { label: "Role", value: "Product design, domain translation, and implementation" },
+      { label: "Status", value: "Public application repository" },
+      { label: "Primary user", value: "Cooks organizing recipes, pantry context, and cooking sessions" },
+      { label: "Product surface", value: "Recipes, cookbooks, pantry signals, and session continuity" },
+      { label: "Constraint", value: "Use culinary language and sequences that feel familiar to operators" },
+      { label: "Delivered outcome", value: "Inspectable product work grounded in hospitality-domain judgment" },
+    ],
     workflow: [
       { number: "01", title: "Discover", copy: "Start with a dish, ingredient, cuisine, or cooking goal." },
       { number: "02", title: "Create", copy: "Shape a structured recipe with ingredients and steps." },
@@ -99,6 +127,14 @@ const projectData: Record<string, Project> = {
     status: "Concept in design · simulated data",
     statusTone: "copper",
     proof: ["Invoice intake", "Vendor deltas", "Food-cost review", "Owner briefing"],
+    facts: [
+      { label: "Role", value: "Product concept, workflow design, and future-state requirements" },
+      { label: "Status", value: "Concept in design with simulated data" },
+      { label: "Primary user", value: "Restaurant owner or operator reviewing back-office signals" },
+      { label: "Product surface", value: "Invoice intake, vendor changes, cost analysis, and operating brief" },
+      { label: "Constraint", value: "Demonstrate the workflow without implying a launch or customer deployment" },
+      { label: "Delivered outcome", value: "Employer-facing concept showing discovery and requirements thinking" },
+    ],
     workflow: [
       { number: "01", title: "Collect", copy: "Bring invoices and vendor documents into one intake." },
       { number: "02", title: "Normalize", copy: "Extract products, prices, units, and vendor context." },
@@ -217,6 +253,14 @@ export function ProjectCase({ project }: { project: Project }) {
       </section>
 
       <div className="case-proofbar"><div className="shell">{project.proof.map((item) => <div key={item}><b>{item}</b></div>)}</div></div>
+
+      <section id="project-facts" className="case-facts-section" aria-label={`${project.title} project facts`}>
+        <div className="shell">
+          <div className="case-facts-grid">
+            {project.facts.map((fact) => <div key={fact.label}><span>{fact.label}</span><b>{fact.value}</b></div>)}
+          </div>
+        </div>
+      </section>
 
       <section className="workflow-section dark-section">
         <div className="shell">

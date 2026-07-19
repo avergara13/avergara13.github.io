@@ -15,12 +15,14 @@ test("home leads with recruiter-first positioning and an above-fold resume actio
   assert.match(html, /Angel_Vergara_Resume_Implementation_Onboarding\.pdf/);
   assert.match(html, /Featured live product/);
   assert.match(html, /Public proof boundary/);
+  assert.match(html, /I learned systems by running the work they have to support./);
+  assert.match(html, /executive chef and general manager/);
   assert.match(html, /href="\/hiring\/"/);
   assert.match(html, /aria-controls="primary-navigation"/);
   assert.match(html, /aria-label="Open navigation menu"/);
 });
 
-test("public pages do not expose the private application system or the unfeatured product repository", async () => {
+test("public pages keep private application systems out while exposing the approved product repository", async () => {
   const pages = await Promise.all([
     readOutput("index.html"),
     readOutput("resume/index.html"),
@@ -30,8 +32,17 @@ test("public pages do not expose the private application system or the unfeature
   const html = pages.join("\n");
 
   assert.doesNotMatch(html, /application-kit|Application quickstart|Cover-letter kit|application-dashboard/i);
-  assert.doesNotMatch(html, /github\.com\/avergara13\/resale-scanner-pro/i);
+  assert.match(html, /github\.com\/avergara13\/resale-scanner-pro/);
   assert.doesNotMatch(html, /15\+ years|FIU · CIA · Valencia/i);
+});
+
+test("case studies expose confirmed project facts without invented metrics", async () => {
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+
+  assert.match(html, /Product design, workflow architecture, implementation, and delivery/);
+  assert.match(html, /Working public product with an evidence-focused employer case study/);
+  assert.match(html, /View source repository/);
+  assert.doesNotMatch(html, /customers|revenue|conversion rate|deployment count/i);
 });
 
 test("resume links are explicit and the recommended lane is unmistakable", async () => {
@@ -69,6 +80,14 @@ test("search metadata is complete and canonical", async () => {
   assert.match(resume, /rel="canonical" href="https:\/\/avergara13\.github\.io\/resume\/"/);
   assert.match(hiring, /rel="canonical" href="https:\/\/avergara13\.github\.io\/hiring\/"/);
   assert.match(caseStudy, /rel="canonical" href="https:\/\/avergara13\.github\.io\/work\/resale-scanner-pro\/"/);
+  assert.match(home, /property="og:url" content="https:\/\/avergara13\.github\.io\/"/);
+  assert.match(resume, /property="og:url" content="https:\/\/avergara13\.github\.io\/resume\/"/);
+  assert.match(hiring, /property="og:url" content="https:\/\/avergara13\.github\.io\/hiring\/"/);
+  assert.match(caseStudy, /property="og:url" content="https:\/\/avergara13\.github\.io\/work\/resale-scanner-pro\/"/);
+  assert.match(home, /og-home\.png/);
+  assert.match(resume, /og-resume\.png/);
+  assert.match(hiring, /og-hiring\.png/);
+  assert.match(caseStudy, /og-resale-scanner-pro\.png/);
   assert.match(home, /application\/ld\+json/);
   assert.match(home, /"@type":"Person"/);
   assert.match(robots, /Sitemap: https:\/\/avergara13\.github\.io\/sitemap\.xml/);
@@ -101,7 +120,10 @@ test("downloadable resumes use the audited, conservative evidence spine", async 
 
   assert.match(generator, /BILINGUAL HOSPITALITY OPERATIONS LEADER \| IMPLEMENTATION & ONBOARDING/);
   assert.match(generator, /OPERATIONS-TO-AI WORKFLOW BUILDER \| SHIPPED PRODUCT & GOVERNED SYSTEMS/);
-  assert.doesNotMatch(generator, /15\+ years|Cafe Linger|bookkeeping support|Valencia Community College|github\.com\/avergara13\/resale-scanner-pro/i);
+  assert.match(generator, /BUSINESS SYSTEMS & OPERATIONS/);
+  assert.match(generator, /Executive Chef, May-Dec 2018 \| General Manager, Jan 2019-Dec 2022/);
+  assert.match(generator, /closure administration and independent consulting through Jan 2024/);
+  assert.doesNotMatch(generator, /15\+ years|bookkeeping support|Valencia Community College|github\.com\/avergara13\/resale-scanner-pro/i);
 
   for (const path of files) {
     const details = await stat(new URL(path, root));

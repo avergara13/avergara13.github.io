@@ -5,6 +5,19 @@ export const metadata: Metadata = {
   title: "For Hiring Teams — Angel Vergara",
   description: "A concise hiring brief covering Angel Vergara's strongest role fit, working style, proof sequence, and contact information.",
   alternates: { canonical: "/hiring/" },
+  openGraph: {
+    type: "website",
+    url: "/hiring/",
+    title: "Angel Vergara — For Hiring Teams",
+    description: "Operations credibility, implementation discipline, and usable systems—with a concise review path.",
+    images: [{ url: "/og-hiring.png", width: 1200, height: 630, alt: "Angel Vergara hiring-team brief" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Angel Vergara — For Hiring Teams",
+    description: "Operations credibility, implementation discipline, and usable systems—with a concise review path.",
+    images: ["/og-hiring.png"],
+  },
 };
 
 const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
