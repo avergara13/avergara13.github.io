@@ -46,6 +46,72 @@ SOUTHERN_SWANK_TITLE = "Southern Swank Kitchen - Head Chef | Davie, FL | Jul 201
 
 RESUMES = [
     {
+        # PUBLIC DEFAULT — the broad General Resume served by the site's primary
+        # Download Resume action. Derived from the canonical General Resume Base
+        # (downstream of the Master Resume + Career Evidence Ledger); the three
+        # targeted lanes below remain the application-specific variants.
+        "filename": "Angel_Vergara_Resume_General.pdf",
+        "headline": "HOSPITALITY TECHNOLOGY & OPERATIONS | IMPLEMENTATION, BUSINESS SYSTEMS & AI WORKFLOWS",
+        "profile": (
+            "Bilingual hospitality operations leader and systems builder with verified Executive Chef to General "
+            "Manager progression. Translates frontline operating pressure into clear requirements, repeatable "
+            "workflows, practical tools, and confident adoption - spanning business-process mapping, operational "
+            "reporting, implementation support, and human-controlled AI-assisted workflow design. Builds from real "
+            "operating friction, with working application and systems proof and a clear boundary between employment "
+            "experience and personal project evidence."
+        ),
+        "strengths": (
+            "Operations leadership & training | business-process mapping | requirements gathering | "
+            "implementation & adoption support | workflow and exception design | operational reporting (inventory, "
+            "food cost, vendor pricing, payroll, P&L awareness) | human-in-the-loop AI workflow design | "
+            "LLM API integration | documentation & handoffs | vendor & purchasing coordination | "
+            "bilingual English/Spanish"
+        ),
+        "projects": [
+            "Hobbyst Resale - Active family resale venture: sourcing, inventory, pricing, listings, sales, shipping, "
+            "marketplace workflows, KPI tracking, and automation.",
+            "Resale Scanner Pro - Working personal AI-assisted application used in the family resale workflow: item "
+            "capture, AI-assisted identification, market research, BUY / MAYBE / PASS decision support, listing "
+            "preparation, publishing, and operating records.",
+            "Loft OS - Governed autonomous AI workflows (public-safe case study): scoped tasks, role-separated "
+            "agents, human approval gates, evidence-backed review, and deterministic closeout.",
+            "Sous Chef - Public AI-assisted culinary workspace: authenticated recipe workflows, pantry and inventory "
+            "signals, cookbooks, and cooking-session history.",
+        ],
+        "experience": [
+            (
+                CAFE_LINGER_TITLE,
+                [
+                    "Became General Manager in Jan 2019 as administrative and financial responsibilities expanded beyond culinary leadership.",
+                    "Led production, purchasing, inventory, vendors, scheduling, training, POS reporting, payroll-data review, QuickBooks workflows, P&L review, compliance, and customer experience.",
+                    "Continued paid closure administration and restaurant consulting through Jan 2024 after operations ended in Dec 2022.",
+                ],
+            ),
+            (
+                FARM_HAUS_TITLE,
+                [
+                    "Helped establish the kitchen workflow, then led culinary execution, production, ordering, food quality, and team coordination while partnering with ownership on operating consistency and growth support.",
+                ],
+            ),
+            (
+                SOUTHERN_SWANK_TITLE,
+                [
+                    "Built opening-stage menu and recipe systems; hired, trained, and scheduled approximately 12 employees for a roughly 200-seat venue.",
+                ],
+            ),
+            (
+                "Earlier Culinary Experience & Leadership | Florida and Massachusetts",
+                [
+                    "Progressed from line and pastry work into Sous Chef and Head Chef responsibilities across high-volume restaurants, openings, and hotel operations.",
+                ],
+            ),
+        ],
+        "tools": (
+            "Notion | Excel & spreadsheets | Git and GitHub | Railway | Supabase integration | Postgres/SQL exposure | "
+            "React | TypeScript | Node/Express | Gemini | Claude API | n8n-style automation"
+        ),
+    },
+    {
         "filename": "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
         "headline": "HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
         "profile": (

@@ -262,7 +262,7 @@ export function ProjectCase({ project }: { project: Project }) {
       ))}
 
       <section id="next-step" className="case-next-step">
-        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the recommended resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
       </section>
     </main>
   );

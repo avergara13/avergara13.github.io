@@ -11,8 +11,9 @@ test("home leads with recruiter-first positioning and an above-fold resume actio
   const html = await readOutput("index.html");
 
   assert.match(html, /Operations leader building systems teams can actually adopt\./);
-  assert.match(html, /Download implementation resume/);
-  assert.match(html, /Angel_Vergara_Resume_Implementation_Onboarding\.pdf/);
+  assert.match(html, /Download resume \(PDF\)/);
+  assert.match(html, /Angel_Vergara_Resume_General\.pdf/);
+  assert.doesNotMatch(html, /Download implementation resume/);
   assert.match(html, /Featured live product/);
   assert.match(html, /Public proof boundary/);
   assert.match(html, /I learned systems by running the work they have to support./);
@@ -96,9 +97,11 @@ test("case studies expose confirmed project facts without invented metrics", asy
 test("resume links are explicit and the recommended lane is unmistakable", async () => {
   const html = (await readOutput("resume/index.html")).replaceAll("<!-- -->", "");
 
-  assert.match(html, /Start with implementation and onboarding/);
-  assert.match(html, /Recommended first choice/);
-  assert.match(html, /Download recommended resume \(PDF\)/);
+  assert.match(html, /Start with the General Resume/);
+  assert.match(html, /Default — start here/);
+  assert.match(html, /Download General Resume \(PDF\)/);
+  assert.match(html, /Angel_Vergara_Resume_General\.pdf/);
+  assert.match(html, /Download Implementation &amp; Onboarding resume \(PDF\)/);
   assert.match(html, /Download Business Systems &amp; Operations resume \(PDF\)/);
   assert.match(html, /Download AI Workflow &amp; Automation resume \(PDF\)/);
   assert.match(html, /href="\/hiring\/"/);
@@ -203,11 +206,15 @@ test("starter-template residue stays removed from the source tree", async () => 
 test("downloadable resumes carry the corrected canonical evidence spine", async () => {
   const generator = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
   const files = [
+    "public/downloads/Angel_Vergara_Resume_General.pdf",
     "public/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf",
     "public/downloads/Angel_Vergara_Resume_Business_Systems_Operations.pdf",
     "public/downloads/Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
   ];
 
+  assert.match(generator, /HOSPITALITY TECHNOLOGY & OPERATIONS \| IMPLEMENTATION, BUSINESS SYSTEMS & AI WORKFLOWS/);
+  assert.match(generator, /Angel_Vergara_Resume_General\.pdf/);
+  assert.match(generator, /Hobbyst Resale - Active family resale venture/);
   assert.match(generator, /HOSPITALITY OPERATIONS LEADER \| IMPLEMENTATION & ONBOARDING/);
   assert.match(generator, /OPERATIONS LEADER \| BUSINESS SYSTEMS & OPERATIONS/);
   assert.match(generator, /OPERATIONS-TO-AI WORKFLOW BUILDER \| APPLIED AI WORKFLOWS & GOVERNED SYSTEMS/);

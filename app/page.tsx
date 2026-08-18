@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
+const generalResume = "/downloads/Angel_Vergara_Resume_General.pdf";
 
 const proofItems = [
   ["English + Spanish", "Bilingual communication"],
@@ -40,8 +40,8 @@ export default function Home() {
               <h1 id="hero-title"><span className="desktop-only">Operations leader building systems teams can actually adopt.</span><span className="mobile-only">Operations leadership built for adoption.</span></h1>
               <p className="lede"><span className="desktop-only">I turn frontline complexity into clear workflows, usable tools, and accountable implementation—grounded in hospitality operations and hands-on product building.</span><span className="mobile-only">Bilingual hospitality operator and systems builder turning frontline complexity into workflows teams can use.</span></p>
               <div className="actions hero-actions">
-                <a className="button primary" href={implementationResume} download>
-                  Download implementation resume <span aria-hidden="true">↓</span>
+                <a className="button primary" href={generalResume} download>
+                  Download resume (PDF) <span aria-hidden="true">↓</span>
                 </a>
                 <Link className="button" href="/work/resale-scanner-pro">
                   <span className="desktop-only">View Resale Scanner Pro</span><span className="mobile-only">View featured work</span> <span aria-hidden="true">→</span>
@@ -142,7 +142,7 @@ export default function Home() {
           <div>
             <p className="eyebrow light-eyebrow">Fast review path · Remote U.S. roles</p>
             <h2>Resume. Strongest proof. Direct conversation.</h2>
-            <p>Start with the implementation resume, inspect the live product, then connect about the operating problem your team needs to solve.</p>
+            <p>Start with the resume, inspect the live product, then connect about the operating problem your team needs to solve.</p>
             <div className="review-meta">
               <Link href="/hiring">Hiring-team brief →</Link>
               <a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer">LinkedIn ↗</a>
@@ -150,7 +150,7 @@ export default function Home() {
             </div>
           </div>
           <div className="application-links">
-            <a href={implementationResume} download><span>Download the recommended resume</span><span>↓</span></a>
+            <a href={generalResume} download><span>Download the resume (PDF)</span><span>↓</span></a>
             <Link href="/work/resale-scanner-pro"><span>Review Resale Scanner Pro</span><span>→</span></Link>
             <a href="mailto:avergara13@me.com"><span>Email Angel</span><span>→</span></a>
           </div>

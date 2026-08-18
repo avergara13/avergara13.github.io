@@ -273,6 +273,7 @@ section { padding:96px 0; }
 .alternate-resume-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
 .alternate-resume-card { display:grid; grid-template-columns:62px 1fr; gap:26px; align-items:start; padding:30px; border:1px solid var(--line); border-top:5px solid var(--ink); background:var(--white); }
 .alternate-resume-card.copper { border-top-color:var(--copper); }
+.alternate-resume-card.cobalt { border-top-color:var(--cobalt); }
 .alternate-resume-card h2 { font-size:2.15rem; margin:14px 0; }
 .alternate-resume-card p,.alternate-resume-card ul { color:var(--muted); }
 .alternate-resume-card .button { grid-column:2; justify-self:start; }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const resumeHref = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
+const resumeHref = "/downloads/Angel_Vergara_Resume_General.pdf";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
