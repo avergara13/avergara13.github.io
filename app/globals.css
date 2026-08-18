@@ -33,8 +33,11 @@ main[data-section="work-office-chef"] { --accent:var(--ink); }
 main[data-section]::before { content:""; display:block; height:4px; background:var(--accent); }
 main[data-section] .eyebrow:not(.light-eyebrow) { color:var(--accent); }
 main[data-section] .dark-section .eyebrow:not(.light-eyebrow),
-main[data-section] .blue-section .eyebrow:not(.light-eyebrow),
 main[data-section] .app-hero .eyebrow:not(.light-eyebrow) { color:#ffb29d; }
+/* Cobalt backgrounds need a lighter tint than the ink/navy salmon:
+   #ffb29d on cobalt = 3.47:1 (AA fail, pre-existing); #ffe4db = 4.97:1. */
+main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:#ffe4db; }
+.review-section .eyebrow, .hiring-section .eyebrow, .materials-cta .eyebrow { color:#ffe4db; }
 .topbar { position:sticky; top:0; z-index:40; border-bottom:1px solid rgba(11,21,51,.18); background:rgba(255,254,251,.96); backdrop-filter:blur(16px); }
 .nav { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .wordmark { font-family:Georgia,serif; font-size:1.05rem; text-decoration:none; }
