@@ -18,12 +18,33 @@ h3 { font-size:1.2rem; line-height:1.2; }
 .lede { max-width:680px; color:#384151; font-size:1.06rem; }
 .mobile-only { display:none; }
 .light-eyebrow { color:#ffb29d; }
+
+/* Section identity: one restrained accent per route family on the shared neutral shell.
+   Accents carry text only on light backgrounds (all pairs computed >= 4.5:1 AA);
+   dark sections keep the light eyebrow tint. Non-color cues: the nav underline +
+   the top identity rule. */
+main[data-section] { --accent:var(--cobalt); }
+main[data-section="resume"] { --accent:var(--green); }
+main[data-section="hiring"] { --accent:var(--copper); }
+main[data-section="work-resale-scanner-pro"] { --accent:var(--green); }
+main[data-section="work-loft-os"] { --accent:var(--copper); }
+main[data-section="work-sous-chef"] { --accent:var(--cobalt); }
+main[data-section="work-office-chef"] { --accent:var(--ink); }
+main[data-section]::before { content:""; display:block; height:4px; background:var(--accent); }
+main[data-section] .eyebrow:not(.light-eyebrow) { color:var(--accent); }
+main[data-section] .dark-section .eyebrow:not(.light-eyebrow),
+main[data-section] .app-hero .eyebrow:not(.light-eyebrow) { color:#ffb29d; }
+/* Cobalt backgrounds need a lighter tint than the ink/navy salmon:
+   #ffb29d on cobalt = 3.47:1 (AA fail, pre-existing); #ffe4db = 4.97:1. */
+main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:#ffe4db; }
+.review-section .eyebrow, .hiring-section .eyebrow, .materials-cta .eyebrow { color:#ffe4db; }
 .topbar { position:sticky; top:0; z-index:40; border-bottom:1px solid rgba(11,21,51,.18); background:rgba(255,254,251,.96); backdrop-filter:blur(16px); }
 .nav { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .wordmark { font-family:Georgia,serif; font-size:1.05rem; text-decoration:none; }
 .navlinks { display:flex; align-items:center; gap:22px; font-size:.84rem; font-weight:780; }
 .navlinks>a:not(.button) { text-decoration:none; }
 .navlinks>a:hover,.navlinks>a:focus-visible { color:var(--cobalt); }
+.navlinks>a[aria-current="page"] { color:var(--cobalt); text-decoration:underline; text-underline-offset:6px; text-decoration-thickness:2px; }
 .menu-button { display:none; width:44px; height:44px; place-items:center; border:1px solid var(--ink); background:var(--white); color:var(--ink); cursor:pointer; }
 .button { min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:10px; border:1px solid var(--ink); padding:11px 16px; background:transparent; color:var(--ink); font-size:.87rem; font-weight:850; text-decoration:none; transition:transform .18s ease,background .18s ease,color .18s ease; }
 .button:hover { transform:translateY(-2px); }
@@ -252,6 +273,7 @@ section { padding:96px 0; }
 .alternate-resume-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
 .alternate-resume-card { display:grid; grid-template-columns:62px 1fr; gap:26px; align-items:start; padding:30px; border:1px solid var(--line); border-top:5px solid var(--ink); background:var(--white); }
 .alternate-resume-card.copper { border-top-color:var(--copper); }
+.alternate-resume-card.cobalt { border-top-color:var(--cobalt); }
 .alternate-resume-card h2 { font-size:2.15rem; margin:14px 0; }
 .alternate-resume-card p,.alternate-resume-card ul { color:var(--muted); }
 .alternate-resume-card .button { grid-column:2; justify-self:start; }

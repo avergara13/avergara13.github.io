@@ -24,10 +24,10 @@ export type Project = {
 const projectData: Record<string, Project> = {
   "resale-scanner-pro": {
     slug: "resale-scanner-pro",
-    eyebrow: "Shipped product · Visual case study",
+    eyebrow: "Working live product · Visual case study",
     title: "Resale Scanner Pro",
-    dek: "A mobile-first decision system that turns a thrift-store photo into a structured resale workflow: identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
-    status: "Public and operational",
+    dek: "A mobile-first decision system built for a real family resale operation: photograph a thrift-store find, identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
+    status: "Live and in real use",
     statusTone: "green",
     proof: ["Photo → decision", "Human gates", "Market evidence", "Live product"],
     links: [
@@ -48,7 +48,7 @@ const projectData: Record<string, Project> = {
       { number: "05", title: "Track", copy: "Record outcomes and feed evidence back into judgment." },
     ],
     sections: [
-      { number: "02", label: "Shipped interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the public application. They show the live session, listing research, and sold-item evidence loop.", kind: "screens" },
+      { number: "02", label: "Working interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the public application. They show the live session, listing research, and sold-item evidence loop.", kind: "screens" },
       { number: "03", label: "Decision design", title: "Useful automation has a stopping rule.", copy: "The product is designed around a buy-or-pass decision, not around producing more output. Uncertainty remains visible and the operator stays in control.", kind: "decision" },
     ],
   },
@@ -64,7 +64,7 @@ const projectData: Record<string, Project> = {
       { label: "Role", value: "Systems architecture, governance design, and operating-model documentation" },
       { label: "Primary user", value: "Teams coordinating bounded AI-assisted work" },
       { label: "Constraint", value: "Explain the operating pattern without exposing private implementation details" },
-      { label: "Delivered outcome", value: "An inspectable employer-facing pattern for accountable delivery" },
+      { label: "Delivered outcome", value: "1,000+ governed pull requests merged under this pattern, with human authority on every high-impact release" },
     ],
     workflow: [
       { number: "01", title: "Intake & scope", copy: "Capture the request, owner, outcome, allowed surfaces, and red lines." },
@@ -217,7 +217,7 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
 
 export function ProjectCase({ project }: { project: Project }) {
   return (
-    <main id="main">
+    <main id="main" data-section={`work-${project.slug}`}>
       <section className="case-hero">
         <div className="shell case-hero-grid">
           <div>
@@ -262,7 +262,7 @@ export function ProjectCase({ project }: { project: Project }) {
       ))}
 
       <section id="next-step" className="case-next-step">
-        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the recommended resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
       </section>
     </main>
   );

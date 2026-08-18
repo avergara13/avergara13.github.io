@@ -20,18 +20,18 @@ export const metadata: Metadata = {
   },
 };
 
-const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onboarding.pdf";
+const generalResume = "/downloads/Angel_Vergara_Resume_General.pdf";
 
 export default function HiringPage() {
   return (
-    <main id="main">
+    <main id="main" data-section="hiring">
       <section className="subpage-hero app-hero">
         <div className="shell compact-hero">
           <p className="eyebrow light-eyebrow">For hiring teams</p>
           <h1>Operations credibility, built for implementation.</h1>
           <p className="lede">Angel Vergara translates frontline complexity into clear workflows, practical tools, and accountable adoption—grounded in hospitality leadership and hands-on product delivery.</p>
           <div className="actions">
-            <a className="button light-button" href={implementationResume} download>Download recommended resume (PDF) <span aria-hidden="true">↓</span></a>
+            <a className="button light-button" href={generalResume} download>Download resume (PDF) <span aria-hidden="true">↓</span></a>
             <a className="button outline-light" href="mailto:avergara13@me.com">Contact Angel <span aria-hidden="true">→</span></a>
           </div>
         </div>
@@ -52,13 +52,13 @@ export default function HiringPage() {
         <div className="shell">
           <div className="split-head"><div><p className="eyebrow">Recommended proof path</p><h2>Three steps to a confident screen.</h2></div><p>Each step answers one hiring question: fit, delivery proof, then working relationship.</p></div>
           <div className="proof-path">
-            <article><span>01 · FIT</span><h3>Implementation resume</h3><p>Operations leadership, training, discovery, configuration, and adoption.</p></article>
+            <article><span>01 · FIT</span><h3>Resume</h3><p>Operations leadership, systems, implementation, and AI-enabled workflow proof.</p></article>
             <span aria-hidden="true">→</span>
-            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A shipped product showing workflow design, human review, and delivery.</p></article>
+            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A working live product showing workflow design, human review, and delivery.</p></article>
             <span aria-hidden="true">→</span>
             <article><span>03 · CONVERSATION</span><h3>Discuss the operating problem</h3><p>Connect customer reality to implementation constraints and adoption.</p></article>
           </div>
-          <div className="actions"><a className="button outline-light" href={implementationResume} download>Download resume (PDF) <span aria-hidden="true">↓</span></a><Link className="button outline-light" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link></div>
+          <div className="actions"><a className="button outline-light" href={generalResume} download>Download resume (PDF) <span aria-hidden="true">↓</span></a><Link className="button outline-light" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link></div>
         </div>
       </section>
 
@@ -71,8 +71,8 @@ export default function HiringPage() {
           </div>
           <div className="application-links ink-links">
             <a href="mailto:avergara13@me.com"><span>Start a conversation</span><span>→</span></a>
-            <a href={implementationResume} download><span>Download the recommended resume</span><span>↓</span></a>
-            <Link href="/work/resale-scanner-pro"><span>Review the shipped product</span><span>→</span></Link>
+            <a href={generalResume} download><span>Download the resume (PDF)</span><span>↓</span></a>
+            <Link href="/work/resale-scanner-pro"><span>Review the live product</span><span>→</span></Link>
           </div>
         </div>
       </section>
