@@ -24,7 +24,7 @@ const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onb
 
 export default function HiringPage() {
   return (
-    <main id="main">
+    <main id="main" data-section="hiring">
       <section className="subpage-hero app-hero">
         <div className="shell compact-hero">
           <p className="eyebrow light-eyebrow">For hiring teams</p>
@@ -54,7 +54,7 @@ export default function HiringPage() {
           <div className="proof-path">
             <article><span>01 · FIT</span><h3>Implementation resume</h3><p>Operations leadership, training, discovery, configuration, and adoption.</p></article>
             <span aria-hidden="true">→</span>
-            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A shipped product showing workflow design, human review, and delivery.</p></article>
+            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A working live product showing workflow design, human review, and delivery.</p></article>
             <span aria-hidden="true">→</span>
             <article><span>03 · CONVERSATION</span><h3>Discuss the operating problem</h3><p>Connect customer reality to implementation constraints and adoption.</p></article>
           </div>
@@ -72,7 +72,7 @@ export default function HiringPage() {
           <div className="application-links ink-links">
             <a href="mailto:avergara13@me.com"><span>Start a conversation</span><span>→</span></a>
             <a href={implementationResume} download><span>Download the recommended resume</span><span>↓</span></a>
-            <Link href="/work/resale-scanner-pro"><span>Review the shipped product</span><span>→</span></Link>
+            <Link href="/work/resale-scanner-pro"><span>Review the live product</span><span>→</span></Link>
           </div>
         </div>
       </section>

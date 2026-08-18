@@ -26,87 +26,191 @@ MUTED = colors.HexColor("#505A6A")
 LINE = colors.HexColor("#CED3DC")
 
 
-COMMON_EXPERIENCE = [
-    (
-        "Cafe Linger | Executive Chef, May-Dec 2018 | General Manager, Jan 2019-Dec 2022",
-        [
-            "Led day-to-day work across production, purchasing, inventory, staff training, reporting, and customer experience.",
-            "Built repeatable routines for ordering, preparation, quality, service readiness, and team handoffs.",
-            "Continued paid closure administration and independent consulting through Jan 2024.",
-        ],
-    ),
-    (
-        "Kitchen and Production Leadership | Florida and Massachusetts",
-        [
-            "Coordinated teams, inventory, ordering, quality, and service execution in hands-on hospitality environments.",
-            "Developed training practices and operating standards shaped by real production pressure and daily exceptions.",
-        ],
-    ),
-]
+# Content source of truth: the corrected 2026-08-17 canonical resume-lane
+# sources (Master Resume + Career Evidence Ledger downstream lanes). Claim
+# boundaries: Cafe Linger operations ended Dec 2022 with paid closure
+# administration/consulting through Jan 2024 (never "Present"); Resale Scanner
+# Pro is a working personal AI-assisted application used in a family resale
+# workflow (never commercial SaaS, customer deployment, or paid
+# software-engineering employment).
 
 EDUCATION = [
     "Florida International University - B.S., Hospitality Management; Minor, Beverage Management",
-    "The Culinary Institute of America - A.S., Culinary Arts",
+    "The Culinary Institute of America - A.S., Culinary Arts; May 2007-Apr 2010",
+    "Valencia Community College - A.A., General Studies",
 ]
+
+CAFE_LINGER_TITLE = "Cafe Linger - Executive Chef to General Manager | Orlando, FL | May 2018-Dec 2022"
+FARM_HAUS_TITLE = "Farm-Haus / Farm & Haus - Chef de Cuisine | Greater Orlando | Sep 2015-Apr 2018"
+SOUTHERN_SWANK_TITLE = "Southern Swank Kitchen - Head Chef | Davie, FL | Jul 2013-May 2014"
 
 RESUMES = [
     {
         "filename": "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
         "headline": "HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
         "profile": (
-            "Bilingual hospitality operations leader and implementation-focused systems builder. "
-            "Translates frontline complexity into clear workflows, usable tools, customer training, and accountable adoption. "
-            "Hands-on proof includes a live decision-support product and employer-facing systems case studies."
+            "Hospitality operations leader bringing 14+ years of restaurant leadership into restaurant technology "
+            "implementation. Progressed from Executive Chef to General Manager with hands-on ownership of workforce "
+            "scheduling, payroll-data review, inventory and procurement, vendors, reporting, training, financial "
+            "administration, and customer experience. Translates frontline operating needs into clear requirements, "
+            "accurate data, repeatable workflows, practical tools, and confident adoption. Comfortable with Excel and "
+            "Pivot Tables, with current systems work extending into workflow automation and AI-assisted applications. "
+            "English/Spanish bilingual."
         ),
         "strengths": (
-            "Customer onboarding and training | workflow discovery | requirements gathering | configuration support | "
-            "adoption and handoffs | documentation | exception handling | hospitality operations | stakeholder communication | "
-            "English and Spanish"
+            "Restaurant & hospitality operations | customer-facing problem solving | implementation readiness & adoption | "
+            "workflow discovery & requirements translation | training & change management | data collection & validation | "
+            "Excel & Pivot Tables | workforce scheduling | payroll-data review | inventory & procurement | "
+            "vendor & third-party coordination | process documentation & handoffs | bilingual English/Spanish"
         ),
         "projects": [
-            "Resale Scanner Pro - Designed and shipped a live mobile-first product that turns item capture and market research into a human-reviewed sourcing and listing workflow.",
-            "Loft OS - Documented a sanitized operating pattern for scoped work, human authorization, verification, recovery, and accountable closeout.",
-            "Sous Chef - Built a public-source culinary workspace shaped by recipe, pantry, cookbook, and cooking-session workflows.",
+            "Resale Scanner Pro - Personal workflow application built for Hobbyst Resale, a small family eBay resale "
+            "business: item capture, AI-assisted identification, market research, BUY / MAYBE / PASS decisions, listing "
+            "preparation, publishing, and operating records; an actively evolving personal project.",
+            "Loft OS - Sanitized architecture case study: governed workflow moving work through scoped intake, "
+            "role-separated execution, human approval, evidence-backed review, recovery, and deterministic closeout.",
+            "Sous Chef - Public application: hospitality-domain workspace for authenticated recipe workflows, pantry and "
+            "inventory signals, cookbooks, session history, and AI-assisted creation.",
         ],
-        "tools": "Notion | spreadsheets | Git and GitHub | React | TypeScript | Node | Postgres | AI-assisted workflow design",
+        "experience": [
+            (
+                CAFE_LINGER_TITLE,
+                [
+                    "Became General Manager in Jan 2019 as administrative and financial responsibilities expanded beyond culinary leadership.",
+                    "Led day-to-day operations across production, purchasing, inventory, vendors, scheduling, staff training, reporting, compliance, and customer experience.",
+                    "Managed vendor accounts, invoices, recurring bills, POS reporting, payroll-data review, QuickBooks workflows, P&L review, and cash-flow awareness.",
+                    "Built and maintained Excel spreadsheets for payroll, ordering, inventory, and operational reporting, using linked formulas and Pivot Tables.",
+                    "Continued paid account-closure, administrative, and restaurant-consulting work after the restaurant closed, through Jan 2024.",
+                ],
+            ),
+            (
+                FARM_HAUS_TITLE,
+                [
+                    "Began with consultation work to establish kitchen workflow, then led production, quality, ordering, inventory, training, and service execution.",
+                    "Worked directly with ownership on operating consistency and growth support.",
+                ],
+            ),
+            (
+                SOUTHERN_SWANK_TITLE,
+                [
+                    "Created the opening menu and recipes; hired, trained, scheduled, and managed approximately 12 employees for a roughly 200-seat venue.",
+                    "Coordinated FOH/BOH staffing, inventory, food-and-beverage ordering, and opening-stage operating systems.",
+                ],
+            ),
+        ],
+        "tools": (
+            "Excel (Pivot Tables) | Notion | Git and GitHub | Railway | Supabase integration | Postgres/SQL exposure | "
+            "React | TypeScript | Node/Express | AI-assisted workflow design"
+        ),
     },
     {
         "filename": "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
-        "headline": "BUSINESS SYSTEMS & OPERATIONS LEADER",
+        "headline": "OPERATIONS LEADER | BUSINESS SYSTEMS & OPERATIONS",
         "profile": (
-            "Bilingual operations leader and systems builder who turns operating problems into clear requirements, workflows, and usable tools. "
-            "Combines frontline hospitality judgment with process mapping, reporting, documentation, and hands-on product delivery."
+            "Hospitality operations leader and systems builder with verified Executive Chef to General Manager "
+            "progression. Turns operating problems into clear requirements, workflows, reports, and usable tools by "
+            "combining frontline judgment with purchasing, inventory, vendor administration, POS data, payroll review, "
+            "P&L awareness, process mapping, documentation, and hands-on product delivery. English/Spanish bilingual "
+            "capability supports stakeholder communication, documentation, and adoption."
         ),
         "strengths": (
-            "Business-process mapping | requirements gathering | workflow analysis | operational reporting | decision rules | "
-            "exception handling | inventory and purchasing | vendor coordination | workforce routines | documentation | "
-            "English and Spanish"
+            "Business-process mapping | requirements gathering | workflow analysis | operational reporting | "
+            "POS and spreadsheet analysis | decision rules | exception handling | inventory and purchasing | "
+            "vendor and invoice coordination | payroll-data review | P&L and cash-flow awareness | workforce routines | "
+            "documentation | bilingual English/Spanish"
         ),
         "projects": [
-            "Resale Scanner Pro - Shipped a live decision-support product with structured intake, market evidence, human review, and operating records.",
-            "Loft OS - Documented a sanitized workflow pattern for scope, ownership, authorization, evidence, recovery, and closeout.",
-            "The Office Chef - Framed a clearly labeled concept using simulated data to explore invoice intake, vendor changes, food cost, and owner-ready reporting.",
+            "Resale Scanner Pro - Working personal AI-assisted workflow application used in a small family resale "
+            "workflow: structured intake, AI-assisted research, human review gates, external-service integration, "
+            "publishing workflows, and operating records.",
+            "Loft OS - Sanitized architecture case study: governed workflow patterns for scope, authorization, evidence, "
+            "recovery, and closeout, focused on visible ownership and fail-closed controls.",
+            "The Office Chef - Concept in design: restaurant back-office automation concept for invoice intake, vendor "
+            "price changes, food costing, inventory review, menu-margin analysis, and owner briefings.",
         ],
-        "tools": "Spreadsheets | Notion | Postgres | Git and GitHub | React | TypeScript | Node | workflow and automation architecture",
+        "experience": [
+            (
+                CAFE_LINGER_TITLE,
+                [
+                    "Promoted to General Manager in Jan 2019 after expanding into administrative, financial, and operating-system ownership.",
+                    "Used POS and spreadsheet reporting to review sales mix, inventory, food cost, menu margin, vendor pricing, payroll, and operating performance.",
+                    "Coordinated purchasing, vendor accounts, invoices, recurring bills, QuickBooks workflows, P&L review, cash-flow awareness, licensing, and maintenance follow-through.",
+                    "Continued paid shutdown administration and restaurant consulting through Jan 2024, closing accounts and completing business wrap-up.",
+                ],
+            ),
+            (
+                FARM_HAUS_TITLE,
+                [
+                    "Helped establish the kitchen workflow, production routines, ordering practices, inventory controls, and quality standards.",
+                    "Partnered with ownership on operating consistency and growth support while coordinating quality and team execution.",
+                ],
+            ),
+            (
+                SOUTHERN_SWANK_TITLE,
+                [
+                    "Built opening-stage menu, recipe, staffing, scheduling, inventory, and ordering systems for a roughly 200-seat venue.",
+                    "Hired, trained, scheduled, and managed approximately 12 employees across the opening operation.",
+                ],
+            ),
+        ],
+        "tools": (
+            "Spreadsheets | Notion databases and dashboards | Supabase integration | Postgres/SQL exposure | "
+            "Git and GitHub | Railway | React/TypeScript | Node/Express | automation architecture"
+        ),
     },
     {
         "filename": "Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
-        "headline": "OPERATIONS-TO-AI WORKFLOW BUILDER | SHIPPED PRODUCT & GOVERNED SYSTEMS",
+        "headline": "OPERATIONS-TO-AI WORKFLOW BUILDER | APPLIED AI WORKFLOWS & GOVERNED SYSTEMS",
         "profile": (
-            "Bilingual operations-to-AI workflow builder focused on useful, human-controlled systems. "
-            "Combines frontline operating judgment with shipped product work, structured outputs, review gates, exception handling, "
-            "recovery logic, and clear implementation documentation."
+            "Hospitality operations-to-AI workflow builder focused on useful, human-controlled systems. Combines "
+            "verified restaurant leadership and financial/administrative workflow ownership with working application "
+            "and systems proof, structured outputs, review gates, exception handling, recovery logic, and clear "
+            "implementation documentation. Builds from real operating friction rather than hypothetical process "
+            "diagrams. English/Spanish bilingual capability supports training, documentation, and adoption."
         ),
         "strengths": (
-            "AI-assisted workflow design | structured outputs | human approval gates | process mapping | exception and recovery logic | "
-            "evidence-backed review | product delivery | technical documentation | stakeholder communication | English and Spanish"
+            "AI-assisted workflow design | LLM API integration | prompt and structured-output design | "
+            "human approval gates | multi-agent workflow architecture | process mapping | exception and recovery logic | "
+            "evidence-backed review | product delivery | implementation documentation | hospitality operations | "
+            "bilingual English/Spanish"
         ),
         "projects": [
-            "Resale Scanner Pro - Designed and shipped a live AI-assisted product connecting item capture, market evidence, human judgment, and outcome tracking.",
-            "Loft OS - Documented a sanitized governed-work pattern with explicit scope, human authority, verification, recovery, and closeout.",
-            "Sous Chef - Built a public-source culinary workspace that translates hospitality-domain workflows into an inspectable product surface.",
+            "Resale Scanner Pro - Working personal AI-assisted application used in a small family resale workflow; "
+            "built with React, TypeScript, Vite, Node/Express, Supabase, and Railway, with Gemini, Claude, "
+            "marketplace/API integrations, automation, and GitHub delivery workflows.",
+            "Loft OS - Sanitized architecture case study: agentic workflows with scoped roles, human authorization, "
+            "evidence-backed review, fail-closed controls, recovery paths, and deterministic closeout.",
+            "Sous Chef - Public application: AI-assisted culinary workspace with authenticated recipe flows, pantry and "
+            "inventory signals, cookbooks, and cooking-session history.",
         ],
-        "tools": "React | TypeScript | Node | Postgres | AI model APIs | Git and GitHub | Notion | workflow and automation design",
+        "experience": [
+            (
+                CAFE_LINGER_TITLE,
+                [
+                    "Became General Manager in Jan 2019 and owned day-to-day workflows spanning production, inventory, purchasing, vendors, staff training, reporting, compliance, and customer experience.",
+                    "Worked with POS data, spreadsheets, invoices, payroll information, QuickBooks, P&L review, vendor pricing, and cash-flow-aware decisions - the operating problems now informing restaurant-automation concepts.",
+                    "Continued paid account-closure, administrative, and restaurant-consulting work through Jan 2024 after restaurant operations ended in Dec 2022.",
+                ],
+            ),
+            (
+                FARM_HAUS_TITLE,
+                [
+                    "Began with kitchen-workflow consultation, then led production, ordering, inventory, quality, training, and service routines.",
+                    "Worked directly with ownership on operating consistency and growth support.",
+                ],
+            ),
+            (
+                "Earlier Culinary Experience & Leadership | Florida and Massachusetts",
+                [
+                    "Progressed from line and pastry work into Sous Chef and Head Chef responsibilities across high-volume restaurants, openings, and hotel operations.",
+                    "Built practical judgment around handoffs, exceptions, quality controls, inventory counts, ordering, training, and service recovery.",
+                ],
+            ),
+        ],
+        "tools": (
+            "React | TypeScript | Vite | Tailwind | Node/Express | Railway | Supabase integration | "
+            "Postgres/SQL exposure | Gemini | Claude API | marketplace APIs | Notion | automation design"
+        ),
     },
 ]
 
@@ -118,89 +222,95 @@ def styles():
             "Name",
             parent=sample["Title"],
             fontName="Helvetica-Bold",
-            fontSize=24,
-            leading=25,
+            fontSize=22,
+            leading=23,
             textColor=INK,
             alignment=TA_CENTER,
-            spaceAfter=3,
+            spaceAfter=2,
         ),
         "headline": ParagraphStyle(
             "Headline",
             parent=sample["Normal"],
             fontName="Helvetica-Bold",
-            fontSize=9.8,
-            leading=12,
+            fontSize=9.6,
+            leading=11.5,
             textColor=COBALT,
             alignment=TA_CENTER,
             tracking=0.3,
-            spaceAfter=4,
+            spaceAfter=3,
         ),
         "contact": ParagraphStyle(
             "Contact",
             parent=sample["Normal"],
             fontName="Helvetica",
-            fontSize=8.4,
-            leading=10,
+            fontSize=8.2,
+            leading=9.6,
             textColor=MUTED,
             alignment=TA_CENTER,
-            spaceAfter=5,
+            spaceAfter=4,
         ),
         "section": ParagraphStyle(
             "Section",
             parent=sample["Heading2"],
             fontName="Helvetica-Bold",
-            fontSize=9.2,
-            leading=11,
+            fontSize=9,
+            leading=10.6,
             textColor=COPPER,
             tracking=0.7,
-            spaceBefore=5,
-            spaceAfter=2,
+            spaceBefore=4,
+            spaceAfter=1.6,
         ),
         "body": ParagraphStyle(
             "Body",
             parent=sample["BodyText"],
             fontName="Helvetica",
-            fontSize=9,
-            leading=11.4,
+            fontSize=8.6,
+            leading=10.7,
             textColor=INK,
-            spaceAfter=2,
+            spaceAfter=1.6,
         ),
         "role": ParagraphStyle(
             "Role",
             parent=sample["BodyText"],
             fontName="Helvetica-Bold",
-            fontSize=9.3,
-            leading=11.4,
+            fontSize=9,
+            leading=10.9,
             textColor=INK,
-            spaceBefore=2,
-            spaceAfter=1,
+            spaceBefore=1.8,
+            spaceAfter=0.8,
         ),
         "bullet": ParagraphStyle(
             "Bullet",
             parent=sample["BodyText"],
             fontName="Helvetica",
-            fontSize=8.7,
-            leading=11,
+            fontSize=8.4,
+            leading=10.4,
             leftIndent=10,
             firstLineIndent=-8,
             bulletIndent=0,
             textColor=INK,
-            spaceAfter=1.2,
+            spaceAfter=0.9,
         ),
         "footer": ParagraphStyle(
             "Footer",
             parent=sample["BodyText"],
             fontName="Helvetica",
-            fontSize=7.6,
-            leading=9,
+            fontSize=7.4,
+            leading=8.8,
             alignment=TA_CENTER,
             textColor=MUTED,
         ),
     }
 
 
+def esc(text: str) -> str:
+    """XML-escape plain text for reportlab Paragraph (bare '&' otherwise
+    renders as a partial entity, e.g. 'P&L' -> 'P&L;')."""
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def bullet(text: str, style: ParagraphStyle) -> Paragraph:
-    return Paragraph(f"- {text}", style)
+    return Paragraph(f"- {esc(text)}", style)
 
 
 def build_resume(resume: dict, destination: Path) -> None:
@@ -208,10 +318,10 @@ def build_resume(resume: dict, destination: Path) -> None:
     doc = SimpleDocTemplate(
         str(destination),
         pagesize=LETTER,
-        rightMargin=0.48 * inch,
-        leftMargin=0.48 * inch,
-        topMargin=0.36 * inch,
-        bottomMargin=0.32 * inch,
+        rightMargin=0.46 * inch,
+        leftMargin=0.46 * inch,
+        topMargin=0.3 * inch,
+        bottomMargin=0.28 * inch,
         title=f"Angel Vergara - {resume['headline'].title()}",
         author="Angel Vergara",
         subject="Resume",
@@ -227,19 +337,19 @@ def build_resume(resume: dict, destination: Path) -> None:
 
     story = [
         Paragraph("Angel Vergara", style["name"]),
-        Paragraph(resume["headline"], style["headline"]),
+        Paragraph(esc(resume["headline"]), style["headline"]),
         Paragraph(contact, style["contact"]),
         HRFlowable(width="100%", thickness=1.2, color=INK, spaceBefore=1, spaceAfter=2),
         Paragraph("PROFILE", style["section"]),
-        Paragraph(resume["profile"], style["body"]),
+        Paragraph(esc(resume["profile"]), style["body"]),
         Paragraph("CORE STRENGTHS", style["section"]),
-        Paragraph(resume["strengths"], style["body"]),
+        Paragraph(esc(resume["strengths"]), style["body"]),
         Paragraph("SELECTED PRODUCT AND SYSTEMS WORK", style["section"]),
     ]
     story.extend(bullet(project, style["bullet"]) for project in resume["projects"])
-    story.append(Paragraph("SELECTED OPERATIONS EXPERIENCE", style["section"]))
-    for title, bullets in COMMON_EXPERIENCE:
-        story.append(Paragraph(title, style["role"]))
+    story.append(Paragraph("SELECTED PROFESSIONAL EXPERIENCE", style["section"]))
+    for title, bullets in resume["experience"]:
+        story.append(Paragraph(esc(title), style["role"]))
         story.extend(bullet(item, style["bullet"]) for item in bullets)
 
     story.extend(
@@ -247,9 +357,9 @@ def build_resume(resume: dict, destination: Path) -> None:
             Paragraph("EDUCATION", style["section"]),
             *[bullet(item, style["bullet"]) for item in EDUCATION],
             Paragraph("TOOLS", style["section"]),
-            Paragraph(resume["tools"], style["body"]),
-            Spacer(1, 3),
-            HRFlowable(width="100%", thickness=0.5, color=LINE, spaceBefore=1, spaceAfter=3),
+            Paragraph(esc(resume["tools"]), style["body"]),
+            Spacer(1, 2),
+            HRFlowable(width="100%", thickness=0.5, color=LINE, spaceBefore=1, spaceAfter=2),
             Paragraph(
                 'Work samples and case studies: <link href="https://avergara13.github.io/" color="#0B4CFF">avergara13.github.io</link>',
                 style["footer"],

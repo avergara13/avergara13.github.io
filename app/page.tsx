@@ -4,19 +4,19 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Angel Vergara — Implementation & Onboarding",
-  description: "Bilingual hospitality operations leader and implementation-focused systems builder with shipped product and workflow-delivery proof.",
+  description: "Bilingual hospitality operations leader and implementation-focused systems builder with a working AI-assisted product and workflow-delivery proof.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "/",
     title: "Angel Vergara — Systems teams can actually adopt.",
-    description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.",
+    description: "Bilingual operations leadership, practical implementation systems, and working product proof.",
     images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara — Systems teams can actually adopt." }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Angel Vergara — Systems teams can actually adopt.",
-    description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.",
+    description: "Bilingual operations leadership, practical implementation systems, and working product proof.",
     images: ["/og-home.png"],
   },
 };
@@ -26,12 +26,12 @@ const implementationResume = "/downloads/Angel_Vergara_Resume_Implementation_Onb
 const proofItems = [
   ["English + Spanish", "Bilingual communication"],
   ["Operations → systems", "Workflow translation"],
-  ["Live product", "Shipped delivery proof"],
+  ["Live product", "In real operating use"],
 ];
 
 export default function Home() {
   return (
-    <main id="main">
+    <main id="main" data-section="home">
       <section className="hero" aria-labelledby="hero-title">
         <div className="shell hero-shell">
           <div className="hero-grid">
@@ -100,12 +100,12 @@ export default function Home() {
 
       <section id="work" className="featured-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Selected work</p><h2>Proof you can inspect.</h2></div><p>Lead with shipped work. Follow with sanitized architecture and clearly labeled supporting projects—no inflated claims and no mystery metrics.</p></div>
+          <div className="split-head"><div><p className="eyebrow">Selected work</p><h2>Proof you can inspect.</h2></div><p>Lead with a working product in real use. Follow with sanitized architecture and clearly labeled supporting projects—no inflated claims and no mystery metrics.</p></div>
           <article className="featured-case">
             <div className="featured-copy">
-              <span className="status-dot green">Shipped and operational</span>
+              <span className="status-dot green">Live and in real use</span>
               <h3>Resale Scanner Pro</h3>
-              <p>A mobile-first AI-assisted resale workflow connecting capture, market research, human judgment, listing preparation, and operating records.</p>
+              <p>A mobile-first AI-assisted resale workflow—built for a real family resale operation—connecting capture, market research, human judgment, listing preparation, and operating records.</p>
               <dl className="facts">
                 <div><dt>Role</dt><dd>Product design, workflow architecture, implementation, delivery</dd></div>
                 <div><dt>Operator</dt><dd>Reseller making sourcing, pricing, and listing decisions</dd></div>
@@ -125,9 +125,9 @@ export default function Home() {
 
       <section className="supporting-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Supporting proof</p><h2>Architecture, domain judgment, and workflow discipline.</h2></div><p>Each project adds a different proof layer while keeping shipped work, public source, and concepts clearly separated.</p></div>
+          <div className="split-head"><div><p className="eyebrow">Supporting proof</p><h2>Architecture, domain judgment, and workflow discipline.</h2></div><p>Each project adds a different proof layer while keeping the live product, public source, and concepts clearly separated.</p></div>
           <div className="project-grid">
-            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Governed AI-assisted work focused on scope, authority, evidence, and repair—without exposing private implementation details.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
+            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Governed AI-assisted work focused on scope, authority, evidence, and repair—1,000+ governed pull requests merged under this pattern, without exposing private implementation details.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
           </div>
           <Link className="concept-link" href="/work/office-chef">
@@ -142,7 +142,7 @@ export default function Home() {
           <div>
             <p className="eyebrow light-eyebrow">Fast review path · Remote U.S. roles</p>
             <h2>Resume. Strongest proof. Direct conversation.</h2>
-            <p>Start with the implementation resume, inspect the shipped product, then connect about the operating problem your team needs to solve.</p>
+            <p>Start with the implementation resume, inspect the live product, then connect about the operating problem your team needs to solve.</p>
             <div className="review-meta">
               <Link href="/hiring">Hiring-team brief →</Link>
               <a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer">LinkedIn ↗</a>

@@ -10,12 +10,12 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL("https://avergara13.github.io"),
   title: { default: "Angel Vergara — Implementation & Onboarding", template: "%s" },
-  description: "Bilingual hospitality operations leader and implementation-focused systems builder with shipped product and workflow-delivery proof.",
+  description: "Bilingual hospitality operations leader and implementation-focused systems builder with a working AI-assisted product and workflow-delivery proof.",
   alternates: { canonical: "/" },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
   robots: { index: true, follow: true },
-  openGraph: { type: "website", url: "/", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems teams can actually adopt." }] },
-  twitter: { card: "summary_large_image", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and shipped product proof.", images: ["/og.png"] },
+  openGraph: { type: "website", url: "/", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and working product proof.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems teams can actually adopt." }] },
+  twitter: { card: "summary_large_image", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and working product proof.", images: ["/og.png"] },
 };
 
 const personSchema = {
@@ -24,7 +24,7 @@ const personSchema = {
   name: "Angel Vergara",
   url: "https://avergara13.github.io/",
   email: "mailto:avergara13@me.com",
-  jobTitle: "Implementation and Onboarding Specialist",
+  jobTitle: "Hospitality Operations Leader & Systems Builder",
   knowsLanguage: ["English", "Spanish"],
   sameAs: [
     "https://linkedin.com/in/angel-vergara-83861540",

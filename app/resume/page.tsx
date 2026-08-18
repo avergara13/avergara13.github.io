@@ -23,13 +23,13 @@ export const metadata: Metadata = {
 const lanes = [
   { number: "01", title: "Implementation & Onboarding", fit: "Recommended first choice", tone: "cobalt", file: "Angel_Vergara_Resume_Implementation_Onboarding.pdf", roles: ["Hospitality technology onboarding", "SaaS implementation specialist", "Customer training and adoption", "Technical customer success"], proof: "Leads with bilingual operations leadership, training, configuration, workflow discovery, and customer-ready implementation." },
   { number: "02", title: "Business Systems & Operations", fit: "Operations-to-systems bridge", tone: "ink", file: "Angel_Vergara_Resume_Business_Systems_Operations.pdf", roles: ["Business systems analyst", "Operations analyst", "Workforce optimization", "Implementation consultant"], proof: "Leads with process discovery, requirements, operating controls, reporting, vendor coordination, inventory, and systems thinking." },
-  { number: "03", title: "AI Workflow & Automation", fit: "Selective technical lane", tone: "copper", file: "Angel_Vergara_Resume_AI_Workflow_Automation.pdf", roles: ["AI process analyst", "Workflow automation analyst", "AI implementation specialist", "Solutions or integration consultant"], proof: "Leads with shipped product work, governed AI workflows, human approval gates, recovery logic, and evidence-backed delivery." },
+  { number: "03", title: "AI Workflow & Automation", fit: "Selective technical lane", tone: "copper", file: "Angel_Vergara_Resume_AI_Workflow_Automation.pdf", roles: ["AI process analyst", "Workflow automation analyst", "AI implementation specialist", "Solutions or integration consultant"], proof: "Leads with working AI product proof, governed AI workflows, human approval gates, recovery logic, and evidence-backed delivery." },
 ];
 
 export default function ResumePage() {
   const [recommended, ...alternates] = lanes;
 
-  return <main id="main">
+  return <main id="main" data-section="resume">
     <section className="subpage-hero resume-hero">
       <div className="shell resume-hero-grid">
         <div>
@@ -62,7 +62,7 @@ export default function ResumePage() {
 
     <section className="resume-close dark-section">
       <div className="shell application-grid">
-        <div><p className="eyebrow light-eyebrow">Next step</p><h2>Continue with proof or start a conversation.</h2><p>Review the shipped product for delivery evidence, or use the hiring brief for the fastest role-fit summary.</p></div>
+        <div><p className="eyebrow light-eyebrow">Next step</p><h2>Continue with proof or start a conversation.</h2><p>Review the live product for delivery evidence, or use the hiring brief for the fastest role-fit summary.</p></div>
         <div className="application-links"><Link href="/work/resale-scanner-pro"><span>Review Resale Scanner Pro</span><span>→</span></Link><Link href="/hiring"><span>Open the hiring-team brief</span><span>→</span></Link><a href="mailto:avergara13@me.com"><span>Email Angel</span><span>→</span></a></div>
       </div>
     </section>
