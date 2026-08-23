@@ -68,7 +68,7 @@ export default function ResumePage() {
 
     <section className="resume-close dark-section">
       <div className="shell application-grid">
-        <div><p className="eyebrow light-eyebrow">Next step</p><h2>Continue with proof or start a conversation.</h2><p>Review the live product for delivery evidence, or use the hiring brief for the fastest role-fit summary.</p></div>
+        <div><p className="eyebrow light-eyebrow">Next step</p><h2>Continue with proof or start a conversation.</h2><p>Review the case study for delivery evidence, or use the hiring brief for the fastest role-fit summary.</p></div>
         <div className="application-links"><Link href="/work/resale-scanner-pro"><span>Review Resale Scanner Pro</span><span>→</span></Link><Link href="/hiring"><span>Open the hiring-team brief</span><span>→</span></Link><a href="mailto:avergara13@me.com"><span>Email Angel</span><span>→</span></a></div>
       </div>
     </section>

@@ -54,7 +54,7 @@ export default function HiringPage() {
           <div className="proof-path">
             <article><span>01 · FIT</span><h3>Resume</h3><p>Operations leadership, systems, implementation, and AI-enabled workflow proof.</p></article>
             <span aria-hidden="true">→</span>
-            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A working live product showing workflow design, human review, and delivery.</p></article>
+            <article><span>02 · PROOF</span><h3>Resale Scanner Pro</h3><p>A working product in real operating use, showing workflow design, human review, and delivery.</p></article>
             <span aria-hidden="true">→</span>
             <article><span>03 · CONVERSATION</span><h3>Discuss the operating problem</h3><p>Connect customer reality to implementation constraints and adoption.</p></article>
           </div>
@@ -72,7 +72,7 @@ export default function HiringPage() {
           <div className="application-links ink-links">
             <a href="mailto:avergara13@me.com"><span>Start a conversation</span><span>→</span></a>
             <a href={generalResume} download><span>Download the resume (PDF)</span><span>↓</span></a>
-            <Link href="/work/resale-scanner-pro"><span>Review the live product</span><span>→</span></Link>
+            <Link href="/work/resale-scanner-pro"><span>Review the case study</span><span>→</span></Link>
           </div>
         </div>
       </section>
