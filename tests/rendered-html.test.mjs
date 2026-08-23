@@ -65,6 +65,17 @@ test("RSP recruiter-surface privacy boundary holds across every employer-facing 
   assert.doesNotMatch(html, /public application/i);
   assert.doesNotMatch(html, /public product/i);
 
+  // Source privacy is NOT product privacy. This WO makes the SOURCE private by
+  // design and the PROOF sanitized; it does not make the operating application
+  // private. Product-level privacy conflation must never reappear.
+  assert.doesNotMatch(html, /Private working product/i);
+  assert.doesNotMatch(html, /Working private product/i);
+
+  // The boundary is stated as source/proof facts, not product-state adjectives.
+  assert.match(html, /Working product · Sanitized visual case study/);
+  assert.match(html, /Private by design/);
+  assert.match(html, /[Ss]anitized (?:case study|employer-facing case study)/);
+
   // Recruiter-readable RSP proof must SURVIVE the privacy correction — this is a
   // narrowing of exposure, not a removal of the case study.
   assert.match(html, /In real operating use/);
@@ -97,7 +108,7 @@ test("RSP framing carries the working-personal-product truth", async () => {
 
   assert.match(home, /In real operating use/);
   assert.match(home, /built for a real family resale operation/);
-  assert.match(caseStudy, /Private working product · Visual case study/);
+  assert.match(caseStudy, /Working product · Sanitized visual case study/);
   assert.match(caseStudy, /In real operating use/);
   assert.match(caseStudy, /built for a real family resale operation/);
 });
@@ -118,7 +129,7 @@ test("case studies expose confirmed project facts without invented metrics", asy
   const html = await readOutput("work/resale-scanner-pro/index.html");
 
   assert.match(html, /Product design, workflow architecture, implementation, and delivery/);
-  assert.match(html, /Working private product in real operating use, with an evidence-focused employer case study/);
+  assert.match(html, /Working product in real operating use, with a sanitized employer-facing case study/);
   assert.doesNotMatch(html, /View source repository/);
   assert.match(html, /Evidence summary/);
   assert.match(html, /Connect the proof to the role/);

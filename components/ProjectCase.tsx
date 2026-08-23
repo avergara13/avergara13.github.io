@@ -24,7 +24,7 @@ export type Project = {
 const projectData: Record<string, Project> = {
   "resale-scanner-pro": {
     slug: "resale-scanner-pro",
-    eyebrow: "Private working product · Visual case study",
+    eyebrow: "Working product · Sanitized visual case study",
     title: "Resale Scanner Pro",
     dek: "A mobile-first decision system built for a real family resale operation: photograph a thrift-store find, identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
     status: "In real operating use",
@@ -34,7 +34,9 @@ const projectData: Record<string, Project> = {
       { label: "Role", value: "Product design, workflow architecture, implementation, and delivery" },
       { label: "Primary user", value: "Reseller making sourcing, pricing, and listing decisions" },
       { label: "Constraint", value: "Uncertainty stays visible and the operator keeps the final decision" },
-      { label: "Delivered outcome", value: "Working private product in real operating use, with an evidence-focused employer case study" },
+      { label: "Source", value: "Private by design" },
+      { label: "Proof", value: "Sanitized case study from a working family resale workflow" },
+      { label: "Delivered outcome", value: "Working product in real operating use, with a sanitized employer-facing case study" },
     ],
     workflow: [
       { number: "01", title: "Capture", copy: "Photograph the item and start a session." },

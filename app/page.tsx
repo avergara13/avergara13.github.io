@@ -110,7 +110,8 @@ export default function Home() {
                 <div><dt>Role</dt><dd>Product design, workflow architecture, implementation, delivery</dd></div>
                 <div><dt>Operator</dt><dd>Reseller making sourcing, pricing, and listing decisions</dd></div>
                 <div><dt>System</dt><dd>React, TypeScript, Node, Postgres, AI and marketplace integrations</dd></div>
-                <div><dt>Proof</dt><dd>Real operating use and employer-facing case study</dd></div>
+                <div><dt>Source</dt><dd>Private by design</dd></div>
+                <div><dt>Proof</dt><dd>Sanitized employer-facing case study from real operating use</dd></div>
               </dl>
               <div className="actions"><Link className="button primary" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link></div>
             </div>
