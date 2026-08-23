@@ -81,6 +81,22 @@ test("RSP recruiter-surface privacy boundary holds across every employer-facing 
   assert.match(html, /In real operating use/);
   assert.match(html, /built for a real family resale operation/);
   assert.match(html, /href="\/work\/resale-scanner-pro\/"/);
+
+  // The RSP social card is part of the recruiter-facing surface, and its copy is
+  // baked into a PNG that no HTML grep can inspect. Pin the GENERATOR source so
+  // the retired framing cannot silently return to the social preview.
+  const generator = await readFile(new URL("scripts/generate_og_images.swift", root), "utf8");
+  const rspCard = generator.split("\n").find((line) => line.includes("og-resale-scanner-pro.png"));
+  assert.ok(rspCard, "RSP social card entry must exist in the OG generator");
+  assert.match(rspCard, /label: "SANITIZED CASE STUDY"/);
+  assert.match(rspCard, /A working decision-support workflow used in a real family resale operation\./);
+  assert.doesNotMatch(rspCard, /SHIPPED PRODUCT/);
+  assert.doesNotMatch(rspCard, /public, operational/);
+  assert.doesNotMatch(rspCard, /private product|public product|live product/i);
+
+  // The case-study page must still reference the intended RSP OG asset.
+  const caseStudyHtml = await readOutput("work/resale-scanner-pro/index.html");
+  assert.match(caseStudyHtml, /og-resale-scanner-pro\.png/);
 });
 
 test("retired claim formulations are absent from every employer-facing page", async () => {
