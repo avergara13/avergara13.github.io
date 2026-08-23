@@ -24,21 +24,19 @@ export type Project = {
 const projectData: Record<string, Project> = {
   "resale-scanner-pro": {
     slug: "resale-scanner-pro",
-    eyebrow: "Working live product · Visual case study",
+    eyebrow: "Working product · Sanitized visual case study",
     title: "Resale Scanner Pro",
     dek: "A mobile-first decision system built for a real family resale operation: photograph a thrift-store find, identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
-    status: "Live and in real use",
+    status: "In real operating use",
     statusTone: "green",
-    proof: ["Photo → decision", "Human gates", "Market evidence", "Live product"],
-    links: [
-      { label: "Open live product", href: "https://resale-scanner-pro-production.up.railway.app", primary: true },
-      { label: "View source repository", href: "https://github.com/avergara13/resale-scanner-pro" },
-    ],
+    proof: ["Photo → decision", "Human gates", "Market evidence", "Real operating use"],
     facts: [
       { label: "Role", value: "Product design, workflow architecture, implementation, and delivery" },
       { label: "Primary user", value: "Reseller making sourcing, pricing, and listing decisions" },
       { label: "Constraint", value: "Uncertainty stays visible and the operator keeps the final decision" },
-      { label: "Delivered outcome", value: "Working public product with an evidence-focused employer case study" },
+      { label: "Source", value: "Private by design" },
+      { label: "Proof", value: "Sanitized case study from a working family resale workflow" },
+      { label: "Delivered outcome", value: "Working product in real operating use, with a sanitized employer-facing case study" },
     ],
     workflow: [
       { number: "01", title: "Capture", copy: "Photograph the item and start a session." },
@@ -48,7 +46,7 @@ const projectData: Record<string, Project> = {
       { number: "05", title: "Track", copy: "Record outcomes and feed evidence back into judgment." },
     ],
     sections: [
-      { number: "02", label: "Working interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the public application. They show the live session, listing research, and sold-item evidence loop.", kind: "screens" },
+      { number: "02", label: "Working interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the working application in real operating use. They show the session, listing research, and sold-item evidence loop.", kind: "screens" },
       { number: "03", label: "Decision design", title: "Useful automation has a stopping rule.", copy: "The product is designed around a buy-or-pass decision, not around producing more output. Uncertainty remains visible and the operator stays in control.", kind: "decision" },
     ],
   },

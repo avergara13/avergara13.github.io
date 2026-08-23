@@ -14,7 +14,7 @@ test("home leads with recruiter-first positioning and an above-fold resume actio
   assert.match(html, /Download resume \(PDF\)/);
   assert.match(html, /Angel_Vergara_Resume_General\.pdf/);
   assert.doesNotMatch(html, /Download implementation resume/);
-  assert.match(html, /Featured live product/);
+  assert.match(html, /Featured working product/);
   assert.match(html, /Public proof boundary/);
   assert.match(html, /I learned systems by running the work they have to support./);
   assert.match(html, /executive chef and general manager/);
@@ -26,7 +26,7 @@ test("home leads with recruiter-first positioning and an above-fold resume actio
   assert.doesNotMatch(html, /Compare all resume options/);
 });
 
-test("public pages keep private application systems out while exposing the approved product repository", async () => {
+test("public pages keep private application systems out and keep the RSP source repository unexposed", async () => {
   const pages = await Promise.all([
     readOutput("index.html"),
     readOutput("resume/index.html"),
@@ -36,8 +36,67 @@ test("public pages keep private application systems out while exposing the appro
   const html = pages.join("\n");
 
   assert.doesNotMatch(html, /application-kit|Application quickstart|Cover-letter kit|application-dashboard/i);
-  assert.match(html, /github\.com\/avergara13\/resale-scanner-pro/);
+  assert.doesNotMatch(html, /github\.com\/avergara13\/resale-scanner-pro/);
   assert.doesNotMatch(html, /15\+ years|FIU · CIA · Valencia/i);
+});
+
+test("RSP recruiter-surface privacy boundary holds across every employer-facing page (WO_ENQ481_002)", async () => {
+  const pages = await Promise.all([
+    readOutput("index.html"),
+    readOutput("resume/index.html"),
+    readOutput("hiring/index.html"),
+    readOutput("work/resale-scanner-pro/index.html"),
+  ]);
+  const html = pages.join("\n");
+
+  // Fixture sanity: if these pages ever stop carrying RSP at all, the bans below
+  // would pass vacuously. Assert the subject is actually present first.
+  assert.match(html, /Resale Scanner Pro/);
+
+  // The two retired outbound CTA classes must never return.
+  assert.doesNotMatch(html, /github\.com\/avergara13\/resale-scanner-pro/);
+  assert.doesNotMatch(html, /resale-scanner-pro-production\.up\.railway\.app/i);
+  assert.doesNotMatch(html, /up\.railway\.app/i);
+  assert.doesNotMatch(html, /Open live product/i);
+  assert.doesNotMatch(html, /View source repository/i);
+
+  // The claim formulations those CTAs made true are retired with them.
+  assert.doesNotMatch(html, /live product/i);
+  assert.doesNotMatch(html, /public application/i);
+  assert.doesNotMatch(html, /public product/i);
+
+  // Source privacy is NOT product privacy. This WO makes the SOURCE private by
+  // design and the PROOF sanitized; it does not make the operating application
+  // private. Product-level privacy conflation must never reappear.
+  assert.doesNotMatch(html, /Private working product/i);
+  assert.doesNotMatch(html, /Working private product/i);
+
+  // The boundary is stated as source/proof facts, not product-state adjectives.
+  assert.match(html, /Working product · Sanitized visual case study/);
+  assert.match(html, /Private by design/);
+  assert.match(html, /[Ss]anitized (?:case study|employer-facing case study)/);
+
+  // Recruiter-readable RSP proof must SURVIVE the privacy correction — this is a
+  // narrowing of exposure, not a removal of the case study.
+  assert.match(html, /In real operating use/);
+  assert.match(html, /built for a real family resale operation/);
+  assert.match(html, /href="\/work\/resale-scanner-pro\/"/);
+
+  // The RSP social card is part of the recruiter-facing surface, and its copy is
+  // baked into a PNG that no HTML grep can inspect. Pin the GENERATOR source so
+  // the retired framing cannot silently return to the social preview.
+  const generator = await readFile(new URL("scripts/generate_og_images.swift", root), "utf8");
+  const rspCard = generator.split("\n").find((line) => line.includes("og-resale-scanner-pro.png"));
+  assert.ok(rspCard, "RSP social card entry must exist in the OG generator");
+  assert.match(rspCard, /label: "SANITIZED CASE STUDY"/);
+  assert.match(rspCard, /A working decision-support workflow used in a real family resale operation\./);
+  assert.doesNotMatch(rspCard, /SHIPPED PRODUCT/);
+  assert.doesNotMatch(rspCard, /public, operational/);
+  assert.doesNotMatch(rspCard, /private product|public product|live product/i);
+
+  // The case-study page must still reference the intended RSP OG asset.
+  const caseStudyHtml = await readOutput("work/resale-scanner-pro/index.html");
+  assert.match(caseStudyHtml, /og-resale-scanner-pro\.png/);
 });
 
 test("retired claim formulations are absent from every employer-facing page", async () => {
@@ -63,10 +122,10 @@ test("RSP framing carries the working-personal-product truth", async () => {
     readOutput("work/resale-scanner-pro/index.html"),
   ]);
 
-  assert.match(home, /Live and in real use/);
+  assert.match(home, /In real operating use/);
   assert.match(home, /built for a real family resale operation/);
-  assert.match(caseStudy, /Working live product · Visual case study/);
-  assert.match(caseStudy, /Live and in real use/);
+  assert.match(caseStudy, /Working product · Sanitized visual case study/);
+  assert.match(caseStudy, /In real operating use/);
   assert.match(caseStudy, /built for a real family resale operation/);
 });
 
@@ -86,8 +145,8 @@ test("case studies expose confirmed project facts without invented metrics", asy
   const html = await readOutput("work/resale-scanner-pro/index.html");
 
   assert.match(html, /Product design, workflow architecture, implementation, and delivery/);
-  assert.match(html, /Working public product with an evidence-focused employer case study/);
-  assert.match(html, /View source repository/);
+  assert.match(html, /Working product in real operating use, with a sanitized employer-facing case study/);
+  assert.doesNotMatch(html, /View source repository/);
   assert.match(html, /Evidence summary/);
   assert.match(html, /Connect the proof to the role/);
   assert.doesNotMatch(html, /A product workflow with an evidence spine/);

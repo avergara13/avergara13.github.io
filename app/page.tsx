@@ -26,7 +26,7 @@ const generalResume = "/downloads/Angel_Vergara_Resume_General.pdf";
 const proofItems = [
   ["English + Spanish", "Bilingual communication"],
   ["Operations → systems", "Workflow translation"],
-  ["Live product", "In real operating use"],
+  ["Working product", "In real operating use"],
 ];
 
 export default function Home() {
@@ -51,10 +51,10 @@ export default function Home() {
                 {proofItems.map(([title, label]) => <div key={title}><b>{title}</b><span>{label}</span></div>)}
               </div>
             </div>
-            <aside className="hero-product" aria-label="Featured live product">
-              <span className="status-dot"><span className="desktop-only">Featured live product</span><span className="mobile-only">Live product</span></span>
+            <aside className="hero-product" aria-label="Featured working product">
+              <span className="status-dot"><span className="desktop-only">Featured working product</span><span className="mobile-only">Working product</span></span>
               <h2>Resale Scanner Pro</h2>
-              <p><span className="desktop-only">A working decision-support product that turns item research into a repeatable evidence workflow.</span><span className="mobile-only">One clear proof point, with a safe live product and outcome-focused case study.</span></p>
+              <p><span className="desktop-only">A working decision-support product that turns item research into a repeatable evidence workflow.</span><span className="mobile-only">One clear proof point, with a working product in real use and an outcome-focused case study.</span></p>
               <div className="hero-workflow">
                 <div><b>01 · Capture</b><span>Collect item evidence</span></div>
                 <div><b>02 · Research</b><span>Compare market signals</span></div>
@@ -66,7 +66,7 @@ export default function Home() {
           </div>
           <div className="hero-bottom">
             <div><b>Recommended path</b><span>Resume → strongest case study → direct contact</span></div>
-            <div><b>Clear labels</b><span>Live product · public source · concept</span></div>
+            <div><b>Clear labels</b><span>Working product · public source · concept</span></div>
             <div><b>Fast scan</b><span>Identity, fit, proof, and action above the fold</span></div>
           </div>
         </div>
@@ -103,16 +103,17 @@ export default function Home() {
           <div className="split-head"><div><p className="eyebrow">Selected work</p><h2>Proof you can inspect.</h2></div><p>Lead with a working product in real use. Follow with sanitized architecture and clearly labeled supporting projects—no inflated claims and no mystery metrics.</p></div>
           <article className="featured-case">
             <div className="featured-copy">
-              <span className="status-dot green">Live and in real use</span>
+              <span className="status-dot green">In real operating use</span>
               <h3>Resale Scanner Pro</h3>
               <p>A mobile-first AI-assisted resale workflow—built for a real family resale operation—connecting capture, market research, human judgment, listing preparation, and operating records.</p>
               <dl className="facts">
                 <div><dt>Role</dt><dd>Product design, workflow architecture, implementation, delivery</dd></div>
                 <div><dt>Operator</dt><dd>Reseller making sourcing, pricing, and listing decisions</dd></div>
                 <div><dt>System</dt><dd>React, TypeScript, Node, Postgres, AI and marketplace integrations</dd></div>
-                <div><dt>Proof</dt><dd>Live product and employer-facing case study</dd></div>
+                <div><dt>Source</dt><dd>Private by design</dd></div>
+                <div><dt>Proof</dt><dd>Sanitized employer-facing case study from real operating use</dd></div>
               </dl>
-              <div className="actions"><Link className="button primary" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link><a className="button" href="https://resale-scanner-pro-production.up.railway.app" target="_blank" rel="noreferrer">Open live product <span aria-hidden="true">↗</span></a></div>
+              <div className="actions"><Link className="button primary" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link></div>
             </div>
             <div className="featured-screens">
               {[["/images/rsp/session.png", "Session decisions", "Session signals and estimated profit"], ["/images/rsp/listings.png", "Listing research", "Human-reviewed optimization queue"], ["/images/rsp/sold.png", "Outcome tracking", "Sales and fulfillment evidence"]].map(([src, label, caption], index) => (
@@ -125,7 +126,7 @@ export default function Home() {
 
       <section className="supporting-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Supporting proof</p><h2>Architecture, domain judgment, and workflow discipline.</h2></div><p>Each project adds a different proof layer while keeping the live product, public source, and concepts clearly separated.</p></div>
+          <div className="split-head"><div><p className="eyebrow">Supporting proof</p><h2>Architecture, domain judgment, and workflow discipline.</h2></div><p>Each project adds a different proof layer while keeping the working product, public source, and concepts clearly separated.</p></div>
           <div className="project-grid">
             <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Governed AI-assisted work focused on scope, authority, evidence, and repair—1,000+ governed pull requests merged under this pattern, without exposing private implementation details.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
@@ -142,7 +143,7 @@ export default function Home() {
           <div>
             <p className="eyebrow light-eyebrow">Fast review path · Remote U.S. roles</p>
             <h2>Resume. Strongest proof. Direct conversation.</h2>
-            <p>Start with the resume, inspect the live product, then connect about the operating problem your team needs to solve.</p>
+            <p>Start with the resume, review the case study, then connect about the operating problem your team needs to solve.</p>
             <div className="review-meta">
               <Link href="/hiring">Hiring-team brief →</Link>
               <a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer">LinkedIn ↗</a>
