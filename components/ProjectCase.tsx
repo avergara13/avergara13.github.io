@@ -6,6 +6,7 @@ export type Project = {
   eyebrow: string;
   title: string;
   dek: string;
+  ogImage?: string;
   status: string;
   statusTone: "green" | "cobalt" | "copper";
   proof: string[];
@@ -128,6 +129,35 @@ const projectData: Record<string, Project> = {
       { number: "03", label: "Concept dashboard", title: "Make the exception visible before it becomes a surprise.", copy: "The sample view uses simulated data to demonstrate a future-state operating experience without implying a launched product or customer deployment.", kind: "decision" },
     ],
   },
+  "assistant-recruiter-pro": {
+    slug: "assistant-recruiter-pro",
+    eyebrow: "Recruiter workflow proof",
+    title: "Assistant Recruiter Pro",
+    dek: "A recruiter-focused AI workflow that generates and iteratively refines Boolean search strategy from job-description constraints and structured user feedback.",
+    ogImage: "/og-home.png",
+    status: "Workflow proof · client-safe framing",
+    statusTone: "cobalt",
+    proof: ["Role map", "Boolean strategy", "Human review", "Refinement loop"],
+    facts: [
+      { label: "User problem", value: "Recruiters need faster, more realistic Boolean strategy from messy job descriptions" },
+      { label: "Role", value: "Workflow design, assistant configuration, iterative search strategy refinement" },
+      { label: "Human control", value: "Recruiter evaluates relevance, false positives, and platform realism" },
+      { label: "Boundary", value: "No customer identity, candidate data, proprietary prompts, or confidential commercial detail exposed" },
+      { label: "Delivered outcome", value: "Inspectable workflow proof for search-strategy generation and iterative quality improvement" },
+    ],
+    workflow: [
+      { number: "01", title: "Intake", copy: "Capture job description context and recruiter constraints." },
+      { number: "02", title: "Role map", copy: "Translate responsibilities into title families and required concepts." },
+      { number: "03", title: "Boolean strategy", copy: "Generate platform-aware broad and narrow search strings." },
+      { number: "04", title: "Human review", copy: "Recruiter checks relevance, realism, and false-positive risk." },
+      { number: "05", title: "Refinement", copy: "Revise exclusions, concepts, and syntax based on structured feedback." },
+    ],
+    sections: [
+      { number: "02", label: "Workflow design", title: "From messy JD language to inspectable search strategy.", copy: "The workflow keeps each step explicit so recruiters can understand and refine the output rather than accept opaque suggestions.", kind: "system" },
+      { number: "03", label: "Evaluation loop", title: "Human judgment improves the strategy over time.", copy: "Feedback is treated as a first-class input: relevance, false positives, and platform realism directly shape the next strategy iteration.", kind: "decision" },
+      { number: "04", label: "Public boundary", title: "Proof without sensitive recruiting data.", copy: "This case intentionally excludes customer identity, candidate details, proprietary prompts, and confidential commercial detail.", kind: "boundary" },
+    ],
+  },
 };
 
 export const projects = Object.values(projectData);
@@ -190,6 +220,20 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
   }
 
   if (kind === "decision") {
+    if (project.slug === "assistant-recruiter-pro") {
+      const rows = [
+        ["Title coverage", "Expand seniority variants"],
+        ["Concept precision", "Tighten must-have skills"],
+        ["False positives", "Add exclusions and context terms"],
+        ["Platform realism", "Adjust syntax to target ATS/search engine"],
+      ];
+      return (
+        <div className="decision-board">
+          {rows.map((row) => <div key={row[0]}><span>{row[0]}</span><b>{row[1]}</b></div>)}
+        </div>
+      );
+    }
+
     const rows = project.slug === "office-chef"
       ? [["Atlantic Produce", "Roma tomatoes", "+18%", "Review menu assumptions"], ["Harbor Foods", "Canola oil", "+9%", "Compare alternate vendor"], ["Green Valley", "Avocado", "-4%", "No action required"]]
       : project.slug === "loft-os"
@@ -226,7 +270,7 @@ export function ProjectCase({ project }: { project: Project }) {
           </div>
           <aside className={`case-note ${project.statusTone}`}>
             <span className="status-dot">{project.status}</span>
-            <h2>{project.slug === "resale-scanner-pro" ? "Built for the decision at the shelf." : project.slug === "loft-os" ? "Public pattern, private implementation." : project.slug === "sous-chef" ? "Domain fluency shaped into product behavior." : "Concept proof without inflated claims."}</h2>
+            <h2>{project.slug === "resale-scanner-pro" ? "Built for the decision at the shelf." : project.slug === "loft-os" ? "Public pattern, private implementation." : project.slug === "sous-chef" ? "Domain fluency shaped into product behavior." : project.slug === "assistant-recruiter-pro" ? "Inspectable workflow, with the recruiter in control." : "Concept proof without inflated claims."}</h2>
           </aside>
         </div>
       </section>

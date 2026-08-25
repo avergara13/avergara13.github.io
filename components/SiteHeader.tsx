@@ -20,14 +20,13 @@ export function SiteHeader() {
 
   const closeMenu = () => setIsOpen(false);
 
-  const isActive = (section: "work" | "resume" | "hiring") => {
+  const isActive = (section: "work" | "resume") => {
     if (!pathname) return false;
     if (section === "work") return pathname.startsWith("/work");
     if (section === "resume") return pathname.startsWith("/resume");
-    return pathname.startsWith("/hiring");
   };
 
-  const currentProps = (section: "work" | "resume" | "hiring") =>
+  const currentProps = (section: "work" | "resume") =>
     isActive(section) ? { "aria-current": "page" as const } : {};
 
   return (
@@ -56,10 +55,9 @@ export function SiteHeader() {
           <Link href="/#work" onClick={closeMenu} {...currentProps("work")}>Case Studies</Link>
           <Link href="/#experience" onClick={closeMenu}>About</Link>
           <Link href="/resume" onClick={closeMenu} {...currentProps("resume")}>Resume</Link>
-          <Link href="/hiring" onClick={closeMenu} {...currentProps("hiring")}>For hiring teams</Link>
           <Link href="/#contact" onClick={closeMenu}>Contact</Link>
           <a className="button button-small nav-cta" href={resumeHref} download onClick={closeMenu}>
-            Download resume <span aria-hidden="true">↓</span>
+            Download Resume <span aria-hidden="true">↓</span>
           </a>
         </div>
       </nav>

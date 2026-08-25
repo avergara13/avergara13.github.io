@@ -72,40 +72,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="experience" className="career-bridge-section" aria-labelledby="career-bridge-title">
-        <div className="shell career-bridge-grid">
-          <div>
-            <p className="eyebrow">Operations to systems</p>
-            <h2 id="career-bridge-title">I learned systems by running the work they have to support.</h2>
-          </div>
-          <div className="career-bridge-copy">
-            <p>My path into implementation and systems work started on restaurant floors and in kitchens, where adoption is not theoretical: training has to hold, handoffs have to survive rushes, and tools have to help people make the next decision.</p>
-            <p>Progressing from hands-on culinary roles to executive chef and general manager taught me to translate operating pressure into clearer workflows, visible ownership, and usable systems.</p>
-          </div>
-        </div>
-        <div className="shell operations-translation" aria-label="How operations experience translates into systems work">
-          <article>
-            <p className="eyebrow">Operating reality</p>
-            <h3>Messy handoffs, hidden exceptions, and pressure that exposes weak systems.</h3>
-            <ul><li>Inventory and vendor pressure</li><li>Training and staffing variability</li><li>Cost, quality, and readiness signals</li></ul>
-          </article>
-          <span aria-hidden="true">→</span>
-          <article>
-            <p className="eyebrow">Systems response</p>
-            <h3>Clear workflows, visible ownership, and human-controlled automation.</h3>
-            <ul><li>Requirements and process mapping</li><li>Training, configuration, and adoption</li><li>Evidence, recovery, and reporting</li></ul>
-          </article>
-        </div>
-      </section>
-
       <section id="capabilities" className="capabilities-section" aria-labelledby="capabilities-title">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">AI / engineering capabilities</p><h2 id="capabilities-title">Useful systems, with the controls left in.</h2></div><p>These are demonstrated working patterns, not a technology inventory.</p></div>
+          <div className="split-head"><div><p className="eyebrow">AI / engineering capabilities</p><h2 id="capabilities-title">Useful systems, with the controls left in.</h2></div><p>Demonstrated workflow capability signals, kept concise and evidence-safe.</p></div>
           <div className="capability-grid capability-grid-large">
-            <article><span>01</span><h3>Role-specific AI workflows</h3><p>Design assistants and agent workflows around a defined responsibility, handoff, and outcome.</p></article>
-            <article><span>02</span><h3>Workflow implementation</h3><p>Translate messy operations into clear inputs, decisions, automations, and usable next steps.</p></article>
-            <article><span>03</span><h3>Human-in-the-loop control</h3><p>Keep review, approval, uncertainty, and recovery visible wherever automation touches a consequential decision.</p></article>
-            <article><span>04</span><h3>Testing and evaluation</h3><p>Use regression checks, evidence capture, and iteration to make a workflow more trustworthy over time.</p></article>
+            <article><span>01</span><h3>AI Workflow Design</h3><p>Custom GPT and Agent SDK role workflows with explicit responsibilities and structured handoffs.</p></article>
+            <article><span>02</span><h3>Implementation</h3><p>LLM/API workflows in TypeScript/Node, with practical Supabase/Postgres exposure and usable outputs.</p></article>
+            <article><span>03</span><h3>Reliability &amp; Human Control</h3><p>Human approval, validation, review, and recovery patterns for consequential workflow decisions.</p></article>
           </div>
         </div>
       </section>
@@ -138,10 +111,10 @@ export default function Home() {
 
       <section className="supporting-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">More proof</p><h2>Systems thinking you can inspect.</h2></div><p>Each project adds a different proof layer while keeping private source material and unsupported claims out of the public surface.</p></div>
+          <div className="split-head"><div><p className="eyebrow">More proof</p><h2>Systems thinking you can inspect.</h2></div><p>RSP is the flagship. Loft OS is first-tier proof of role-specific agent workflows, human control, and accountable delivery patterns.</p></div>
           <div className="project-grid">
-            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Role-specific AI workflows coordinated through clear handoffs, human review, evidence, recovery, and accountable closeout.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
-            <article className="project-card recruiter-card"><span className="card-tag">Customer workflow · evaluation loop</span><h3>Assistant Recruiter Pro</h3><p>Designed/customized a recruiter-focused AI assistant that generates and refines Boolean search strategies and uses structured user feedback to improve search quality and platform realism.</p><div className="capability-grid"><div><b>Role / JD</b><span>Structured search strategy</span></div><div><b>Variants</b><span>Broad and narrow options</span></div><div><b>Refinement</b><span>Title and NOT-block edits</span></div><div><b>Feedback</b><span>Evaluation and iteration</span></div></div><span className="card-link">Review proof in hiring brief →</span></article>
+            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">First-tier proof · sanitized architecture case study</span><h3>Loft OS</h3><p>Role-specific AI workflows coordinated through clear handoffs, human review, evidence, recovery, and accountable closeout.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
+            <Link className="project-card recruiter-card" href="/work/assistant-recruiter-pro"><span className="card-tag">Recruiter workflow · inspectable proof</span><h3>Assistant Recruiter Pro</h3><p>Designed/customized a recruiter-focused AI assistant that generates and refines Boolean search strategies and uses structured user feedback to improve search quality and platform realism.</p><div className="capability-grid"><div><b>JD map</b><span>Role and constraint intake</span></div><div><b>Boolean strategy</b><span>Platform-aware query variants</span></div><div><b>Human review</b><span>Relevance and realism checks</span></div><div><b>Iteration</b><span>Structured refinement loop</span></div></div><span className="card-link">Open workflow proof →</span></Link>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
           </div>
           <Link className="concept-link" href="/work/office-chef">
@@ -151,14 +124,40 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="experience" className="career-bridge-section" aria-labelledby="career-bridge-title">
+        <div className="shell career-bridge-grid">
+          <div>
+            <p className="eyebrow">About / career bridge</p>
+            <h2 id="career-bridge-title">I learned systems by running the work they have to support.</h2>
+          </div>
+          <div className="career-bridge-copy">
+            <p>My path into implementation and systems work started on restaurant floors and in kitchens, where adoption is not theoretical: training has to hold, handoffs have to survive rushes, and tools have to help people make the next decision.</p>
+            <p>Progressing from hands-on culinary roles to executive chef and general manager taught me to translate operating pressure into clearer workflows, visible ownership, and usable systems.</p>
+          </div>
+        </div>
+        <div className="shell operations-translation" aria-label="How operations experience translates into systems work">
+          <article>
+            <p className="eyebrow">Operating reality</p>
+            <h3>Messy handoffs, hidden exceptions, and pressure that exposes weak systems.</h3>
+            <ul><li>Inventory and vendor pressure</li><li>Training and staffing variability</li><li>Cost, quality, and readiness signals</li></ul>
+          </article>
+          <span aria-hidden="true">→</span>
+          <article>
+            <p className="eyebrow">Systems response</p>
+            <h3>Clear workflows, visible ownership, and human-controlled automation.</h3>
+            <ul><li>Requirements and process mapping</li><li>Training, configuration, and adoption</li><li>Evidence, recovery, and reporting</li></ul>
+          </article>
+        </div>
+      </section>
+
       <section id="contact" className="review-section">
         <div className="shell application-grid">
           <div>
             <p className="eyebrow light-eyebrow">Fast review path · Remote U.S. roles</p>
-            <h2>Resume. Strongest proof. Direct conversation.</h2>
-            <p>Start with the resume, review the case study, then connect about the operating problem your team needs to solve.</p>
+            <h2>Resume. Proof. Direct conversation.</h2>
+            <p>Start with the resume, inspect RSP and Loft OS, then connect about the operating problem your team needs to solve.</p>
             <div className="review-meta">
-              <Link href="/hiring">Hiring-team brief →</Link>
+              <Link href="/#experience">About / career bridge →</Link>
               <a href="https://linkedin.com/in/angel-vergara-83861540" target="_blank" rel="noreferrer">LinkedIn ↗</a>
               <a href="https://github.com/avergara13" target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>

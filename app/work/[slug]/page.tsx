@@ -12,6 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const project = getProject(slug);
   const path = `/work/${project?.slug}/`;
+  const ogImage = project?.ogImage ?? `/og-${project?.slug}.png`;
   return project ? {
     title: `${project.title} — Angel Vergara`,
     description: project.dek,
@@ -21,13 +22,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: path,
       title: `${project.title} — Angel Vergara`,
       description: project.dek,
-      images: [{ url: `/og-${project.slug}.png`, width: 1200, height: 630, alt: `${project.title} case study by Angel Vergara` }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${project.title} case study by Angel Vergara` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${project.title} — Angel Vergara`,
       description: project.dek,
-      images: [`/og-${project.slug}.png`],
+      images: [ogImage],
     },
   } : {};
 }

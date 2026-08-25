@@ -30,6 +30,7 @@ main[data-section="work-resale-scanner-pro"] { --accent:var(--green); }
 main[data-section="work-loft-os"] { --accent:var(--copper); }
 main[data-section="work-sous-chef"] { --accent:var(--cobalt); }
 main[data-section="work-office-chef"] { --accent:var(--ink); }
+main[data-section="work-assistant-recruiter-pro"] { --accent:var(--cobalt); }
 main[data-section]::before { content:""; display:block; height:4px; background:var(--accent); }
 main[data-section] .eyebrow:not(.light-eyebrow) { color:var(--accent); }
 main[data-section] .dark-section .eyebrow:not(.light-eyebrow),
