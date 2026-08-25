@@ -74,7 +74,7 @@ const projectData: Record<string, Project> = {
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
       { number: "03", label: "Evidence continuity", title: "A public-safe rail from request to closeout.", copy: "The visible pattern keeps scope, review, verification, and completion connected without exposing private implementation details.", kind: "evidence" },
-      { number: "04", label: "Current implementation", title: "The operating layer in use now.", copy: "A compact view of the implemented control surfaces represented by this case study, with no speculative future system claims.", kind: "implementation" },
+      { number: "04", label: "CURRENT IMPLEMENTATION", title: "The operating layer in use now.", copy: "A compact view of the implemented control surfaces represented by this case study, with no speculative future system claims.", kind: "implementation" },
       { number: "05", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
     ],
   },
