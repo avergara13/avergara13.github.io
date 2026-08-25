@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HumanGatedHandoff from "@/components/HumanGatedHandoff";
 
 export type Project = {
   slug: string;
@@ -40,11 +41,9 @@ const projectData: Record<string, Project> = {
       { label: "Delivered outcome", value: "Working product in real operating use, with a sanitized employer-facing case study" },
     ],
     workflow: [
-      { number: "01", title: "Capture", copy: "Photograph the item and start a session." },
-      { number: "02", title: "Research", copy: "Identify the item and review comparable market signals." },
-      { number: "03", title: "Decide", copy: "Compare cost, fees, margin, risk, and confidence." },
-      { number: "04", title: "Prepare", copy: "Create and approve the listing before publication." },
-      { number: "05", title: "Track", copy: "Record outcomes and feed evidence back into judgment." },
+      { number: "01", title: "Evaluate", copy: "Collect item evidence and compare market signals." },
+      { number: "02", title: "Act", copy: "Prepare the next listing action with human review." },
+      { number: "03", title: "Learn", copy: "Track outcomes so the next decision starts with context." },
     ],
     sections: [
       { number: "02", label: "Working interface", title: "Evidence, not a concept rendering.", copy: "These screens come from the working application in real operating use. They show the session, listing research, and sold-item evidence loop.", kind: "screens" },
@@ -66,11 +65,11 @@ const projectData: Record<string, Project> = {
       { label: "Delivered outcome", value: "Coordinated AI-assisted workflows with human review, evidence, recovery, and accountable closeout" },
     ],
     workflow: [
-      { number: "01", title: "Intake & scope", copy: "Capture the request, owner, outcome, allowed surfaces, and red lines." },
-      { number: "02", title: "Execute", copy: "Change only the authorized, traceable surfaces." },
-      { number: "03", title: "Review", copy: "Inspect behavior, quality, and scope compliance." },
-      { number: "04", title: "Authorize", copy: "Keep high-impact decisions under explicit human control." },
-      { number: "05", title: "Close out", copy: "Freeze evidence, reconcile state, and confirm ownership." },
+      { number: "01", title: "Governed handoff", copy: "Request, scope, and role boundaries stay explicit." },
+      { number: "02", title: "Specialist work", copy: "The assigned work changes only authorized surfaces." },
+      { number: "03", title: "Review + evidence", copy: "Inspect behavior, quality, and recoverability." },
+      { number: "04", title: "Human decision", copy: "Keep high-impact choices under explicit human control." },
+      { number: "05", title: "Closeout", copy: "Reconcile evidence and confirm accountable ownership." },
     ],
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
@@ -171,9 +170,9 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
     return (
       <div className="case-screens">
         {[
-          ["/images/rsp/session.png", "Live session", "Session-level signals and sourcing decisions."],
-          ["/images/rsp/listings.png", "Market research", "Comparable listings beside the item decision."],
-          ["/images/rsp/sold.png", "Outcome tracking", "Sold evidence closes the loop."],
+          ["/images/rsp/session.png", "01 · Evaluate", "Session-level signals and sourcing decisions."],
+          ["/images/rsp/listings.png", "02 · Act", "Comparable listings beside the item decision."],
+          ["/images/rsp/sold.png", "03 · Learn", "Sold evidence closes the loop."],
         ].map(([src, label, caption]) => (
           <figure className="phone" key={src}>
             <Image src={src} alt={`${project.title} ${label} screen`} width={780} height={1688} sizes="(max-width: 620px) 46vw, 28vw" />
@@ -195,10 +194,13 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
 
   if (kind === "controls") {
     return (
-      <div className="three-cards">
+      <div className="loft-controls">
+        <HumanGatedHandoff variant="dark" />
+        <div className="three-cards">
         <article><span>01</span><h3>Scope boundary</h3><ul><li>Named surfaces</li><li>Explicit acceptance criteria</li><li>Clear red lines</li></ul></article>
         <article><span>02</span><h3>Authority boundary</h3><ul><li>Clear roles</li><li>Human approval for material release</li><li>Custody rules for handoffs</li></ul></article>
         <article><span>03</span><h3>Evidence boundary</h3><ul><li>Preflight state checks</li><li>Repeatable verification</li><li>Known-good closeout</li></ul></article>
+        </div>
       </div>
     );
   }

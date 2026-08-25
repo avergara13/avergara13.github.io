@@ -39,11 +39,11 @@ test("homepage recruiter scan order is hero -> capabilities -> proof -> about ->
 test("capability section is concise and materially explicit", async () => {
   const html = await readOutput("index.html");
 
-  assert.match(html, /AI Workflow Design/);
-  assert.match(html, /Custom GPT and Agent SDK role workflows/);
-  assert.match(html, /LLM\/API workflows in TypeScript\/Node/);
-  assert.match(html, /Supabase\/Postgres exposure/);
-  assert.match(html, /Human approval, validation, review, and recovery/);
+  assert.match(html, /AI workflow \/ role design/);
+  assert.match(html, /Implementation \/ usable delivery/);
+  assert.match(html, /Reliability \/ human control \/ evaluation/);
+  assert.match(html, /PROOF · Loft OS/);
+  assert.match(html, /PROOF · Resale Scanner Pro/);
 
   assert.doesNotMatch(html, /LangGraph|Kubernetes|AWS|RAG\b|Python\b/i);
 });
@@ -58,6 +58,11 @@ test("featured proof keeps RSP primary and elevates Loft OS with inspectable Ass
   assert.match(home, /Assistant Recruiter Pro/);
   assert.match(home, /href="\/work\/assistant-recruiter-pro\/"/);
   assert.match(home, /Open workflow proof/);
+  assert.match(home, /01 · Evaluate/);
+  assert.match(home, /02 · Act/);
+  assert.match(home, /03 · Learn/);
+  assert.match(home, /Human-gated handoff/);
+  assert.doesNotMatch(home, /hero-bottom/);
 });
 
 test("assistant recruiter route exists and is client-safe inspectable proof", async () => {

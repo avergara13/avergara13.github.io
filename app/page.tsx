@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import HumanGatedHandoff from "@/components/HumanGatedHandoff";
 
 export const metadata: Metadata = {
   title: "Angel Vergara — AI Workflows & Business Systems",
@@ -51,23 +52,11 @@ export default function Home() {
                 {proofItems.map(([title, label]) => <div key={title}><b>{title}</b><span>{label}</span></div>)}
               </div>
             </div>
-            <aside className="hero-product" aria-label="Featured working product">
-              <span className="status-dot"><span className="desktop-only">Featured working product</span><span className="mobile-only">Working product</span></span>
-              <h2>Resale Scanner Pro</h2>
-              <p><span className="desktop-only">A working decision-support product that turns item research into a repeatable evidence workflow.</span><span className="mobile-only">A working decision-support workflow in real use.</span></p>
-              <div className="hero-workflow">
-                <div><b>01 · Capture</b><span>Collect item evidence</span></div>
-                <div><b>02 · Research</b><span>Compare market signals</span></div>
-                <div><b>03 · Decide</b><span>Score opportunity</span></div>
-                <div><b>04 · Act</b><span>Export the next step</span></div>
-              </div>
-              <div className="proof-note"><b>Public proof boundary</b><span>Product behavior and safe sample outputs are public. Internal workspace and infrastructure details stay private.</span></div>
+            <aside className="hero-product hero-handoff" aria-label="Human-gated handoff">
+              <span className="status-dot">Human-gated handoff</span>
+              <h2>Useful automation keeps the decision visible.</h2>
+              <HumanGatedHandoff />
             </aside>
-          </div>
-          <div className="hero-bottom">
-            <div><b>Recommended path</b><span>Resume → strongest case study → direct contact</span></div>
-            <div><b>Clear labels</b><span>Working product · public source · concept</span></div>
-            <div><b>Fast scan</b><span>Identity, fit, proof, and action above the fold</span></div>
           </div>
         </div>
       </section>
@@ -75,10 +64,10 @@ export default function Home() {
       <section id="capabilities" className="capabilities-section" aria-labelledby="capabilities-title">
         <div className="shell">
           <div className="split-head"><div><p className="eyebrow">AI / engineering capabilities</p><h2 id="capabilities-title">Useful systems, with the controls left in.</h2></div><p>Demonstrated workflow capability signals, kept concise and evidence-safe.</p></div>
-          <div className="capability-grid capability-grid-large">
-            <article><span>01</span><h3>AI Workflow Design</h3><p>Custom GPT and Agent SDK role workflows with explicit responsibilities and structured handoffs.</p></article>
-            <article><span>02</span><h3>Implementation</h3><p>LLM/API workflows in TypeScript/Node, with practical Supabase/Postgres exposure and usable outputs.</p></article>
-            <article><span>03</span><h3>Reliability &amp; Human Control</h3><p>Human approval, validation, review, and recovery patterns for consequential workflow decisions.</p></article>
+          <div className="field-manual">
+            <article><span>01</span><h3>AI workflow / role design</h3><p>Define a useful role, its boundaries, and its handoff points.</p><Link href="/work/loft-os">PROOF · Loft OS →</Link></article>
+            <article><span>02</span><h3>Implementation / usable delivery</h3><p>Turn a workflow into a practical interface people can use and inspect.</p><Link href="/work/resale-scanner-pro">PROOF · Resale Scanner Pro →</Link></article>
+            <article><span>03</span><h3>Reliability / human control / evaluation</h3><p>Keep review, recovery, and human decisions visible in consequential work.</p><Link href="/work/loft-os">PROOF · Loft OS + ARP →</Link></article>
           </div>
         </div>
       </section>
@@ -101,7 +90,7 @@ export default function Home() {
               <div className="actions"><Link className="button primary" href="/work/resale-scanner-pro">Open case study <span aria-hidden="true">→</span></Link></div>
             </div>
             <div className="featured-screens">
-              {[["/images/rsp/session.png", "Session decisions", "Session signals and estimated profit"], ["/images/rsp/listings.png", "Listing research", "Human-reviewed optimization queue"], ["/images/rsp/sold.png", "Outcome tracking", "Sales and fulfillment evidence"]].map(([src, label, caption], index) => (
+              {[['/images/rsp/session.png', '01 · Evaluate', 'Session signals and estimated profit'], ['/images/rsp/listings.png', '02 · Act', 'Human-reviewed optimization queue'], ['/images/rsp/sold.png', '03 · Learn', 'Sales and fulfillment evidence']].map(([src, label, caption], index) => (
                 <figure className={`phone phone-${index + 1}`} key={src}><Image src={src} alt={`Resale Scanner Pro ${label}`} width={780} height={1470} sizes="(max-width: 620px) 46vw, 18vw" /><figcaption><b>{label}</b><span>{caption}</span></figcaption></figure>
               ))}
             </div>
@@ -114,6 +103,7 @@ export default function Home() {
           <div className="split-head"><div><p className="eyebrow">More proof</p><h2>Systems thinking you can inspect.</h2></div><p>RSP is the flagship. Loft OS is first-tier proof of role-specific agent workflows, human control, and accountable delivery patterns.</p></div>
           <div className="project-grid">
             <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">First-tier proof · sanitized architecture case study</span><h3>Loft OS</h3><p>Role-specific AI workflows coordinated through clear handoffs, human review, evidence, recovery, and accountable closeout.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
+              <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">First-tier proof · sanitized architecture case study</span><h3>Loft OS</h3><p>Role-specific AI workflows coordinated through clear handoffs, human review, evidence, recovery, and accountable closeout.</p><HumanGatedHandoff variant="dark" /><span className="card-link">Open case study →</span></Link>
             <Link className="project-card recruiter-card" href="/work/assistant-recruiter-pro"><span className="card-tag">Recruiter workflow · inspectable proof</span><h3>Assistant Recruiter Pro</h3><p>Designed/customized a recruiter-focused AI assistant that generates and refines Boolean search strategies and uses structured user feedback to improve search quality and platform realism.</p><div className="capability-grid"><div><b>JD map</b><span>Role and constraint intake</span></div><div><b>Boolean strategy</b><span>Platform-aware query variants</span></div><div><b>Human review</b><span>Relevance and realism checks</span></div><div><b>Iteration</b><span>Structured refinement loop</span></div></div><span className="card-link">Open workflow proof →</span></Link>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
           </div>

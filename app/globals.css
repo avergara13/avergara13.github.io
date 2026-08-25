@@ -66,6 +66,9 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:#ffe4db; }
 .hero-product .status-dot { color:#7da2ff; }
 .hero-product h2 { margin:12px 0 16px; font-size:clamp(2.3rem,4vw,3.7rem); }
 .hero-product>p { color:#c7d0e4; }
+.hero-handoff { background:var(--white); color:var(--ink); border-color:var(--line); box-shadow:18px 20px 0 rgba(182,58,31,.12); }
+.hero-handoff .status-dot { color:var(--copper); }
+.hero-handoff>h2 { font-family:Georgia,serif; font-weight:500; }
 .hero-workflow { display:grid; grid-template-columns:1fr 1fr; gap:1px; margin:26px 0; border:1px solid #405071; background:#405071; }
 .hero-workflow>div { min-height:91px; padding:14px; background:#0c1d43; }
 .hero-workflow b,.hero-workflow span { display:block; }
@@ -159,6 +162,29 @@ section { padding:96px 0; }
 .capability-grid-large article>span { color:var(--copper); font-family:Georgia,serif; font-size:1.6rem; }
 .capability-grid-large h3 { margin:18px 0 9px; font-family:Georgia,serif; font-size:1.45rem; font-weight:500; }
 .capability-grid-large p { margin:0; color:var(--muted); font-size:.86rem; }
+.field-manual { border-top:1px solid var(--line); }
+.field-manual article { display:grid; grid-template-columns:70px 1.1fr 1.6fr auto; gap:22px; align-items:center; padding:19px 0; border-bottom:1px solid var(--line); }
+.field-manual article>span { color:var(--copper); font-family:Georgia,serif; font-size:1.4rem; }
+.field-manual h3,.field-manual p { margin:0; }
+.field-manual h3 { font-family:Georgia,serif; font-size:1.15rem; font-weight:500; }
+.field-manual p { color:var(--muted); font-size:.84rem; }
+.field-manual a { color:var(--cobalt); font-size:.68rem; font-weight:900; letter-spacing:.08em; text-decoration:none; white-space:nowrap; }
+.handoff { color:var(--ink); }
+.handoff-flow { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; border:1px solid var(--line); background:var(--line); margin:20px 0 0; }
+.handoff-node { min-height:76px; padding:12px; background:var(--paper); }
+.handoff-node span,.handoff-recovery>span:first-child { display:block; color:var(--copper); font-size:.62rem; font-weight:900; letter-spacing:.08em; }
+.handoff-node b { display:block; margin-top:8px; font-size:.75rem; }
+.handoff-decision { outline:2px solid var(--cobalt); outline-offset:-2px; }
+.handoff-recovery { display:flex; gap:10px; align-items:center; margin-top:12px; padding:10px 12px; border:1px dashed var(--copper); font-size:.7rem; }
+.handoff-recovery b { font-weight:800; }
+.handoff-note { margin:12px 0 0; color:var(--muted); font-size:.72rem; }
+.handoff-dark { color:white; }
+.handoff-dark .handoff-flow { border-color:#3d4661; background:#3d4661; }
+.handoff-dark .handoff-node { background:var(--ink); }
+.handoff-dark .handoff-decision { background:var(--cobalt); outline-color:white; }
+.handoff-dark .handoff-recovery { border-color:#9fb0dc; }
+.handoff-dark .handoff-note { color:#c4ccdb; }
+.loft-controls { display:grid; gap:24px; }
 .concept-link { display:flex; justify-content:space-between; gap:24px; margin-top:18px; padding:18px 20px; border:1px solid var(--line); background:var(--white); color:var(--muted); font-size:.82rem; text-decoration:none; }
 .concept-link b,.concept-link span:last-child { color:var(--ink); }
 .concept-link:hover,.concept-link:focus-visible { border-color:var(--cobalt); }
@@ -386,7 +412,7 @@ section { padding:96px 0; }
   .proof-grid { grid-template-columns:1fr; }
   .proof-grid>div { border-right:0; border-bottom:1px solid var(--line); }
   .featured-screens,.case-screens { grid-template-columns:1fr 1fr; }
-  .featured-screens .phone:nth-child(3),.case-screens .phone:nth-child(3) { display:none; }
+  .featured-screens .phone:nth-child(3),.case-screens .phone:nth-child(3) { display:block; }
   .phone-2,.case-screens .phone:nth-child(2) { margin-top:36px; }
   .project-grid,.resume-grid,.three-cards,.system-grid,.domain-strip,.boundary-grid,.case-facts-grid { grid-template-columns:1fr; }
   .career-bridge-grid { gap:36px; }
@@ -396,6 +422,9 @@ section { padding:96px 0; }
   .case-proof-list { justify-content:flex-start; }
   .wide-card,.full-card { grid-column:auto; }
   .mini-workflow,.capability-grid { grid-template-columns:1fr 1fr; }
+  .field-manual article { grid-template-columns:48px 1fr; gap:10px 14px; }
+  .field-manual p,.field-manual a { grid-column:2; }
+  .handoff-flow { grid-template-columns:1fr 1fr; }
   .timeline { grid-template-columns:88px 1fr; }
   .translation-grid { grid-template-columns:1fr; }
   .translation-grid>span { transform:rotate(90deg); justify-self:center; }
