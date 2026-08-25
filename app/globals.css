@@ -143,6 +143,10 @@ section { padding:96px 0; }
 .project-card { min-height:430px; display:block; border:1px solid rgba(11,21,51,.24); background:var(--white); padding:34px; text-decoration:none; transition:transform .18s ease,box-shadow .18s ease; }
 .project-card:hover { transform:translateY(-4px); box-shadow:0 22px 60px rgba(11,21,51,.1); }
 .dark-card { background:var(--ink); color:white; }
+.loft-plate { grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,.9fr); gap:38px; align-items:center; min-height:360px; padding:42px; background:var(--navy); border-color:#25375e; box-shadow:18px 18px 0 rgba(11,76,255,.12); }
+.loft-plate-copy { min-width:0; }
+.loft-plate .mini-workflow { margin-top:0; }
+.loft-plate .card-link { color:#fff; }
 .project-card h3 { margin:13px 0 15px; font-family:Georgia,serif; font-size:2.2rem; font-weight:500; }
 .project-card p { color:var(--muted); }
 .dark-card p { color:#c8cedc; }
@@ -286,6 +290,14 @@ section { padding:96px 0; }
 .boundary-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .boundary-grid article { min-height:250px; padding:30px; border:1px solid rgba(255,255,255,.38); }
 .boundary-grid ul { color:#e0e7ff; }
+.evidence-rail { display:grid; grid-template-columns:1fr auto 1fr auto 1fr auto 1fr; gap:12px; align-items:stretch; }
+.evidence-rail article { min-height:170px; padding:22px; border:1px solid var(--line); background:var(--white); }
+.evidence-rail span,.implementation-strip span { display:block; color:var(--copper); font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+.evidence-rail b,.implementation-strip b { display:block; margin-top:25px; font-family:Georgia,serif; font-size:1.35rem; font-weight:500; }
+.evidence-rail p,.implementation-strip p { margin:9px 0 0; color:var(--muted); font-size:.76rem; }
+.evidence-rail>i { align-self:center; color:var(--copper); font-size:1.5rem; font-style:normal; }
+.implementation-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; max-width:900px; background:var(--line); border:1px solid var(--line); }
+.implementation-strip article { min-height:150px; padding:22px; background:var(--white); }
 .sous-visual { position:relative; max-width:1050px; min-height:650px; margin:auto; padding-right:130px; }
 .sous-desktop { width:100%; border:1px solid var(--line); box-shadow:0 24px 60px rgba(11,21,51,.16); }
 .sous-mobile { position:absolute; right:0; bottom:0; width:260px; border:1px solid var(--line); box-shadow:0 24px 60px rgba(11,21,51,.2); }
@@ -378,6 +390,7 @@ section { padding:96px 0; }
   .proof-grid>div:nth-child(2) { border-right:0; }
   .proof-grid>div:nth-child(-n+2) { border-bottom:1px solid var(--line); }
   .project-card { min-height:0; }
+  .loft-plate { grid-template-columns:1fr; }
   .resume-grid,.material-grid,.strategy-grid { grid-template-columns:1fr; }
   .resume-card p { min-height:0; }
   .workflow-steps { grid-template-columns:repeat(4,1fr); }
@@ -416,7 +429,9 @@ section { padding:96px 0; }
   .featured-screens,.case-screens { grid-template-columns:1fr 1fr; }
   .featured-screens .phone:nth-child(3),.case-screens .phone:nth-child(3) { display:block; }
   .phone-2,.case-screens .phone:nth-child(2) { margin-top:36px; }
-  .project-grid,.resume-grid,.three-cards,.system-grid,.domain-strip,.boundary-grid,.case-facts-grid { grid-template-columns:1fr; }
+  .project-grid,.resume-grid,.three-cards,.system-grid,.domain-strip,.boundary-grid,.case-facts-grid,.implementation-strip { grid-template-columns:1fr; }
+  .evidence-rail { grid-template-columns:1fr; }
+  .evidence-rail>i { transform:rotate(90deg); justify-self:center; }
   .project-grid > *,.handoff { min-width:0; }
   .career-bridge-grid { gap:36px; }
   .operations-translation,.proof-path { grid-template-columns:1fr; }
@@ -424,6 +439,7 @@ section { padding:96px 0; }
   .concept-link,.case-evidence-head { align-items:flex-start; flex-direction:column; }
   .case-proof-list { justify-content:flex-start; }
   .wide-card,.full-card { grid-column:auto; }
+  .loft-plate { padding:26px 22px; }
   .mini-workflow,.capability-grid { grid-template-columns:1fr 1fr; }
   .field-manual article { grid-template-columns:48px 1fr; gap:10px 14px; }
   .field-manual p,.field-manual a { grid-column:2; }

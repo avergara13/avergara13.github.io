@@ -19,7 +19,7 @@ export type Project = {
     label: string;
     title: string;
     copy: string;
-    kind: "screens" | "decision" | "controls" | "system" | "domain" | "boundary";
+    kind: "screens" | "decision" | "controls" | "system" | "domain" | "boundary" | "evidence" | "implementation";
   }[];
 };
 
@@ -73,7 +73,9 @@ const projectData: Record<string, Project> = {
     ],
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
-      { number: "03", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
+      { number: "03", label: "Evidence continuity", title: "A public-safe rail from request to closeout.", copy: "The visible pattern keeps scope, review, verification, and completion connected without exposing private implementation details.", kind: "evidence" },
+      { number: "04", label: "CURRENT IMPLEMENTATION", title: "The operating layer in use now.", copy: "A compact view of the implemented control surfaces represented by this case study, with no speculative future system claims.", kind: "implementation" },
+      { number: "05", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
     ],
   },
   "sous-chef": {
@@ -212,6 +214,14 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
         <article><h3>Withheld</h3><ul><li>Private source and repository details</li><li>Live infrastructure and internal links</li><li>Secrets, security posture, and customer data</li><li>Internal identifiers and release evidence</li></ul></article>
       </div>
     );
+  }
+
+  if (project.slug === "loft-os" && kind === "evidence") {
+    return <div className="evidence-rail" aria-label="Public-safe evidence continuity"><article><span>01</span><b>Request</b><p>Intent and scope become explicit.</p></article><i aria-hidden="true">→</i><article><span>02</span><b>Work</b><p>Authorized surfaces stay bounded.</p></article><i aria-hidden="true">→</i><article><span>03</span><b>Review</b><p>Human judgment remains visible.</p></article><i aria-hidden="true">→</i><article><span>04</span><b>Close</b><p>Evidence confirms the result.</p></article></div>;
+  }
+
+  if (project.slug === "loft-os" && kind === "implementation") {
+    return <div className="implementation-strip"><article><span>Control</span><b>Scoped work</b><p>Named boundaries and acceptance criteria.</p></article><article><span>Authority</span><b>Human review</b><p>Material decisions stay explicit.</p></article><article><span>Evidence</span><b>Verified closeout</b><p>Recovery and completion remain inspectable.</p></article></div>;
   }
 
   if (kind === "domain") {

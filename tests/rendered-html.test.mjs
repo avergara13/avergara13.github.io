@@ -62,7 +62,7 @@ test("featured proof keeps RSP primary and elevates Loft OS with inspectable Ass
   assert.match(home, /02 · Act/);
   assert.match(home, /03 · Learn/);
   assert.match(home, /Human-gated handoff/);
-  assert.equal((home.match(/class="project-card dark-card wide-card"/g) || []).length, 1);
+  assert.equal((home.match(/class="project-card dark-card wide-card loft-plate"/g) || []).length, 1);
   assert.match(home, /SIMPLIFIED PUBLIC-SAFE VIEW/);
   assert.doesNotMatch(home, /hero-bottom/);
 });
