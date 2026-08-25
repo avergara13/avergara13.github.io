@@ -10,11 +10,15 @@ const readOutput = (path) => readFile(new URL(path, output), "utf8");
 test("home leads with recruiter-first positioning and an above-fold resume action", async () => {
   const html = await readOutput("index.html");
 
-  assert.match(html, /Operations leader building systems teams can actually adopt\./);
+  assert.match(html, /I design and build practical AI-assisted workflows and business systems\./);
+  assert.match(html, /usable, testable tools/);
   assert.match(html, /Download resume \(PDF\)/);
   assert.match(html, /Angel_Vergara_Resume_General\.pdf/);
   assert.doesNotMatch(html, /Download implementation resume/);
   assert.match(html, /Featured working product/);
+  assert.match(html, /AI \/ engineering capabilities/);
+  assert.match(html, /Role-specific AI workflows/);
+  assert.match(html, /Assistant Recruiter Pro/);
   assert.match(html, /Public proof boundary/);
   assert.match(html, /I learned systems by running the work they have to support./);
   assert.match(html, /executive chef and general manager/);
@@ -135,8 +139,8 @@ test("Loft OS case carries the verified governed-delivery proof without private 
     readOutput("work/loft-os/index.html"),
   ]);
 
-  assert.match(home, /1,000\+ governed pull requests/);
-  assert.match(loftOs, /1,000\+ governed pull requests/);
+  assert.match(home, /Role-specific AI workflows coordinated through clear handoffs/);
+  assert.match(loftOs, /Coordinated AI-assisted workflows with human review/);
   assert.match(loftOs, /Sanitized by design/);
   assert.doesNotMatch(loftOs, /loft_os_architect|Loft_OS_Architect|WO_ENQ|TSK-\d/);
 });

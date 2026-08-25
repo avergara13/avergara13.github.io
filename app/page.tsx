@@ -3,20 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Angel Vergara — Implementation & Onboarding",
-  description: "Bilingual hospitality operations leader and implementation-focused systems builder with a working AI-assisted product and workflow-delivery proof.",
+  title: "Angel Vergara — AI Workflows & Business Systems",
+  description: "I design and build practical AI-assisted workflows and business systems that turn messy operational problems into usable, testable tools.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "/",
-    title: "Angel Vergara — Systems teams can actually adopt.",
-    description: "Bilingual operations leadership, practical implementation systems, and working product proof.",
-    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara — Systems teams can actually adopt." }],
+    title: "Angel Vergara — AI workflows and business systems",
+    description: "Practical AI-assisted workflows, business systems, and implementation proof.",
+    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara — AI workflows and business systems." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Angel Vergara — Systems teams can actually adopt.",
-    description: "Bilingual operations leadership, practical implementation systems, and working product proof.",
+    title: "Angel Vergara — AI workflows and business systems",
+    description: "Practical AI-assisted workflows, business systems, and implementation proof.",
     images: ["/og-home.png"],
   },
 };
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const generalResume = "/downloads/Angel_Vergara_Resume_General.pdf";
 
 const proofItems = [
-  ["English + Spanish", "Bilingual communication"],
-  ["Operations → systems", "Workflow translation"],
-  ["Working product", "In real operating use"],
+  ["AI workflows", "Designed for real work"],
+  ["Human controls", "Review stays visible"],
+  ["Tested delivery", "Evidence over promises"],
 ];
 
 export default function Home() {
@@ -36,9 +36,9 @@ export default function Home() {
         <div className="shell hero-shell">
           <div className="hero-grid">
             <div className="hero-copy">
-              <p className="eyebrow"><span className="desktop-only">Implementation & onboarding · operations systems</span><span className="mobile-only">Implementation & onboarding</span></p>
-              <h1 id="hero-title"><span className="desktop-only">Operations leader building systems teams can actually adopt.</span><span className="mobile-only">Operations leadership built for adoption.</span></h1>
-              <p className="lede"><span className="desktop-only">I turn frontline complexity into clear workflows, usable tools, and accountable implementation—grounded in hospitality operations and hands-on product building.</span><span className="mobile-only">Bilingual hospitality operator and systems builder turning frontline complexity into workflows teams can use.</span></p>
+              <p className="eyebrow"><span className="desktop-only">AI-assisted workflows · business systems · implementation</span><span className="mobile-only">AI workflows · business systems</span></p>
+              <h1 id="hero-title"><span className="desktop-only">I design and build practical AI-assisted workflows and business systems.</span><span className="mobile-only">Practical AI workflows and business systems.</span></h1>
+              <p className="lede"><span className="desktop-only">I turn messy operational problems into usable, testable tools—with clear human control points and evidence-backed delivery.</span><span className="mobile-only">Turning messy operational problems into usable, testable tools.</span></p>
               <div className="actions hero-actions">
                 <a className="button primary" href={generalResume} download>
                   Download resume (PDF) <span aria-hidden="true">↓</span>
@@ -54,7 +54,7 @@ export default function Home() {
             <aside className="hero-product" aria-label="Featured working product">
               <span className="status-dot"><span className="desktop-only">Featured working product</span><span className="mobile-only">Working product</span></span>
               <h2>Resale Scanner Pro</h2>
-              <p><span className="desktop-only">A working decision-support product that turns item research into a repeatable evidence workflow.</span><span className="mobile-only">One clear proof point, with a working product in real use and an outcome-focused case study.</span></p>
+              <p><span className="desktop-only">A working decision-support product that turns item research into a repeatable evidence workflow.</span><span className="mobile-only">A working decision-support workflow in real use.</span></p>
               <div className="hero-workflow">
                 <div><b>01 · Capture</b><span>Collect item evidence</span></div>
                 <div><b>02 · Research</b><span>Compare market signals</span></div>
@@ -98,6 +98,18 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="capabilities" className="capabilities-section" aria-labelledby="capabilities-title">
+        <div className="shell">
+          <div className="split-head"><div><p className="eyebrow">AI / engineering capabilities</p><h2 id="capabilities-title">Useful systems, with the controls left in.</h2></div><p>These are demonstrated working patterns, not a technology inventory.</p></div>
+          <div className="capability-grid capability-grid-large">
+            <article><span>01</span><h3>Role-specific AI workflows</h3><p>Design assistants and agent workflows around a defined responsibility, handoff, and outcome.</p></article>
+            <article><span>02</span><h3>Workflow implementation</h3><p>Translate messy operations into clear inputs, decisions, automations, and usable next steps.</p></article>
+            <article><span>03</span><h3>Human-in-the-loop control</h3><p>Keep review, approval, uncertainty, and recovery visible wherever automation touches a consequential decision.</p></article>
+            <article><span>04</span><h3>Testing and evaluation</h3><p>Use regression checks, evidence capture, and iteration to make a workflow more trustworthy over time.</p></article>
+          </div>
+        </div>
+      </section>
+
       <section id="work" className="featured-section">
         <div className="shell">
           <div className="split-head"><div><p className="eyebrow">Selected work</p><h2>Proof you can inspect.</h2></div><p>Lead with a working product in real use. Follow with sanitized architecture and clearly labeled supporting projects—no inflated claims and no mystery metrics.</p></div>
@@ -126,9 +138,10 @@ export default function Home() {
 
       <section className="supporting-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Supporting proof</p><h2>Architecture, domain judgment, and workflow discipline.</h2></div><p>Each project adds a different proof layer while keeping the working product, public source, and concepts clearly separated.</p></div>
+          <div className="split-head"><div><p className="eyebrow">More proof</p><h2>Systems thinking you can inspect.</h2></div><p>Each project adds a different proof layer while keeping private source material and unsupported claims out of the public surface.</p></div>
           <div className="project-grid">
-            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Governed AI-assisted work focused on scope, authority, evidence, and repair—1,000+ governed pull requests merged under this pattern, without exposing private implementation details.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
+            <Link className="project-card dark-card wide-card" href="/work/loft-os"><span className="card-tag">Sanitized architecture case study</span><h3>Loft OS</h3><p>Role-specific AI workflows coordinated through clear handoffs, human review, evidence, recovery, and accountable closeout.</p><div className="mini-workflow">{["Intake", "Scope", "Execute", "Review", "Authorize", "Closeout"].map((item, index) => <div key={item}><span>0{index + 1}</span><b>{item}</b></div>)}</div><span className="card-link">Open case study →</span></Link>
+            <article className="project-card recruiter-card"><span className="card-tag">Customer workflow · evaluation loop</span><h3>Assistant Recruiter Pro</h3><p>Designed/customized a recruiter-focused AI assistant that generates and refines Boolean search strategies and uses structured user feedback to improve search quality and platform realism.</p><div className="capability-grid"><div><b>Role / JD</b><span>Structured search strategy</span></div><div><b>Variants</b><span>Broad and narrow options</span></div><div><b>Refinement</b><span>Title and NOT-block edits</span></div><div><b>Feedback</b><span>Evaluation and iteration</span></div></div><span className="card-link">Review proof in hiring brief →</span></article>
             <Link className="project-card" href="/work/sous-chef"><span className="card-tag">Public source case study</span><h3>Sous Chef</h3><p>An AI-assisted culinary workspace for recipe workflows, pantry signals, cookbooks, and cooking-session continuity.</p><div className="capability-grid"><div><b>Recipes</b><span>Structured creation</span></div><div><b>Pantry</b><span>Ingredient signals</span></div><div><b>Cookbooks</b><span>Reusable organization</span></div><div><b>Sessions</b><span>Cooking continuity</span></div></div><span className="card-link">Open case study →</span></Link>
           </div>
           <Link className="concept-link" href="/work/office-chef">

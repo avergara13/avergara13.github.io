@@ -153,6 +153,11 @@ section { padding:96px 0; }
 .capability-grid div { min-height:96px; padding:16px; border:1px solid var(--line); }
 .capability-grid b { display:block; color:var(--cobalt); margin-bottom:6px; }
 .capability-grid span { color:var(--muted); text-transform:none; letter-spacing:0; font-size:.75rem; }
+.capability-grid-large { margin-top:0; gap:1px; border:1px solid var(--line); background:var(--line); }
+.capability-grid-large article { min-height:190px; padding:26px; background:var(--white); }
+.capability-grid-large article>span { color:var(--copper); font-family:Georgia,serif; font-size:1.6rem; }
+.capability-grid-large h3 { margin:18px 0 9px; font-family:Georgia,serif; font-size:1.45rem; font-weight:500; }
+.capability-grid-large p { margin:0; color:var(--muted); font-size:.86rem; }
 .concept-link { display:flex; justify-content:space-between; gap:24px; margin-top:18px; padding:18px 20px; border:1px solid var(--line); background:var(--white); color:var(--muted); font-size:.82rem; text-decoration:none; }
 .concept-link b,.concept-link span:last-child { color:var(--ink); }
 .concept-link:hover,.concept-link:focus-visible { border-color:var(--cobalt); }

@@ -62,7 +62,7 @@ const projectData: Record<string, Project> = {
       { label: "Role", value: "Systems architecture, governance design, and operating-model documentation" },
       { label: "Primary user", value: "Teams coordinating bounded AI-assisted work" },
       { label: "Constraint", value: "Explain the operating pattern without exposing private implementation details" },
-      { label: "Delivered outcome", value: "1,000+ governed pull requests merged under this pattern, with human authority on every high-impact release" },
+      { label: "Delivered outcome", value: "Coordinated AI-assisted workflows with human review, evidence, recovery, and accountable closeout" },
     ],
     workflow: [
       { number: "01", title: "Intake & scope", copy: "Capture the request, owner, outcome, allowed surfaces, and red lines." },

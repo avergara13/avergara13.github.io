@@ -53,7 +53,8 @@ export function SiteHeader() {
           </svg>
         </button>
         <div id="primary-navigation" className={`navlinks ${isOpen ? "is-open" : ""}`}>
-          <Link href="/#work" onClick={closeMenu} {...currentProps("work")}>Work</Link>
+          <Link href="/#work" onClick={closeMenu} {...currentProps("work")}>Case Studies</Link>
+          <Link href="/#experience" onClick={closeMenu}>About</Link>
           <Link href="/resume" onClick={closeMenu} {...currentProps("resume")}>Resume</Link>
           <Link href="/hiring" onClick={closeMenu} {...currentProps("hiring")}>For hiring teams</Link>
           <Link href="/#contact" onClick={closeMenu}>Contact</Link>

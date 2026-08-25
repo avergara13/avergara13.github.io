@@ -9,13 +9,13 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://avergara13.github.io"),
-  title: { default: "Angel Vergara — Implementation & Onboarding", template: "%s" },
-  description: "Bilingual hospitality operations leader and implementation-focused systems builder with a working AI-assisted product and workflow-delivery proof.",
+  title: { default: "Angel Vergara — AI Workflows & Business Systems", template: "%s" },
+  description: "I design and build practical AI-assisted workflows and business systems that turn messy operational problems into usable, testable tools.",
   alternates: { canonical: "/" },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
   robots: { index: true, follow: true },
-  openGraph: { type: "website", url: "/", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and working product proof.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — Systems teams can actually adopt." }] },
-  twitter: { card: "summary_large_image", title: "Angel Vergara — Systems teams can actually adopt.", description: "Bilingual operations leadership, practical implementation systems, and working product proof.", images: ["/og.png"] },
+  openGraph: { type: "website", url: "/", title: "Angel Vergara — AI workflows and business systems", description: "Practical AI-assisted workflows, business systems, and implementation proof.", images: [{ url: "/og.png", width: 1732, height: 909, alt: "Angel Vergara — AI workflows and business systems." }] },
+  twitter: { card: "summary_large_image", title: "Angel Vergara — AI workflows and business systems", description: "Practical AI-assisted workflows, business systems, and implementation proof.", images: ["/og.png"] },
 };
 
 const personSchema = {
