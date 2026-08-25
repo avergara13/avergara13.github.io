@@ -62,7 +62,15 @@ test("featured proof keeps RSP primary and elevates Loft OS with inspectable Ass
   assert.match(home, /02 · Act/);
   assert.match(home, /03 · Learn/);
   assert.match(home, /Human-gated handoff/);
+  assert.equal((home.match(/class="project-card dark-card wide-card"/g) || []).length, 1);
+  assert.match(home, /SIMPLIFIED PUBLIC-SAFE VIEW/);
   assert.doesNotMatch(home, /hero-bottom/);
+});
+
+test("approved Assistant Recruiter Pro heading is pinned", async () => {
+  const html = await readOutput("work/assistant-recruiter-pro/index.html");
+
+  assert.match(html, /From a messy job description to a reviewable search strategy\./);
 });
 
 test("assistant recruiter route exists and is client-safe inspectable proof", async () => {

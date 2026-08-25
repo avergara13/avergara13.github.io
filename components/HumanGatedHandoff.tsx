@@ -26,6 +26,7 @@ export default function HumanGatedHandoff({ variant = "light" }: HandoffProps) {
         <span aria-hidden="true">↩ Specialist work</span>
       </div>
       <p className="handoff-note">Closeout follows the human decision.</p>
+      <p className="handoff-public-label">SIMPLIFIED PUBLIC-SAFE VIEW</p>
     </div>
   );
 }

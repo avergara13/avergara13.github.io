@@ -152,7 +152,7 @@ const projectData: Record<string, Project> = {
       { number: "05", title: "Refinement", copy: "Revise exclusions, concepts, and syntax based on structured feedback." },
     ],
     sections: [
-      { number: "02", label: "Workflow design", title: "From messy JD language to inspectable search strategy.", copy: "The workflow keeps each step explicit so recruiters can understand and refine the output rather than accept opaque suggestions.", kind: "system" },
+      { number: "02", label: "Workflow design", title: "From a messy job description to a reviewable search strategy.", copy: "The workflow keeps each step explicit so recruiters can understand and refine the output rather than accept opaque suggestions.", kind: "system" },
       { number: "03", label: "Evaluation loop", title: "Human judgment improves the strategy over time.", copy: "Feedback is treated as a first-class input: relevance, false positives, and platform realism directly shape the next strategy iteration.", kind: "decision" },
       { number: "04", label: "Public boundary", title: "Proof without sensitive recruiting data.", copy: "This case intentionally excludes customer identity, candidate details, proprietary prompts, and confidential commercial detail.", kind: "boundary" },
     ],

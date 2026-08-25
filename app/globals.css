@@ -178,12 +178,14 @@ section { padding:96px 0; }
 .handoff-recovery { display:flex; gap:10px; align-items:center; margin-top:12px; padding:10px 12px; border:1px dashed var(--copper); font-size:.7rem; }
 .handoff-recovery b { font-weight:800; }
 .handoff-note { margin:12px 0 0; color:var(--muted); font-size:.72rem; }
+.handoff-public-label { margin:12px 0 0; color:var(--muted); font-size:.58rem; font-weight:900; letter-spacing:.1em; }
 .handoff-dark { color:white; }
 .handoff-dark .handoff-flow { border-color:#3d4661; background:#3d4661; }
 .handoff-dark .handoff-node { background:var(--ink); }
 .handoff-dark .handoff-decision { background:var(--cobalt); outline-color:white; }
 .handoff-dark .handoff-recovery { border-color:#9fb0dc; }
 .handoff-dark .handoff-note { color:#c4ccdb; }
+.handoff-dark .handoff-public-label { color:#9fb0dc; }
 .loft-controls { display:grid; gap:24px; }
 .concept-link { display:flex; justify-content:space-between; gap:24px; margin-top:18px; padding:18px 20px; border:1px solid var(--line); background:var(--white); color:var(--muted); font-size:.82rem; text-decoration:none; }
 .concept-link b,.concept-link span:last-child { color:var(--ink); }
@@ -415,6 +417,7 @@ section { padding:96px 0; }
   .featured-screens .phone:nth-child(3),.case-screens .phone:nth-child(3) { display:block; }
   .phone-2,.case-screens .phone:nth-child(2) { margin-top:36px; }
   .project-grid,.resume-grid,.three-cards,.system-grid,.domain-strip,.boundary-grid,.case-facts-grid { grid-template-columns:1fr; }
+  .project-grid > *,.handoff { min-width:0; }
   .career-bridge-grid { gap:36px; }
   .operations-translation,.proof-path { grid-template-columns:1fr; }
   .operations-translation>span,.proof-path>span { transform:rotate(90deg); justify-self:center; }
