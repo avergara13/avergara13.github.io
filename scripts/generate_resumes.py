@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 from reportlab.lib import colors
@@ -26,13 +27,13 @@ MUTED = colors.HexColor("#505A6A")
 LINE = colors.HexColor("#CED3DC")
 
 
-# Content source of truth: the corrected 2026-08-17 canonical resume-lane
-# sources (Master Resume + Career Evidence Ledger downstream lanes). Claim
+# Content source of truth: the current corrected Notion resume-lane source
+# pages (Master Resume + Career Evidence Ledger downstream lanes). Claim
 # boundaries: Cafe Linger operations ended Dec 2022 with paid closure
 # administration/consulting through Jan 2024 (never "Present"); Resale Scanner
-# Pro is a working personal AI-assisted application used in a family resale
-# workflow (never commercial SaaS, customer deployment, or paid
-# software-engineering employment).
+# Pro is a personal/private working AI-assisted application used in a small
+# family resale workflow (never commercial SaaS, customer deployment, mature
+# finished production product, or paid software-engineering employment).
 
 EDUCATION = [
     "Florida International University - B.S., Hospitality Management; Minor, Beverage Management",
@@ -113,6 +114,7 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
+        "source_page": "3a1f99e8-53ab-815b-a5e6-fdb0e889dc4d",
         "headline": "HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
         "profile": (
             "Hospitality operations leader bringing 14+ years of restaurant leadership into restaurant technology "
@@ -132,7 +134,7 @@ RESUMES = [
         "projects": [
             "Resale Scanner Pro - Personal workflow application built for Hobbyst Resale, a small family eBay resale "
             "business: item capture, AI-assisted identification, market research, BUY / MAYBE / PASS decisions, listing "
-            "preparation, publishing, and operating records; an actively evolving personal project.",
+            "preparation, publishing, and operating records; actively evolving personal project evidence.",
             "Loft OS - Sanitized architecture case study: governed workflow moving work through scoped intake, "
             "role-separated execution, human approval, evidence-backed review, recovery, and deterministic closeout.",
             "Sous Chef - Public application: hospitality-domain workspace for authenticated recipe workflows, pantry and "
@@ -153,7 +155,7 @@ RESUMES = [
                 FARM_HAUS_TITLE,
                 [
                     "Began with consultation work to establish kitchen workflow, then led production, quality, ordering, inventory, training, and service execution.",
-                    "Worked directly with ownership on operating consistency and growth support.",
+                    "Worked directly with ownership on operating consistency and growth support while coordinating kitchen production, quality, ordering, inventory, training, and service execution.",
                 ],
             ),
             (
@@ -166,11 +168,12 @@ RESUMES = [
         ],
         "tools": (
             "Excel (Pivot Tables) | Notion | Git and GitHub | Railway | Supabase integration | Postgres/SQL exposure | "
-            "React | TypeScript | Node/Express | AI-assisted workflow design"
+            "React | TypeScript | Node/Express | Gemini | Claude API | marketplace APIs | n8n-style automation"
         ),
     },
     {
         "filename": "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
+        "source_page": "3a1f99e8-53ab-818d-8ca5-f1e90d6d7afc",
         "headline": "OPERATIONS LEADER | BUSINESS SYSTEMS & OPERATIONS",
         "profile": (
             "Hospitality operations leader and systems builder with verified Executive Chef to General Manager "
@@ -188,7 +191,7 @@ RESUMES = [
         "projects": [
             "Resale Scanner Pro - Working personal AI-assisted workflow application used in a small family resale "
             "workflow: structured intake, AI-assisted research, human review gates, external-service integration, "
-            "publishing workflows, and operating records.",
+            "publishing workflows, and operating records within a family-use context.",
             "Loft OS - Sanitized architecture case study: governed workflow patterns for scope, authorization, evidence, "
             "recovery, and closeout, focused on visible ownership and fail-closed controls.",
             "The Office Chef - Concept in design: restaurant back-office automation concept for invoice intake, vendor "
@@ -208,7 +211,7 @@ RESUMES = [
                 FARM_HAUS_TITLE,
                 [
                     "Helped establish the kitchen workflow, production routines, ordering practices, inventory controls, and quality standards.",
-                    "Partnered with ownership on operating consistency and growth support while coordinating quality and team execution.",
+                    "Partnered with ownership on operating consistency and growth support while coordinating kitchen workflow, production routines, ordering practices, inventory controls, quality, and team execution.",
                 ],
             ),
             (
@@ -220,12 +223,13 @@ RESUMES = [
             ),
         ],
         "tools": (
-            "Spreadsheets | Notion databases and dashboards | Supabase integration | Postgres/SQL exposure | "
+            "Spreadsheets | Notion databases and dashboards | verified Supabase integration | Postgres/SQL exposure | "
             "Git and GitHub | Railway | React/TypeScript | Node/Express | automation architecture"
         ),
     },
     {
         "filename": "Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
+        "source_page": "3a1f99e8-53ab-814d-8a4e-e31dd79ea1fc",
         "headline": "OPERATIONS-TO-AI WORKFLOW BUILDER | APPLIED AI WORKFLOWS & GOVERNED SYSTEMS",
         "profile": (
             "Hospitality operations-to-AI workflow builder focused on useful, human-controlled systems. Combines "
@@ -241,9 +245,9 @@ RESUMES = [
             "bilingual English/Spanish"
         ),
         "projects": [
-            "Resale Scanner Pro - Working personal AI-assisted application used in a small family resale workflow; "
+            "Resale Scanner Pro - Private working personal AI-assisted application used in a small family resale workflow; "
             "built with React, TypeScript, Vite, Node/Express, Supabase, and Railway, with Gemini, Claude, "
-            "marketplace/API integrations, automation, and GitHub delivery workflows.",
+            "marketplace/API integrations, automation, and GitHub delivery workflows. Private working-product evidence only; no live deployment or source link is included.",
             "Loft OS - Sanitized architecture case study: agentic workflows with scoped roles, human authorization, "
             "evidence-backed review, fail-closed controls, recovery paths, and deterministic closeout.",
             "Sous Chef - Public application: AI-assisted culinary workspace with authenticated recipe flows, pantry and "
@@ -275,7 +279,7 @@ RESUMES = [
         ],
         "tools": (
             "React | TypeScript | Vite | Tailwind | Node/Express | Railway | Supabase integration | "
-            "Postgres/SQL exposure | Gemini | Claude API | marketplace APIs | Notion | automation design"
+            "Postgres/SQL exposure | Gemini | Claude API | marketplace APIs | GitHub Actions workflow exposure | Notion | n8n-style automation"
         ),
     },
 ]
@@ -436,10 +440,32 @@ def build_resume(resume: dict, destination: Path) -> None:
     doc.build(story)
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate portfolio resume PDFs.")
+    parser.add_argument(
+        "--only",
+        action="append",
+        dest="only",
+        default=[],
+        metavar="FILENAME",
+        help="Generate only this PDF filename. Repeat for multiple files. Default: all resumes.",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    requested = set(args.only)
+    known = {resume["filename"] for resume in RESUMES}
+    unknown = requested - known
+    if unknown:
+        raise SystemExit(f"Unknown resume filename(s): {', '.join(sorted(unknown))}")
+
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
     for resume in RESUMES:
+        if requested and resume["filename"] not in requested:
+            continue
         public_path = PUBLIC_DIR / resume["filename"]
         archive_path = ARCHIVE_DIR / resume["filename"]
         build_resume(resume, public_path)
