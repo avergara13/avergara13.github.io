@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const resumeHref = "/downloads/Angel_Vergara_Resume_General.pdf";
-
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -20,13 +18,14 @@ export function SiteHeader() {
 
   const closeMenu = () => setIsOpen(false);
 
-  const isActive = (section: "work" | "resume") => {
+  const isActive = (section: "work" | "about" | "resume") => {
     if (!pathname) return false;
     if (section === "work") return pathname.startsWith("/work");
+    if (section === "about") return pathname.startsWith("/about");
     if (section === "resume") return pathname.startsWith("/resume");
   };
 
-  const currentProps = (section: "work" | "resume") =>
+  const currentProps = (section: "work" | "about" | "resume") =>
     isActive(section) ? { "aria-current": "page" as const } : {};
 
   return (
@@ -52,13 +51,10 @@ export function SiteHeader() {
           </svg>
         </button>
         <div id="primary-navigation" className={`navlinks ${isOpen ? "is-open" : ""}`}>
-          <Link href="/#work" onClick={closeMenu} {...currentProps("work")}>Case Studies</Link>
-          <Link href="/#experience" onClick={closeMenu}>About</Link>
-          <Link href="/resume" onClick={closeMenu} {...currentProps("resume")}>Resume</Link>
+          <Link href="/work/" onClick={closeMenu} {...currentProps("work")}>Work</Link>
+          <Link href="/about/" onClick={closeMenu} {...currentProps("about")}>About</Link>
+          <Link href="/resume/" onClick={closeMenu} {...currentProps("resume")}>Resume</Link>
           <Link href="/#contact" onClick={closeMenu}>Contact</Link>
-          <a className="button button-small nav-cta" href={resumeHref} download onClick={closeMenu}>
-            Download Resume <span aria-hidden="true">↓</span>
-          </a>
         </div>
       </nav>
     </header>

@@ -6,7 +6,7 @@ const baseUrl = "https://avergara13.github.io";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/resume", "/hiring"];
+  const staticRoutes = ["", "/work", "/about", "/resume", "/hiring", "/lab"];
   const projectRoutes = projects.map((project) => `/work/${project.slug}`);
 
   return [...staticRoutes, ...projectRoutes].map((route) => ({

@@ -7,64 +7,64 @@ const output = new URL("../out/", import.meta.url);
 
 const readOutput = (path) => readFile(new URL(path, output), "utf8");
 
-test("top navigation is locked to the TSK-924 contract", async () => {
+test("top navigation preserves Work, About, Resume, and Contact", async () => {
   const html = await readOutput("index.html");
 
-  assert.match(html, />Case Studies<\/a>/);
+  assert.match(html, />Work<\/a>/);
   assert.match(html, />About<\/a>/);
   assert.match(html, />Resume<\/a>/);
   assert.match(html, />Contact<\/a>/);
-  assert.match(html, /Download Resume/);
-
-  assert.doesNotMatch(html, />For hiring teams<\/a>/i);
-  assert.doesNotMatch(html, />Home<\/a>/i);
+  assert.match(html, /href="\/work\/"/);
+  assert.match(html, /href="\/about\/"/);
 });
 
-test("homepage recruiter scan order is hero -> capabilities -> proof -> about -> contact", async () => {
+test("homepage recruiter scan order is hero -> Decision Relay -> story bridge", async () => {
   const html = await readOutput("index.html");
 
-  const hero = html.indexOf("Practical AI workflows and business systems.");
-  const capabilities = html.indexOf("AI / engineering capabilities");
-  const featured = html.indexOf("Selected work");
-  const about = html.indexOf("About / career bridge");
-  const contact = html.indexOf("Fast review path");
+  const hero = html.indexOf("I design AI workflows that turn messy operations into clear, usable systems.");
+  const relay = html.indexOf("Decision Relay");
+  const story = html.indexOf("Operating Reality");
 
-  assert.ok(hero !== -1 && capabilities !== -1 && featured !== -1 && about !== -1 && contact !== -1);
-  assert.ok(hero < capabilities);
-  assert.ok(capabilities < featured);
-  assert.ok(featured < about);
-  assert.ok(about < contact);
+  assert.ok(hero !== -1 && relay !== -1 && story !== -1);
+  assert.ok(hero < relay && relay < story);
+  assert.doesNotMatch(html, /Selected work|More proof|project-card/);
 });
 
-test("capability section is concise and materially explicit", async () => {
-  const html = await readOutput("index.html");
-
-  assert.match(html, /AI workflow \/ role design/);
-  assert.match(html, /Implementation \/ usable delivery/);
-  assert.match(html, /Reliability \/ human control \/ evaluation/);
-  assert.match(html, /PROOF · Loft OS/);
-  assert.match(html, /PROOF · Resale Scanner Pro/);
-
-  assert.doesNotMatch(html, /LangGraph|Kubernetes|AWS|RAG\b|Python\b/i);
-});
-
-test("featured proof keeps RSP primary and elevates Loft OS with inspectable Assistant Recruiter Pro route", async () => {
+test("Decision Relay is a bounded curated demo with visible three-agent and human-refinement structure", async () => {
   const home = await readOutput("index.html");
+  const component = await readFile(new URL("components/DecisionRelay.tsx", root), "utf8");
+  const contract = `${home}\n${component}`;
 
-  assert.match(home, /Resale Scanner Pro/);
-  assert.match(home, /In real operating use/);
-  assert.match(home, /Loft OS/);
-  assert.match(home, /First-tier proof/);
-  assert.match(home, /Assistant Recruiter Pro/);
-  assert.match(home, /href="\/work\/assistant-recruiter-pro\/"/);
-  assert.match(home, /Open workflow proof/);
-  assert.match(home, /01 · Evaluate/);
-  assert.match(home, /02 · Act/);
-  assert.match(home, /03 · Learn/);
-  assert.match(home, /Human-gated handoff/);
-  assert.equal((home.match(/class="project-card dark-card wide-card loft-plate"/g) || []).length, 1);
-  assert.match(home, /SIMPLIFIED PUBLIC-SAFE VIEW/);
-  assert.doesNotMatch(home, /hero-bottom/);
+  assert.match(contract, /Decision Relay/);
+  assert.match(contract, /Curated demo/i);
+  assert.match(contract, /Triage Agent/);
+  assert.match(contract, /Planning Agent/);
+  assert.match(contract, /Personal Assistant Agent/);
+  assert.match(contract, /Refine the plan/);
+  assert.match(contract, /Custom input is not processed in this public demo/);
+  assert.match(contract, /arbitrary input is never presented as processed/i);
+  assert.doesNotMatch(contract, /Mess → Mission|Mess to Mission/i);
+});
+
+test("formal work index preserves evidence-backed RSP and Systems Field Manual proof", async () => {
+  const html = await readOutput("work/index.html");
+  assert.match(html, /Evidence Atlas/);
+  assert.match(html, /Resale Scanner Pro/);
+  assert.match(html, /Loft OS/);
+  assert.match(html, /Systems Field Manual/);
+  assert.match(html, /Assistant Recruiter Pro/);
+  assert.match(html, /Sous Chef/);
+  assert.match(html, /Experiments &amp; explorations/);
+});
+
+test("Gemini remains isolated under Lab with truthful public capability boundary", async () => {
+  const home = await readOutput("index.html");
+  const lab = await readOutput("lab/index.html");
+  assert.doesNotMatch(home, /Gemini Chat|Live Voice|PUBLIC LIVE/i);
+  assert.match(lab, /Gemini Chat \+ Live Voice/);
+  assert.match(lab, /local-private/i);
+  assert.match(lab, /public live not enabled/i);
+  assert.doesNotMatch(lab, /api\/chat|\/live\b|railway|ollama/i);
 });
 
 test("approved Assistant Recruiter Pro heading is pinned", async () => {
@@ -102,7 +102,9 @@ test("metadata and footer language align with applied AI workflows positioning",
   const hiring = await readOutput("hiring/index.html");
 
   assert.match(home, /AI workflows and business systems/i);
-  assert.match(home, /Applied AI Workflows · Business Systems · Implementation · Human-Controlled Automation/);
+  assert.match(home, /Email →/);
+  assert.match(home, /LinkedIn ↗/);
+  assert.match(home, /GitHub ↗/);
   assert.match(hiring, /og-home\.png/);
 
   const layoutSource = await readFile(new URL("app/layout.tsx", root), "utf8");
@@ -113,6 +115,9 @@ test("metadata and footer language align with applied AI workflows positioning",
 test("claim-boundary and privacy scan passes across recruiter-facing routes", async () => {
   const pages = await Promise.all([
     readOutput("index.html"),
+    readOutput("work/index.html"),
+    readOutput("about/index.html"),
+    readOutput("lab/index.html"),
     readOutput("resume/index.html"),
     readOutput("hiring/index.html"),
     readOutput("work/resale-scanner-pro/index.html"),
@@ -128,10 +133,13 @@ test("claim-boundary and privacy scan passes across recruiter-facing routes", as
   assert.doesNotMatch(html, /up\.railway\.app/i);
 });
 
-test("sitemap and route inventory include the new inspectable assistant route", async () => {
+test("sitemap and route inventory include formal work, about, lab, and inspectable assistant routes", async () => {
   const sitemap = await readOutput("sitemap.xml");
 
   assert.match(sitemap, /https:\/\/avergara13\.github\.io\/work\/assistant-recruiter-pro\//);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/work\//);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/about\//);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/lab\//);
   assert.match(sitemap, /https:\/\/avergara13\.github\.io\/hiring\//);
 });
 
