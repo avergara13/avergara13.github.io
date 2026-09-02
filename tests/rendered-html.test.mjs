@@ -131,6 +131,11 @@ test("claim-boundary and privacy scan passes across recruiter-facing routes", as
   assert.doesNotMatch(html, /WO_ENQ|TSK-\d|loft_os_architect|Loft_OS_Architect|private runtime topology/i);
   assert.doesNotMatch(html, /github\.com\/avergara13\/resale-scanner-pro/i);
   assert.doesNotMatch(html, /up\.railway\.app/i);
+  // Notion identifiers must never reach public output (dashed or bare 32-hex).
+  assert.doesNotMatch(html, /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+  assert.doesNotMatch(html, /notion\.so|app\.notion\.com/i);
+  // Absolute local paths must never reach public output.
+  assert.doesNotMatch(html, /\/Users\//);
 });
 
 test("sitemap and route inventory include formal work, about, lab, and inspectable assistant routes", async () => {
@@ -171,4 +176,59 @@ test("resume PDFs still exist and remain complete", async () => {
     const details = await stat(new URL(path, root));
     assert.ok(details.size > 4_000, `${path} should be a complete PDF`);
   }
+});
+
+test("Loft OS flagship proof strip and Failure Lab are pinned", async () => {
+  const html = await readOutput("work/loft-os/index.html");
+
+  // 1. the governed-run proof strip exists on the Loft OS case study
+  assert.match(html, /id="governed-run"/);
+  assert.match(html, /class="proof-chain"/);
+
+  // 2. the seven proof stages appear in order
+  const stages = [
+    "Request",
+    "Scoped work contract",
+    "Execution authority",
+    "Agent execution",
+    "Review",
+    "Merge authority",
+    "Frozen evidence",
+  ];
+  const positions = stages.map((stage) => {
+    const at = html.indexOf(`<b>${stage}</b>`);
+    assert.notEqual(at, -1, `proof stage missing from rendered output: ${stage}`);
+    return at;
+  });
+  for (let i = 1; i < positions.length; i += 1) {
+    assert.ok(
+      positions[i] > positions[i - 1],
+      `proof stages out of order: "${stages[i]}" must render after "${stages[i - 1]}"`,
+    );
+  }
+
+  // 3. execution authority and merge authority are represented as SEPARATE authorities
+  const executionAt = html.indexOf("<b>Execution authority</b>");
+  const mergeAt = html.indexOf("<b>Merge authority</b>");
+  assert.ok(executionAt < mergeAt, "execution authority must precede merge authority");
+  assert.match(html, /The party that did the work cannot approve its own merge/);
+  const authorityGates = html.match(/authority-gate/g) ?? [];
+  assert.ok(authorityGates.length >= 2, "both authority gates must be marked distinctly");
+
+  // 4. the Failure Lab appears after CURRENT IMPLEMENTATION and before the Public Boundary
+  const implementationAt = html.indexOf("CURRENT IMPLEMENTATION");
+  const failureAt = html.indexOf("Failure lab");
+  const boundaryAt = html.indexOf("Public boundary");
+  assert.notEqual(failureAt, -1, "Failure Lab section missing");
+  assert.ok(implementationAt < failureAt, "Failure Lab must follow CURRENT IMPLEMENTATION");
+  assert.ok(failureAt < boundaryAt, "Failure Lab must precede the Public Boundary");
+
+  // 5. the Public Boundary survives, with its shown/withheld contract intact
+  assert.match(html, /class="boundary-grid"/);
+  assert.match(html, />Shown</);
+  assert.match(html, />Withheld</);
+
+  // the failure narrative is present and stays honest about the open gap
+  assert.match(html, /class="failure-lab"/);
+  assert.match(html, /tracked as open work, not described as solved/);
 });
