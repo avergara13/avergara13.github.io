@@ -340,7 +340,7 @@ export function ProjectCase({ project }: { project: Project }) {
               {project.proofChain.map((step, index) => (
                 <li className={step.authority ? "authority-gate" : ""} key={step.stage}>
                   <article>
-                    <span>{step.authority ? "Authority gate" : `Stage ${index + 1}`}</span>
+                    <span>{step.authority ? `Stage ${index + 1} \u00b7 Authority gate` : `Stage ${index + 1}`}</span>
                     <b>{step.stage}</b>
                     <p>{step.note}</p>
                   </article>
