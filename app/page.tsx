@@ -16,6 +16,7 @@ const selectedProof = [
     number: "01",
     title: "Loft OS",
     href: "/work/loft-os/",
+    flagship: true,
     kind: "Flagship systems proof · Governed multi-agent workflow orchestration",
     summary: "Scoped intake, role-separated execution, human approval, evidence, and accountable closeout.",
   },
@@ -54,7 +55,7 @@ export default function Home() {
         <h2 id="proof-bridge-title">Systems that were built, shipped, and used.</h2>
       </div>
       <div className="proof-bridge-list">
-        {selectedProof.map((item) => <Link className="proof-bridge-row" href={item.href} key={item.href}>
+        {selectedProof.map((item) => <Link className={`proof-bridge-row${item.flagship ? " is-flagship" : ""}`} href={item.href} key={item.href}>
           <span className="proof-bridge-number">{item.number}</span>
           <div>
             <h3>{item.title}</h3>

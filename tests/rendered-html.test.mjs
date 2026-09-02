@@ -98,6 +98,62 @@ test("homepage recruiter scan order is hero -> CTAs -> Decision Relay -> selecte
   assert.doesNotMatch(html, /Selected work|More proof|project-card/);
 });
 
+test("Loft OS is marked as the flagship proof and Resale Scanner Pro is not", async () => {
+  const main = await readHomeMain();
+  const bridge = main.slice(main.indexOf('class="proof-bridge-list"'), main.indexOf('id="story-title"'));
+
+  // The flagship distinction must be structural, not left to reading order alone:
+  // the two rows are otherwise identical markup, so CSS needs a hook it can rank on.
+  const rows = [...bridge.matchAll(/<a class="(proof-bridge-row[^"]*)" href="([^"]+)"/g)]
+    .map(([, cls, href]) => ({ cls, href }));
+
+  assert.equal(rows.length, 2, "the selected-proof bridge must render exactly two rows");
+  assert.equal(rows[0].href, "/work/loft-os/");
+  assert.equal(rows[1].href, "/work/resale-scanner-pro/");
+  assert.match(rows[0].cls, /\bis-flagship\b/, "Loft OS must carry the flagship marker");
+  assert.doesNotMatch(rows[1].cls, /\bis-flagship\b/, "only one row may be the flagship");
+
+  // Ordinals stay put.
+  assert.match(bridge, /<span class="proof-bridge-number">01<\/span>/);
+  assert.match(bridge, /<span class="proof-bridge-number">02<\/span>/);
+});
+
+test("homepage visual prominence follows the intended ranking at every width", async () => {
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+
+  // Guards the regression that shipped: .proof-bridge-head h2 used clamp() and floored at
+  // 30.4px below ~950px wide, while .story-bridge h2 was a FIXED 2.35rem/2rem. So at
+  // 768/430/390 the trailing narrative card out-ranked the flagship proof section even
+  // though the DOM order was correct. Sizes that scale with vw must be compared AT THE SAME
+  // WIDTH — comparing one clamp's max against another's min mixes two different viewports.
+  const declared = (selector) => {
+    const rule = new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`, "g");
+    const decls = [...css.matchAll(rule)].map((m) => m[1]).filter((b) => /font-size\s*:/.test(b));
+    assert.equal(decls.length, 1, `${selector} must declare font-size exactly once — a second override can silently re-invert the hierarchy`);
+    const value = decls[0].match(/font-size\s*:\s*([^;]+)/)[1].trim();
+    const clamped = value.match(/^clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)rem\s*\)$/);
+    if (clamped) {
+      const [, lo, vw, hi] = clamped.map(Number.parseFloat);
+      return (width) => Math.min(Math.max(lo * 16, (vw / 100) * width), hi * 16);
+    }
+    const rem = value.match(/^([\d.]+)rem$/);
+    assert.ok(rem, `${selector}: unsupported font-size form ${value}`);
+    return () => parseFloat(rem[1]) * 16;
+  };
+
+  const proofHead = declared(".proof-bridge-head h2");
+  const flagship = declared(".proof-bridge-row.is-flagship h3");
+  const row = declared(".proof-bridge-row h3");
+  const story = declared(".story-bridge h2");
+
+  for (const width of [1440, 768, 430, 390]) {
+    const [ph, fl, rw, st] = [proofHead(width), flagship(width), row(width), story(width)];
+    assert.ok(ph > st, `at ${width}px the selected-proof heading (${ph}px) must out-rank the trailing story section (${st}px)`);
+    assert.ok(ph > fl, `at ${width}px the section heading (${ph}px) must out-rank the flagship row title (${fl}px)`);
+    assert.ok(fl > rw, `at ${width}px the flagship Loft OS row (${fl}px) must out-rank Resale Scanner Pro (${rw}px)`);
+  }
+});
+
 test("Decision Relay is a bounded curated demo with visible three-agent and human-refinement structure", async () => {
   const home = await readOutput("index.html");
   const component = await readFile(new URL("components/DecisionRelay.tsx", root), "utf8");

@@ -563,11 +563,14 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 
 .proof-bridge { padding:8px 0 84px; }
 .proof-bridge-head { max-width:760px; margin-bottom:34px; }
-.proof-bridge-head h2 { margin:10px 0 0; font-size:clamp(1.9rem,3.2vw,2.6rem); }
+.proof-bridge-head h2 { margin:10px 0 0; font-size:clamp(2rem,3.2vw,2.6rem); }
 .proof-bridge-list { border-top:1px solid var(--line); }
 .proof-bridge-row { display:grid; grid-template-columns:52px 1fr 32px; gap:28px; align-items:center; padding:30px 0; border-bottom:1px solid var(--line); text-decoration:none; }
 .proof-bridge-number { align-self:start; color:var(--copper); font-family:var(--font-geist-mono),monospace; font-size:.73rem; }
-.proof-bridge-row h3 { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.85rem; font-weight:500; }
+.proof-bridge-row h3 { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.45rem,2.05vw,1.85rem); font-weight:500; }
+.proof-bridge-row.is-flagship { padding:36px 0 32px; }
+.proof-bridge-row.is-flagship h3 { font-size:clamp(1.75rem,2.5vw,2.25rem); }
+.proof-bridge-row.is-flagship .proof-bridge-kind { color:var(--copper); }
 .proof-bridge-kind { margin:10px 0 0; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.68rem; letter-spacing:.05em; text-transform:uppercase; }
 .proof-bridge-row>div>p:last-child { margin:12px 0 0; max-width:640px; color:#434b5a; font-size:.95rem; }
 .proof-bridge-arrow { color:var(--muted); font-size:1.3rem; transition:transform .18s ease,color .18s ease; }
@@ -575,7 +578,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .proof-bridge>.lab-link { margin-top:30px; }
 
 .story-bridge { margin-bottom:90px; padding:62px; border:1px solid var(--line); background:var(--white); }
-.story-bridge h2 { font-size:2.35rem; }
+.story-bridge h2 { margin-bottom:18px; font-size:clamp(1.5rem,2.4vw,1.9rem); }
 .story-bridge p { max-width:780px; color:#303745; font-size:1rem; }
 
 .work-index,.about-page,.lab-page { padding:84px 0 110px; }
@@ -641,10 +644,8 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .relay-refinement>div:first-of-type { grid-template-columns:1fr; }
   .proof-bridge { padding-bottom:60px; }
   .proof-bridge-row { grid-template-columns:1fr; gap:12px; padding:24px 0; }
-  .proof-bridge-row h3 { font-size:1.55rem; }
   .proof-bridge-arrow { display:none; }
   .story-bridge { margin-bottom:60px; padding:30px 24px; }
-  .story-bridge h2 { font-size:2rem; }
   .work-index,.about-page,.lab-page { padding-top:60px; }
   .work-index-row { grid-template-columns:1fr; gap:14px; }
   .work-index-row img { grid-column:1; height:220px; }
