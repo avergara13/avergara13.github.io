@@ -86,15 +86,22 @@ test("assistant recruiter route exists and is client-safe inspectable proof", as
   assert.doesNotMatch(html, /private runtime|WO_ENQ|TSK-\d|credentials|candidate identity/i);
 });
 
-test("hiring route is compatibility about/career-bridge and no longer dominates with old positioning", async () => {
+test("hiring route is a hiring brief whose named proof matches its links", async () => {
   const html = await readOutput("hiring/index.html");
 
-  assert.match(html, /About \/ career bridge/i);
+  assert.match(html, /Hiring brief/i);
   assert.match(html, /Applied AI workflows and business systems, grounded in operating reality/i);
-  assert.match(html, /Return to homepage/);
 
+  // The named proof and the actual proof links must not drift apart again.
+  assert.match(html, /Loft OS \+ Resale Scanner Pro/i);
+  assert.match(html, /href="\/work\/loft-os\/"/);
+  assert.match(html, /href="\/work\/resale-scanner-pro\/"/);
+
+  // Route-maintenance framing must stay gone.
+  assert.doesNotMatch(html, /keeps compatibility/i);
+  assert.doesNotMatch(html, /About \/ career bridge/i);
+  assert.doesNotMatch(html, /Use this route for additional context/i);
   assert.doesNotMatch(html, /Operations credibility, built for implementation\./i);
-  assert.doesNotMatch(html, /For hiring teams/i);
 });
 
 test("metadata and footer language align with applied AI workflows positioning", async () => {
@@ -105,7 +112,7 @@ test("metadata and footer language align with applied AI workflows positioning",
   assert.match(home, /Email →/);
   assert.match(home, /LinkedIn ↗/);
   assert.match(home, /GitHub ↗/);
-  assert.match(hiring, /og-home\.png/);
+  assert.match(hiring, /og-hiring\.png/);
 
   const layoutSource = await readFile(new URL("app/layout.tsx", root), "utf8");
   assert.match(layoutSource, /Applied AI Workflow and Business Systems Implementation/);
@@ -231,4 +238,20 @@ test("Loft OS flagship proof strip and Failure Lab are pinned", async () => {
   // the failure narrative is present and stays honest about the open gap
   assert.match(html, /class="failure-lab"/);
   assert.match(html, /tracked as open work, not described as solved/);
+});
+
+test("resume generator source honors the public claim boundary", async () => {
+  const raw = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
+  // Strip comment lines: the module header deliberately NAMES the banned terms to document the boundary.
+  const source = raw.split("\n").filter((line) => !line.trimStart().startsWith("#")).join("\n");
+
+  // Uncontrolled-autonomy and commercial claims must never reach a published resume.
+  assert.doesNotMatch(source, /autonom/i);
+  assert.doesNotMatch(source, /\bSaaS\b/i);
+  assert.doesNotMatch(source, /production[- ]ready/i);
+
+  // No private endpoints, repositories, or workspace identifiers in a public generator.
+  assert.doesNotMatch(source, /up\.railway\.app/i);
+  assert.doesNotMatch(source, /github\.com\/avergara13\/(loft_os|resale-scanner-pro)/i);
+  assert.doesNotMatch(source, /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
 });

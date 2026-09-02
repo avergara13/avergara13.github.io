@@ -13,10 +13,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const project = getProject(slug);
   const path = `/work/${project?.slug}/`;
   const ogImage = project?.ogImage ?? `/og-${project?.slug}.png`;
+  // The Office Chef is a labeled concept, not production proof: reachable by URL, kept out of the search index.
+  const conceptOnly = slug === "office-chef";
   return project ? {
     title: `${project.title} — Angel Vergara`,
     description: project.dek,
     alternates: { canonical: path },
+    robots: conceptOnly ? { index: false, follow: true } : undefined,
     openGraph: {
       type: "article",
       url: path,

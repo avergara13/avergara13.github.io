@@ -7,11 +7,12 @@ export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = ["", "/work", "/about", "/resume", "/hiring", "/lab"];
-  const projectRoutes = projects.map((project) => `/work/${project.slug}`);
+  // The Office Chef is a labeled concept, not production proof: reachable by URL, excluded from the primary sitemap.
+  const projectRoutes = projects.filter((project) => project.slug !== "office-chef").map((project) => `/work/${project.slug}`);
 
   return [...staticRoutes, ...projectRoutes].map((route) => ({
     url: `${baseUrl}${route}/`,
-    lastModified: new Date("2026-08-17"),
+    lastModified: new Date("2026-09-02"),
     changeFrequency: route === "" ? "weekly" : "monthly",
     priority: route === "" ? 1 : route.startsWith("/work/") ? 0.8 : 0.9,
   }));
