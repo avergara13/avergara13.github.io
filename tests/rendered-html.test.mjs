@@ -146,11 +146,16 @@ test("homepage visual prominence follows the intended ranking at every width", a
   const row = declared(".proof-bridge-row h3");
   const story = declared(".story-bridge h2");
 
+  // A rank gap has to be SEEN, not just satisfied numerically: 30.4px over 28px is a
+  // 1.09x difference that reads as "same size" and leaves the hierarchy ambiguous.
+  const STEP = 1.12;
+  const outranks = (bigger, smaller) => bigger >= smaller * STEP;
+
   for (const width of [1440, 768, 430, 390]) {
     const [ph, fl, rw, st] = [proofHead(width), flagship(width), row(width), story(width)];
-    assert.ok(ph > st, `at ${width}px the selected-proof heading (${ph}px) must out-rank the trailing story section (${st}px)`);
-    assert.ok(ph > fl, `at ${width}px the section heading (${ph}px) must out-rank the flagship row title (${fl}px)`);
-    assert.ok(fl > rw, `at ${width}px the flagship Loft OS row (${fl}px) must out-rank Resale Scanner Pro (${rw}px)`);
+    assert.ok(outranks(ph, st), `at ${width}px the selected-proof heading (${ph}px) must visibly out-rank the trailing story section (${st}px)`);
+    assert.ok(outranks(ph, fl), `at ${width}px the section heading (${ph}px) must visibly out-rank the flagship row title (${fl}px)`);
+    assert.ok(outranks(fl, rw), `at ${width}px the flagship Loft OS row (${fl}px) must visibly out-rank Resale Scanner Pro (${rw}px)`);
   }
 });
 
