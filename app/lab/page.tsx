@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Lab — Angel Vergara", description: "Experimental and local-private portfolio explorations separated from production proof.", alternates: { canonical: "/lab/" }, robots: { index: true, follow: true } };
+export const metadata: Metadata = { title: "Lab — Angel Vergara", description: "Experimental and local-private portfolio explorations separated from production proof.", alternates: { canonical: "/lab/" }, robots: { index: true, follow: true }, openGraph: { type: "website", url: "/lab/", title: "Lab — Angel Vergara", description: "Experimental and local-private portfolio explorations, separated from production proof.", images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara lab and experiments" }] }, twitter: { card: "summary_large_image", title: "Lab — Angel Vergara", description: "Experimental and local-private portfolio explorations, separated from production proof.", images: ["/og-home.png"] } };
 
 export default function Lab() {
   return <main id="main" data-section="lab">

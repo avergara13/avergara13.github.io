@@ -291,7 +291,7 @@ export function DecisionRelay() {
         <label className="sr-only" htmlFor="relay-input">Messy input</label>
         <textarea id="relay-input" value={input} disabled={running} onChange={(event) => { const value = event.target.value; setInput(value); setFixtureId((current) => current && value === fixtures[current].input ? current : null); setWarning(""); }} placeholder="Dump everything here — tasks, deadlines, worries, ideas, reminders, things you’re waiting on…" />
         {warning && <p className="relay-warning" aria-live="polite">{warning}</p>}
-        <button className="relay-run" type="button" onClick={runDemo} disabled={running}>{running ? "Relay running…" : "Run the agents"}</button>
+        <button className="relay-run" type="button" onClick={runDemo} disabled={running}>{running ? "Relay running…" : "Run demo"}</button>
         <div className="relay-samples" aria-label="Curated examples">{Object.entries(fixtures).map(([id, fixture]) => <button type="button" key={id} onClick={() => chooseFixture(id)} disabled={running}>{fixture.label}</button>)}</div>
         <p className="relay-privacy">Do not paste confidential or sensitive information.</p>
       </div>

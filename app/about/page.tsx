@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "About — Angel Vergara", description: "From hospitality operations leadership to applied AI workflows and business systems.", alternates: { canonical: "/about/" } };
+export const metadata: Metadata = { title: "About — Angel Vergara", description: "From hospitality operations leadership to applied AI workflows and business systems.", alternates: { canonical: "/about/" }, openGraph: { type: "website", url: "/about/", title: "About — Angel Vergara", description: "From hospitality operations leadership to applied AI workflows and business systems.", images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "About Angel Vergara" }] }, twitter: { card: "summary_large_image", title: "About — Angel Vergara", description: "From hospitality operations leadership to applied AI workflows and business systems.", images: ["/og-home.png"] } };
 
 export default function About() {
   return <main id="main" data-section="about">

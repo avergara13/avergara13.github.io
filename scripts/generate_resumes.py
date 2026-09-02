@@ -74,8 +74,9 @@ RESUMES = [
             "Resale Scanner Pro - Working personal AI-assisted application used in the family resale workflow: item "
             "capture, AI-assisted identification, market research, BUY / MAYBE / PASS decision support, listing "
             "preparation, publishing, and operating records.",
-            "Loft OS - Governed autonomous AI workflows (public-safe case study): scoped tasks, role-separated "
-            "agents, human approval gates, evidence-backed review, and deterministic closeout.",
+            "Loft OS - Sanitized architecture case study: governed multi-agent AI workflows with scoped roles, "
+            "human authorization, evidence-backed review, fail-closed controls, recovery paths, and "
+            "deterministic closeout.",
             "Sous Chef - Public AI-assisted culinary workspace: authenticated recipe workflows, pantry and inventory "
             "signals, cookbooks, and cooking-session history.",
         ],
@@ -114,7 +115,6 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
-        "source_page": "3a1f99e8-53ab-815b-a5e6-fdb0e889dc4d",
         "headline": "HOSPITALITY OPERATIONS LEADER | IMPLEMENTATION & ONBOARDING",
         "profile": (
             "Hospitality operations leader bringing 14+ years of restaurant leadership into restaurant technology "
@@ -173,7 +173,6 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
-        "source_page": "3a1f99e8-53ab-818d-8ca5-f1e90d6d7afc",
         "headline": "OPERATIONS LEADER | BUSINESS SYSTEMS & OPERATIONS",
         "profile": (
             "Hospitality operations leader and systems builder with verified Executive Chef to General Manager "
@@ -229,7 +228,6 @@ RESUMES = [
     },
     {
         "filename": "Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
-        "source_page": "3a1f99e8-53ab-814d-8a4e-e31dd79ea1fc",
         "headline": "OPERATIONS-TO-AI WORKFLOW BUILDER | APPLIED AI WORKFLOWS & GOVERNED SYSTEMS",
         "profile": (
             "Hospitality operations-to-AI workflow builder focused on useful, human-controlled systems. Combines "
