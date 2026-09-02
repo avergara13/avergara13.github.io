@@ -89,6 +89,11 @@ test("homepage recruiter scan order is hero -> CTAs -> Decision Relay -> selecte
   assert.notEqual(rsp, -1, "Resale Scanner Pro must appear in the selected-proof bridge");
   assert.ok(loftOs < rsp, "Loft OS must lead the selected-proof bridge");
 
+  // The leading row must actually be labelled Loft OS: pinning link order alone
+  // would still pass if the rows kept their hrefs but swapped their identities.
+  assert.match(bridge.slice(loftOs, rsp), /<h3>Loft OS<\/h3>/);
+  assert.match(bridge.slice(rsp), /<h3>Resale Scanner Pro<\/h3>/);
+
   // The retired card-heavy homepage layout must not return.
   assert.doesNotMatch(html, /Selected work|More proof|project-card/);
 });
