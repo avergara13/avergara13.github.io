@@ -282,8 +282,9 @@ export function DecisionRelay() {
 
   return <section className="relay-section shell" id="decision-relay" aria-labelledby="relay-title">
     <div className="relay-header">
+      <p className="relay-eyebrow">Interactive proof</p>
       <div className="relay-title-row"><h2 id="relay-title">Decision Relay</h2><span>Curated demo</span></div>
-      <p>Turn an unstructured brain dump into a prioritized plan through a bounded three-agent workflow.</p>
+      <p>See how messy input becomes a scoped, reviewable plan through a bounded AI workflow.</p>
     </div>
     <div className="relay-layout">
       <div className="relay-input-panel">
