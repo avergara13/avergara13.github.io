@@ -17,7 +17,7 @@
 
   /* text tiers on deep proof surfaces */
   --on-dark:#ffffff; --on-dark-muted:#c3cbdb; --on-dark-faint:#94a0bb; --dark-line:#25324f;
-  --cobalt-on-dark:var(--cobalt-on-dark); --navy-deep:#0a1228; --navy-raised:#152244;
+  --cobalt-on-dark:#7da2ff; --navy-deep:#0a1228; --navy-raised:#152244;
 
   /* surface system: thin alpha borders, soft elevation, 14-16px radii */
   --edge:rgba(11,18,32,.10); --edge-strong:rgba(11,18,32,.16);
@@ -25,7 +25,9 @@
   --lift:0 1px 2px rgba(11,18,32,.04), 0 8px 24px rgba(11,18,32,.06);
   --lift-lg:0 2px 4px rgba(11,18,32,.05), 0 18px 44px rgba(11,18,32,.09);
 
-  --focus:var(--focus);
+  /* Focus ring is CONTEXTUAL: the old amber was only 1.52:1 on the canvas.
+     Ink on light and white on dark both clear 17:1. */
+  --focus:#0b1220;
 
   --max:1180px;
 
@@ -777,6 +779,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
    surface, scale and density change. */
 .relay-section { border-top:1px solid var(--line); }
 .relay-title-row span {
+  display:inline-block; align-self:center; width:max-content;
   padding:4px 10px; border:1px solid var(--edge-strong); border-radius:var(--r-chip);
   background:var(--surface); color:var(--copper);
 }
@@ -833,3 +836,70 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .proof-surface .proof-chain>li::before { left:5px; right:auto; top:0; bottom:0; width:1px; height:auto; }
   .proof-surface .proof-chain>li::after { top:4px; }
 }
+
+/* ── Deliberate mobile recomposition ────────────────────────────────────────
+   Not a squeezed desktop: the flagship surface keeps its own padding scale,
+   the signals wrap as chips, and the arrow column is dropped in favour of the
+   row's own affordance rather than shrinking everything proportionally. */
+@media (max-width:620px) {
+  .relay-title-row>span { display:inline-block; width:max-content; margin-top:8px; }
+  .proof-bridge-row.is-flagship { grid-template-columns:1fr; padding:26px 20px; gap:14px; border-radius:var(--r-card); }
+  .proof-bridge-row.is-flagship .proof-bridge-arrow { display:block; color:var(--cobalt-on-dark); }
+  .proof-signals { gap:6px; margin-top:14px; }
+  .proof-signals li { font-size:.6rem; padding:5px 10px; }
+  .proof-bridge-list { gap:14px; }
+}
+@media (max-width:960px) and (min-width:621px) {
+  .proof-bridge-row.is-flagship { padding:28px 24px; grid-template-columns:44px 1fr 28px; }
+}
+
+/* ── Contrast corrections found by the rendered-page audit ──────────────────
+   1. The public-boundary section used a cobalt FIELD. In this system cobalt is an
+      action colour, not a canvas: no warm eyebrow tint clears 4.5:1 on #2466FD
+      (the best is 4.32), so the section becomes a navy proof surface instead —
+      consistent with the board and compliant (copper-on-dark 7.24:1).
+   2. .handoff-dark was rendering inside a WHITE case section, so its pale text
+      landed on white — the recovery label measured 1.0:1, i.e. invisible. The dark
+      variant now carries its own navy plate, which is what "dark" was assuming. */
+.blue-section { background:var(--navy); }
+.blue-section .eyebrow,
+main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copper-on-dark); }
+.blue-section h2,.blue-section h3,.blue-section b { color:var(--on-dark); }
+.blue-section p,.blue-section li,.blue-section .split-head p:last-child { color:var(--on-dark-muted); }
+.blue-section .boundary-grid ul { color:var(--on-dark-muted); }
+
+.handoff-dark {
+  padding:26px; border-radius:var(--r-surface);
+  background:var(--navy); border:1px solid var(--dark-line); box-shadow:var(--lift-lg);
+  color:var(--on-dark);
+}
+.handoff-dark .handoff-flow { border-color:var(--dark-line); background:var(--dark-line); }
+.handoff-dark .handoff-node { background:var(--navy-deep); }
+.handoff-dark .handoff-node span { color:var(--copper-on-dark); }
+.handoff-dark .handoff-node b { color:var(--on-dark); }
+.handoff-dark .handoff-recovery { border-color:var(--copper-on-dark); color:var(--on-dark-muted); }
+.handoff-dark .handoff-recovery>span:first-child,
+.handoff-dark .handoff-recovery b { color:var(--copper-on-dark); }
+.handoff-dark .handoff-recovery>span:last-child { color:var(--on-dark-muted); }
+.handoff-dark .handoff-note { color:var(--on-dark-muted); }
+.handoff-dark .handoff-public-label { color:var(--on-dark-faint); }
+
+/* Decorative ordinals sit on a LIGHT card, so an on-dark tier is the wrong tier.
+   Copper matches the board's region-numbering treatment and clears AA at 5.02:1. */
+.three-cards article>span { color:var(--copper); }
+
+/* These micro-labels render on BOTH light and dark surfaces depending on the case
+   study. Default them to the light-safe copper label treatment and re-tint only
+   inside an actual dark context, rather than assuming one surface. */
+.system-grid span,.domain-strip span { color:var(--copper); }
+.dark-section .system-grid span,.dark-section .domain-strip span,
+.blue-section .system-grid span,.blue-section .domain-strip span,
+.proof-surface .system-grid span,.proof-surface .domain-strip span { color:var(--copper-on-dark); }
+
+/* Anything sitting on a deep proof surface flips the ring to white so it always
+   clears its own backdrop. */
+.dark-section,.blue-section,.proof-surface,.handoff-dark,.app-hero,.hero-product,
+.loft-plate,.dark-card,.experience-section,.workflow-section,
+.proof-bridge-row.is-flagship { --focus:#ffffff; }
+/* The cobalt primary sits on the light canvas, and its ring is offset outside the
+   fill, so the ink ring is measured against the canvas (17:1), not the button. */
