@@ -330,7 +330,7 @@ export function ProjectCase({ project }: { project: Project }) {
       </section>
 
       {project.proofChain && (
-        <section id="governed-run" className="case-section" aria-label="Governed run: request to frozen evidence">
+        <section id="governed-run" className="case-section proof-surface" aria-label="Governed run: request to frozen evidence">
           <div className="shell">
             <div className="split-head">
               <div><p className="eyebrow">Governed run</p><h2>One path, and two gates held by different parties.</h2></div>

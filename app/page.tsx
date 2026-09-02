@@ -19,6 +19,8 @@ const selectedProof = [
     flagship: true,
     kind: "Flagship systems proof · Governed multi-agent workflow orchestration",
     summary: "Scoped intake, role-separated execution, human approval, evidence, and accountable closeout.",
+    // Verbatim from the Loft OS case study's own proof array — not new claims.
+    signals: ["Scoped execution", "Human authority", "Evidence chain", "Repair loops"],
   },
   {
     number: "02",
@@ -61,6 +63,9 @@ export default function Home() {
             <h3>{item.title}</h3>
             <p className="proof-bridge-kind">{item.kind}</p>
             <p>{item.summary}</p>
+            {item.signals && <ul className="proof-signals" aria-label="Governed run signals">
+              {item.signals.map((signal) => <li key={signal}>{signal}</li>)}
+            </ul>}
           </div>
           <span className="proof-bridge-arrow" aria-hidden="true">→</span>
         </Link>)}
