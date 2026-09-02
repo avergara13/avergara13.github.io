@@ -7,6 +7,29 @@ const output = new URL("../out/", import.meta.url);
 
 const readOutput = (path) => readFile(new URL(path, output), "utf8");
 
+// Scope homepage order checks to <main>: the <head> description and the nav/footer
+// repeat hero copy ("Angel Vergara", the value proposition, /resume/), so a
+// whole-document indexOf would silently measure the wrong occurrence.
+const readHomeMain = async () => {
+  const html = await readOutput("index.html");
+  const at = html.indexOf('<main id="main"');
+  assert.notEqual(at, -1, "homepage <main> landmark is missing");
+  return html.slice(at);
+};
+
+// Each marker must appear EXACTLY once and in the given order. Uniqueness is part
+// of the assertion: a duplicated marker would make the ordering claim meaningless.
+const assertOrder = (haystack, markers) => {
+  let previous = -1;
+  for (const marker of markers) {
+    const at = haystack.indexOf(marker);
+    assert.notEqual(at, -1, `ordered marker missing from rendered output: ${marker}`);
+    assert.equal(haystack.indexOf(marker, at + 1), -1, `ordered marker must be unique: ${marker}`);
+    assert.ok(at > previous, `rendered order violated: ${marker} appears too early`);
+    previous = at;
+  }
+};
+
 test("top navigation preserves Work, About, Resume, and Contact", async () => {
   const html = await readOutput("index.html");
 
@@ -18,15 +41,60 @@ test("top navigation preserves Work, About, Resume, and Contact", async () => {
   assert.match(html, /href="\/about\/"/);
 });
 
-test("homepage recruiter scan order is hero -> Decision Relay -> story bridge", async () => {
+test("homepage hero leads with identity, a subordinate role family, the value proposition, then CTAs", async () => {
+  const main = await readHomeMain();
+
+  // The identity anchor is the page h1 — not the nav wordmark.
+  assert.match(main, /<h1 id="hero-title">Angel Vergara<\/h1>/);
+
+  // The role family is carried by a subordinate line, never promoted into a heading.
+  assert.match(main, /<p class="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems<\/p>/);
+  assert.doesNotMatch(main, /<h[12][^>]*>[^<]*AI Workflow Automation/);
+
+  // Value proposition and the restrained proof cue.
+  assert.match(main, /<p class="hero-value">I turn messy operating problems into clear, controlled systems people can actually use\.<\/p>/);
+  assert.match(main, /<p class="hero-proof-cue">Governed AI systems · Working products · Implementation discipline<\/p>/);
+
+  // Recruiter CTAs resolve to the flagship case study and the resume, inside the hero.
+  const ctas = main.slice(main.indexOf('class="hero-ctas"'), main.indexOf('class="editorial-handoff"'));
+  assert.match(ctas, /href="\/work\/loft-os\/"[^>]*>View flagship work/);
+  assert.match(ctas, /href="\/resume\/">Resume</);
+
+  assertOrder(main, [
+    'id="hero-title"',
+    'class="hero-role-family"',
+    'class="hero-value"',
+    'class="hero-proof-cue"',
+    'class="hero-ctas"',
+  ]);
+});
+
+test("homepage recruiter scan order is hero -> CTAs -> Decision Relay -> selected proof -> story bridge", async () => {
   const html = await readOutput("index.html");
+  const main = await readHomeMain();
 
-  const hero = html.indexOf("I design AI workflows that turn messy operations into clear, usable systems.");
-  const relay = html.indexOf("Decision Relay");
-  const story = html.indexOf("Operating Reality");
+  assertOrder(main, [
+    'id="hero-title"',
+    'class="hero-ctas"',
+    'id="relay-title"',
+    'class="proof-bridge-list"',
+    'id="story-title"',
+  ]);
 
-  assert.ok(hero !== -1 && relay !== -1 && story !== -1);
-  assert.ok(hero < relay && relay < story);
+  // Loft OS is the flagship proof and leads; Resale Scanner Pro follows it.
+  const bridge = main.slice(main.indexOf('class="proof-bridge-list"'), main.indexOf('id="story-title"'));
+  const loftOs = bridge.indexOf('href="/work/loft-os/"');
+  const rsp = bridge.indexOf('href="/work/resale-scanner-pro/"');
+  assert.notEqual(loftOs, -1, "Loft OS must appear in the selected-proof bridge");
+  assert.notEqual(rsp, -1, "Resale Scanner Pro must appear in the selected-proof bridge");
+  assert.ok(loftOs < rsp, "Loft OS must lead the selected-proof bridge");
+
+  // The leading row must actually be labelled Loft OS: pinning link order alone
+  // would still pass if the rows kept their hrefs but swapped their identities.
+  assert.match(bridge.slice(loftOs, rsp), /<h3>Loft OS<\/h3>/);
+  assert.match(bridge.slice(rsp), /<h3>Resale Scanner Pro<\/h3>/);
+
+  // The retired card-heavy homepage layout must not return.
   assert.doesNotMatch(html, /Selected work|More proof|project-card/);
 });
 
@@ -37,6 +105,8 @@ test("Decision Relay is a bounded curated demo with visible three-agent and huma
 
   assert.match(contract, /Decision Relay/);
   assert.match(contract, /Curated demo/i);
+  // Framed as secondary interactive proof, and still visibly a curated demo.
+  assert.match(home, /<p class="relay-eyebrow">Interactive proof<\/p>/);
   assert.match(contract, /Triage Agent/);
   assert.match(contract, /Planning Agent/);
   assert.match(contract, /Personal Assistant Agent/);
