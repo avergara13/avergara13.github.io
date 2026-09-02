@@ -14,12 +14,13 @@ export type Project = {
   links?: { label: string; href: string; primary?: boolean }[];
   facts: { label: string; value: string }[];
   workflow: { number: string; title: string; copy: string }[];
+  proofChain?: { stage: string; note: string; authority?: boolean }[];
   sections: {
     number: string;
     label: string;
     title: string;
     copy: string;
-    kind: "screens" | "decision" | "controls" | "system" | "domain" | "boundary" | "evidence" | "implementation";
+    kind: "screens" | "decision" | "controls" | "system" | "domain" | "boundary" | "evidence" | "implementation" | "failure";
   }[];
 };
 
@@ -71,11 +72,21 @@ const projectData: Record<string, Project> = {
       { number: "04", title: "Human decision", copy: "Keep high-impact choices under explicit human control." },
       { number: "05", title: "Closeout", copy: "Reconcile evidence and confirm accountable ownership." },
     ],
+    proofChain: [
+      { stage: "Request", note: "Intent enters as a plain request." },
+      { stage: "Scoped work contract", note: "An explicit contract names what may change and what \u201cdone\u201d means." },
+      { stage: "Execution authority", note: "A separate authority grants permission to execute.", authority: true },
+      { stage: "Agent execution", note: "Work happens only inside the declared scope." },
+      { stage: "Review", note: "Independent review before anything lands." },
+      { stage: "Merge authority", note: "A different authority again decides whether it merges.", authority: true },
+      { stage: "Frozen evidence", note: "Closeout is refused if the evidence is incomplete." },
+    ],
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
       { number: "03", label: "Evidence continuity", title: "A public-safe rail from request to closeout.", copy: "The visible pattern keeps scope, review, verification, and completion connected without exposing private implementation details.", kind: "evidence" },
       { number: "04", label: "CURRENT IMPLEMENTATION", title: "The operating layer in use now.", copy: "A compact view of the implemented control surfaces represented by this case study, with no speculative future system claims.", kind: "implementation" },
-      { number: "05", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
+      { number: "05", label: "Failure lab", title: "When the system was wrong about itself.", copy: "A real containment failure, kept on the record. The verdict was wrong, the evidence was preserved rather than corrected, and the gap it exposed is still tracked as open work.", kind: "failure" },
+      { number: "06", label: "Public boundary", title: "What this portfolio shows—and protects.", copy: "The case study explains the operating pattern without exposing private systems, repository details, identifiers, or sensitive implementation evidence.", kind: "boundary" },
     ],
   },
   "sous-chef": {
@@ -207,6 +218,25 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
     );
   }
 
+  if (kind === "failure") {
+    const beats: [string, string, string][] = [
+      ["01", "Active work", "An execution lane was working normally. Inside a ninety-minute window it produced two commits folding reviewer findings, resolved seven review threads, and stood with an open change and all required checks passing."],
+      ["02", "A false verdict", "A liveness watchdog concluded the lane was dead. Its stated reason: the lane\u2019s heartbeat signal had aged past its threshold, with no corroborating evidence of activity."],
+      ["03", "Containment", "The system did what it is designed to do with a dead lane. It closed the work timer, set the task aside, and returned the execution lock to its owner \u2014 while the lane was mid-review with open, passing work."],
+      ["04", "The evidence was kept", "The containment record was left intact. It was not edited, deleted, or explained away. The timer had been closed with an end time equal to its start time, recording zero duration for roughly two hours of real work, and that false record was preserved as evidence."],
+      ["05", "Root cause", "The signal was stale about the heartbeat, never about the lane. The heartbeat is created when work starts and finalized when it ends, and no automated path in the production flow refreshes it in between. A refresh command exists, but nothing in production calls it."],
+      ["06", "Recovery", "The lane resumed the way the rules require: a fresh start record, the heartbeat recreated, the lock re-claimed with the full reason recorded. The lost time was not backfilled with an invented duration. A contained lane also cannot revive itself \u2014 reversing a containment requires a separate party, by design."],
+      ["07", "What changed, and what hasn\u2019t", "The fix is not to weaken the watchdog. Two corrections are specified: require positive evidence of death, and never close a timer to zero duration. This is tracked as open work, not described as solved."],
+    ];
+    return (
+      <div className="failure-lab" aria-label="Documented failure and recovery">
+        {beats.map(([n, title, copy]) => (
+          <article key={n}><span>{n}</span><b>{title}</b><p>{copy}</p></article>
+        ))}
+      </div>
+    );
+  }
+
   if (kind === "boundary") {
     return (
       <div className="boundary-grid">
@@ -298,6 +328,28 @@ export function ProjectCase({ project }: { project: Project }) {
           </div>
         </div>
       </section>
+
+      {project.proofChain && (
+        <section id="governed-run" className="case-section" aria-label="Governed run: request to frozen evidence">
+          <div className="shell">
+            <div className="split-head">
+              <div><p className="eyebrow">Governed run</p><h2>One path, and two gates held by different parties.</h2></div>
+              <p>A request becomes an explicit contract naming what may change and what &ldquo;done&rdquo; means. A separate authority grants permission to execute. Agents do the work inside that scope and open it for review. The party that did the work cannot approve its own merge. Each stage leaves evidence, and closeout is refused if that evidence is incomplete.</p>
+            </div>
+            <ol className="proof-chain">
+              {project.proofChain.map((step, index) => (
+                <li className={step.authority ? "authority-gate" : ""} key={step.stage}>
+                  <article>
+                    <span>{step.authority ? "Authority gate" : `Stage ${index + 1}`}</span>
+                    <b>{step.stage}</b>
+                    <p>{step.note}</p>
+                  </article>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )}
 
       <section id="workflow" className="workflow-section dark-section">
         <div className="shell">
