@@ -644,7 +644,8 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .relay-refinement>div:first-of-type { grid-template-columns:1fr; }
   .proof-bridge { padding-bottom:60px; }
   .proof-bridge-row { grid-template-columns:1fr; gap:12px; padding:24px 0; }
-  .proof-bridge-arrow { display:none; }
+  /* Keep the link affordance on mobile: hiding it left the flagship row reading as body copy. */
+  .proof-bridge-arrow { font-size:1.05rem; }
   .story-bridge { margin-bottom:60px; padding:30px 24px; }
   .work-index,.about-page,.lab-page { padding-top:60px; }
   .work-index-row { grid-template-columns:1fr; gap:14px; }
