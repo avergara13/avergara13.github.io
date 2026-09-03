@@ -1,30 +1,43 @@
 from __future__ import annotations
 
 import argparse
+import json
+import re
+import sys
 from pathlib import Path
 
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.pagesizes import LETTER
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import inch
-from reportlab.platypus import (
-    HRFlowable,
-    Paragraph,
-    SimpleDocTemplate,
-    Spacer,
-)
+# TSK-966: --emit-json is the single-writer feed for the readable /resume/ HTML and
+# has to run in CI, where reportlab is not installed. Keep the structured emission
+# stdlib-only; PDF generation still needs reportlab and refuses loudly without it.
+try:
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER
+    from reportlab.lib.pagesizes import LETTER
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import (
+        HRFlowable,
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+    )
+except ModuleNotFoundError:  # pragma: no cover - exercised only without reportlab
+    colors = None
+
+PDF_AVAILABLE = colors is not None
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DIR = ROOT / "public" / "downloads"
 ARCHIVE_DIR = ROOT / "output" / "pdf"
+WEB_JSON_PATH = ROOT / "app" / "resume" / "general-resume.json"
 
-INK = colors.HexColor("#0B1533")
-COBALT = colors.HexColor("#0B4CFF")
-COPPER = colors.HexColor("#B63A1F")
-MUTED = colors.HexColor("#505A6A")
-LINE = colors.HexColor("#CED3DC")
+if PDF_AVAILABLE:
+    INK = colors.HexColor("#0B1533")
+    COBALT = colors.HexColor("#0B4CFF")
+    COPPER = colors.HexColor("#B63A1F")
+    MUTED = colors.HexColor("#505A6A")
+    LINE = colors.HexColor("#CED3DC")
 
 
 # Content source of truth: the current corrected Notion resume-lane source
@@ -281,6 +294,91 @@ RESUMES = [
 ]
 
 
+# --- Structured emission for the public /resume/ HTML surface (TSK-966) ------
+#
+# SINGLE WRITER. The readable HTML resume and the downloadable General PDF are
+# both derived from RESUMES[0] + EDUCATION above. Nothing downstream may keep a
+# second, hand-maintained copy of this content. `--emit-json` writes the
+# committed artifact, and tests/rendered-html.test.mjs re-runs this emitter and
+# fails on any byte difference, so drift cannot silently create dual truth.
+#
+# PRIVACY. This artifact is a public-surface PROJECTION of the resume, not a full
+# copy. The published site discloses no geography at all; the acceptance record
+# (design-qa.md) pins "a phone number and city inside the resume PDFs only". So:
+#   - the contact line (city, phone, email) is composed inside build_resume() and
+#     is not part of RESUMES, so it cannot reach the HTML through this artifact;
+#   - employer LOCATION segments are dropped here on purpose. The PDFs still carry
+#     them from RESUMES; the public page must not introduce them.
+# The privacy boundary is enforced at this single writer, and pinned by the
+# no-geography control in tests/rendered-html.test.mjs.
+
+GENERAL_RESUME_FILENAME = "Angel_Vergara_Resume_General.pdf"
+
+
+def _pipe_parts(value: str) -> list[str]:
+    return [part.strip() for part in value.split("|") if part.strip()]
+
+
+# A resume date segment always carries a four-digit year ("May 2018-Dec 2022").
+# A location segment ("Orlando, FL", "Florida and Massachusetts") never does.
+_YEAR = re.compile(r"\b\d{4}\b")
+
+
+def _dash_split(value: str) -> tuple[str, str]:
+    head, separator, tail = value.partition(" - ")
+    if not separator:
+        return value.strip(), ""
+    return head.strip(), tail.strip()
+
+
+def general_resume_document() -> dict:
+    """Deterministic structured view of the General Resume."""
+    resume = next(item for item in RESUMES if item["filename"] == GENERAL_RESUME_FILENAME)
+
+    experience = []
+    for title, bullets in resume["experience"]:
+        parts = _pipe_parts(title)
+        organization, role = _dash_split(parts[0])
+        experience.append(
+            {
+                "organization": organization,
+                "role": role,
+                # Dates only. Location segments are deliberately not projected onto
+                # the public surface -- see the PRIVACY note above.
+                "dates": [part for part in parts[1:] if _YEAR.search(part)],
+                "bullets": list(bullets),
+            }
+        )
+
+    projects = []
+    for entry in resume["projects"]:
+        name, summary = _dash_split(entry)
+        projects.append({"name": name, "summary": summary})
+
+    education = []
+    for entry in EDUCATION:
+        institution, credential = _dash_split(entry)
+        education.append({"institution": institution, "credential": credential})
+
+    return {
+        "generated_by": "scripts/generate_resumes.py --emit-json",
+        "source": f"RESUMES[0] / {GENERAL_RESUME_FILENAME}",
+        "name": "Angel Vergara",
+        "pdf": GENERAL_RESUME_FILENAME,
+        "headline": resume["headline"],
+        "profile": resume["profile"],
+        "strengths": _pipe_parts(resume["strengths"]),
+        "projects": projects,
+        "experience": experience,
+        "education": education,
+        "tools": _pipe_parts(resume["tools"]),
+    }
+
+
+def general_resume_json() -> str:
+    return json.dumps(general_resume_document(), indent=2, ensure_ascii=False) + "\n"
+
+
 def styles():
     sample = getSampleStyleSheet()
     return {
@@ -446,11 +544,44 @@ def parse_args() -> argparse.Namespace:
         metavar="FILENAME",
         help="Generate only this PDF filename. Repeat for multiple files. Default: all resumes.",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--emit-json",
+        action="store_true",
+        help=(
+            "Emit the deterministic structured General Resume consumed by the /resume/ "
+            "HTML surface instead of building PDFs. Uses no third-party packages."
+        ),
+    )
+    parser.add_argument(
+        "--stdout",
+        action="store_true",
+        help="With --emit-json, print to stdout instead of writing the committed artifact.",
+    )
+    args = parser.parse_args()
+    if args.stdout and not args.emit_json:
+        parser.error("--stdout is only meaningful with --emit-json")
+    return args
 
 
 def main() -> None:
     args = parse_args()
+
+    if args.emit_json:
+        payload = general_resume_json()
+        if args.stdout:
+            sys.stdout.write(payload)
+        else:
+            WEB_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
+            WEB_JSON_PATH.write_text(payload, encoding="utf-8")
+            print(WEB_JSON_PATH)
+        return
+
+    if not PDF_AVAILABLE:
+        raise SystemExit(
+            "reportlab is required to build the resume PDFs. Install it, or use "
+            "--emit-json for the stdlib-only structured emission."
+        )
+
     requested = set(args.only)
     known = {resume["filename"] for resume in RESUMES}
     unknown = requested - known

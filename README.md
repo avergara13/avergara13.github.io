@@ -4,8 +4,8 @@
 
 This branch holds the editable source for the public, employer-facing portfolio:
 a Next.js static-export site with a recruiter-first structure — practical
-AI-assisted workflows up front, public-safe case studies, four role-matched
-resume lanes, a concise hiring-team brief, and direct contact links.
+AI-assisted workflows up front, public-safe case studies, one readable career
+record with a downloadable PDF, and direct contact links.
 
 The `main` branch of this repository carries only the generated static export
 that GitHub Pages serves; it is never edited by hand. Durable changes happen

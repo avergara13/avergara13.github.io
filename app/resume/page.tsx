@@ -1,33 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import resume from "./general-resume.json";
 
 export const metadata: Metadata = {
   title: "Resume — Angel Vergara",
-  description: "Start with the General Resume. Targeted versions reorder the same verified evidence for implementation, business systems, and AI workflow roles.",
+  description: "The full career record in one place: hospitality and operations leadership, systems implementation, business-process work, and current AI-assisted workflow proof.",
   alternates: { canonical: "/resume/" },
   openGraph: {
     type: "website",
     url: "/resume/",
     title: "Angel Vergara — Resume",
-    description: "One General Resume plus three targeted versions with one consistent, evidence-backed career story.",
+    description: "One readable career record, with the same evidence available as a PDF.",
     images: [{ url: "/og-resume.png", width: 1200, height: 630, alt: "Angel Vergara resume" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Angel Vergara — Resume",
-    description: "One General Resume plus three targeted versions with one consistent, evidence-backed career story.",
+    description: "One readable career record, with the same evidence available as a PDF.",
     images: ["/og-resume.png"],
   },
 };
 
-const generalFile = "Angel_Vergara_Resume_General.pdf";
+// TSK-966: /resume/ is the single canonical recruiter surface. The record below is
+// rendered from app/resume/general-resume.json, which scripts/generate_resumes.py
+// emits from the same RESUMES[0] data that builds the PDF — one writer, no second
+// hand-maintained copy. Do not transcribe resume content into this file.
+//
+// The three targeted resume variants remain application assets under
+// public/downloads/. They are deliberately NOT offered here: a recruiter gets one
+// stable career record, not a choice between four versions.
 
-// TSK-961 Phase 7: title, one-sentence fit, one "Best for" line, download CTA.
-// "Best for" describes role fit, never a previously held title.
-const lanes = [
-  { number: "01", tone: "cobalt", title: "Implementation & Onboarding", file: "Angel_Vergara_Resume_Implementation_Onboarding.pdf", summary: "Leads with hospitality operations, training, workflow discovery, rollout, adoption, and customer-ready implementation.", bestFor: "Implementation · Onboarding · Customer training · Hospitality technology" },
-  { number: "02", tone: "ink", title: "Business Systems & Operations", file: "Angel_Vergara_Resume_Business_Systems_Operations.pdf", summary: "Leads with process discovery, requirements, reporting, operating controls, vendor coordination, and systems judgment.", bestFor: "Business systems · Business/process analysis · Operations systems" },
-  { number: "03", tone: "copper", title: "AI Workflow & Automation", file: "Angel_Vergara_Resume_AI_Workflow_Automation.pdf", summary: "Leads with working AI product proof, governed workflows, human decision boundaries, automation, and evidence-backed delivery.", bestFor: "AI workflow automation · AI implementation · Applied AI operations" },
+// Role fit, not held titles. Labels are the four EA-approved lanes; the copy is
+// carried over from the retired /hiring/ decision surface and the canonical resume
+// strengths, so it introduces no new claim.
+const fitLanes: [string, string][] = [
+  ["AI Workflow & Automation", "Applied AI workflows, automation, human decision points, evaluation, and practical controls."],
+  ["Systems Implementation", "Requirements, process mapping, onboarding, rollout, adoption, and the handoff between business needs and technical teams."],
+  ["Business Systems & Operations", "Process discovery, operational reporting, operating controls, vendor coordination, and the systems judgment behind them."],
+  ["Hospitality Technology", "Restaurant and hospitality systems where operating knowledge strengthens implementation, product, onboarding, and AI-workflow decisions."],
 ];
 
 export default function ResumePage() {
@@ -35,28 +45,69 @@ export default function ResumePage() {
     <section className="subpage-hero resume-hero">
       <div className="shell resume-hero-single">
         <p className="eyebrow">Resume</p>
-        <h1>Start with the General Resume.</h1>
+        <h1>The whole career record, in one place.</h1>
         <p className="lede">One concise view of my hospitality and operations leadership, systems implementation, business-process work, and current AI-assisted workflow proof.</p>
-        <p className="resume-support">For a clearly matched role, use one of the targeted versions below. The evidence stays the same; the emphasis changes.</p>
-        <div className="actions"><a className="button primary" href={`/downloads/${generalFile}`} download>Download General Resume <span aria-hidden="true">↓</span></a></div>
+        <p className="resume-support">Looking for a role-specific version? I tailor the same verified experience to the position when applying.</p>
+        <div className="actions"><a className="button primary" href={`/downloads/${resume.pdf}`} download>Download PDF <span aria-hidden="true">↓</span></a></div>
       </div>
     </section>
 
-    <section className="alternate-resume-section">
-      <div className="shell">
-        <div className="split-head"><div><p className="eyebrow">Targeted versions</p><h2>Targeted versions</h2></div><p>Same verified experience. Different proof order for the role.</p></div>
-        <div className="alternate-resume-grid">
-          {lanes.map((lane) => <article className={`alternate-resume-card ${lane.tone}`} key={lane.number}>
-            <div className="lane-number">{lane.number}</div>
-            <div>
-              <h3>{lane.title}</h3>
-              <p>{lane.summary}</p>
-              <p className="resume-best-for"><span>Best for</span>{lane.bestFor}</p>
-            </div>
-            <a className="button" href={`/downloads/${lane.file}`} download>Download PDF<span className="sr-only"> — {lane.title} resume</span> <span aria-hidden="true">↓</span></a>
+    <section className="resume-record-section">
+      <div className="shell resume-record">
+        <p className="resume-record-headline">{resume.headline.split("|").map((part) => part.trim()).join(" · ")}</p>
+
+        <section className="resume-block">
+          <h2>Profile</h2>
+          <p>{resume.profile}</p>
+        </section>
+
+        <section className="resume-block">
+          <h2>Core strengths</h2>
+          <ul className="resume-taglist">{resume.strengths.map((item) => <li key={item}>{item}</li>)}</ul>
+        </section>
+
+        <section className="resume-block">
+          <h2>Selected product and systems work</h2>
+          <dl className="resume-projects">
+            {resume.projects.map((project) => <div key={project.name}>
+              <dt>{project.name}</dt>
+              <dd>{project.summary}</dd>
+            </div>)}
+          </dl>
+        </section>
+
+        <section className="resume-block">
+          <h2>Selected professional experience</h2>
+          {resume.experience.map((role) => <article className="resume-role" key={role.organization}>
+            <h3>{role.organization}</h3>
+            <p className="resume-role-meta">{[role.role, ...role.dates].filter(Boolean).join(" · ")}</p>
+            <ul>{role.bullets.map((line) => <li key={line}>{line}</li>)}</ul>
           </article>)}
+        </section>
+
+        <section className="resume-block">
+          <h2>Education</h2>
+          <dl className="resume-projects">
+            {resume.education.map((entry) => <div key={entry.institution}>
+              <dt>{entry.institution}</dt>
+              <dd>{entry.credential}</dd>
+            </div>)}
+          </dl>
+        </section>
+
+        <section className="resume-block">
+          <h2>Tools</h2>
+          <ul className="resume-taglist">{resume.tools.map((item) => <li key={item}>{item}</li>)}</ul>
+        </section>
+      </div>
+    </section>
+
+    <section className="resume-fit-section">
+      <div className="shell">
+        <div className="split-head"><div><p className="eyebrow">Role fit</p><h2>Where I fit</h2></div><p>These are role-fit lanes, not claims of prior paid titles.</p></div>
+        <div className="fit-list">
+          {fitLanes.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}
         </div>
-        <p className="resume-versions-note"><b>How the versions work.</b> The General Resume is the baseline. Targeted versions reorder the same verified chronology and evidence so the most relevant experience appears first for a particular role family.</p>
       </div>
     </section>
 
@@ -64,8 +115,7 @@ export default function ResumePage() {
       <div className="shell application-grid">
         <div><p className="eyebrow light-eyebrow">Next step</p><h2>Want the proof behind the résumé?</h2></div>
         <div className="application-links">
-          <Link href="/work/"><span>View portfolio</span><span aria-hidden="true">→</span></Link>
-          <Link href="/hiring/"><span>Open hiring brief</span><span aria-hidden="true">→</span></Link>
+          <Link href="/work/"><span>View work</span><span aria-hidden="true">→</span></Link>
           <a href="mailto:avergara13@me.com"><span>Contact</span><span aria-hidden="true">→</span></a>
         </div>
       </div>
