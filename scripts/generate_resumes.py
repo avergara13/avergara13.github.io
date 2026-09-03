@@ -557,9 +557,22 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="With --emit-json, print to stdout instead of writing the committed artifact.",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help=(
+            "With --emit-json, VERIFY the committed artifact matches this generator and "
+            "exit non-zero if it does not. Writes nothing. This is the gate the build "
+            "runs before producing anything publishable."
+        ),
+    )
     args = parser.parse_args()
     if args.stdout and not args.emit_json:
         parser.error("--stdout is only meaningful with --emit-json")
+    if args.check and not args.emit_json:
+        parser.error("--check is only meaningful with --emit-json")
+    if args.check and args.stdout:
+        parser.error("--check and --stdout are mutually exclusive")
     return args
 
 
@@ -568,6 +581,24 @@ def main() -> None:
 
     if args.emit_json:
         payload = general_resume_json()
+        if args.check:
+            # Deployment gate. The public /resume/ HTML is rendered FROM the committed
+            # artifact, so a stale artifact publishes content its own writer no longer
+            # produces. Verify only -- never repair silently, or a build would "fix"
+            # the drift into production without anyone reviewing the change.
+            if not WEB_JSON_PATH.exists():
+                raise SystemExit(
+                    f"MISSING {WEB_JSON_PATH}. Run: python3 scripts/generate_resumes.py --emit-json"
+                )
+            current = WEB_JSON_PATH.read_text(encoding="utf-8")
+            if current != payload:
+                raise SystemExit(
+                    f"STALE {WEB_JSON_PATH}: it no longer matches RESUMES[0] in this "
+                    "generator, so a build would publish resume content its own source "
+                    "no longer produces.\nRun: python3 scripts/generate_resumes.py --emit-json"
+                )
+            print(f"OK {WEB_JSON_PATH} matches the generator")
+            return
         if args.stdout:
             sys.stdout.write(payload)
         else:

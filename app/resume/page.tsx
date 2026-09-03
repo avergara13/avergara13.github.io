@@ -78,11 +78,17 @@ export default function ResumePage() {
 
         <section className="resume-block">
           <h2>Selected professional experience</h2>
-          {resume.experience.map((role) => <article className="resume-role" key={role.organization}>
-            <h3>{role.organization}</h3>
-            <p className="resume-role-meta">{[role.role, ...role.dates].filter(Boolean).join(" · ")}</p>
-            <ul>{role.bullets.map((line) => <li key={line}>{line}</li>)}</ul>
-          </article>)}
+          {resume.experience.map((role) => {
+            // Not every entry carries a role or dates (the summarised earlier-experience
+            // row carries neither), so the meta line is rendered only when it has content
+            // -- an empty <p> is markup noise a screen reader still walks into.
+            const meta = [role.role, ...role.dates].filter(Boolean).join(" · ");
+            return <article className="resume-role" key={role.organization}>
+              <h3>{role.organization}</h3>
+              {meta ? <p className="resume-role-meta">{meta}</p> : null}
+              <ul>{role.bullets.map((line) => <li key={line}>{line}</li>)}</ul>
+            </article>;
+          })}
         </section>
 
         <section className="resume-block">

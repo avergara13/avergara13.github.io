@@ -400,6 +400,56 @@ test("the committed General Resume artifact matches generator output (single wri
   assert.notEqual(emitted.replace("Angel Vergara", "Angel Vergarra"), committed, "control: byte comparison must be able to detect drift");
 });
 
+test("the production build path refuses to publish a stale resume artifact", async () => {
+  // The drift test above proves the artifact CAN be checked. This proves the check is
+  // actually WIRED to the path that produces publishable output -- a gate nothing calls
+  // is capability, not enforcement. Pinning the wiring here means a future edit cannot
+  // silently unhook it and still ship green.
+  const pkg = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const verify = pkg.scripts["verify:resume-artifact"];
+  assert.ok(verify, "verify:resume-artifact script is missing");
+  assert.match(verify, /generate_resumes\.py/, "the verification must invoke the generator");
+  assert.match(verify, /--check/, "the verification must be the verify-only mode, never a silent rewrite");
+  assert.doesNotMatch(verify, /--stdout/, "the gate must compare the committed artifact, not print to stdout");
+
+  // Every build entry point must pass through the gate before next build runs. Resolve
+  // one level of npm indirection so "build:pages": "npm run build" still counts.
+  const resolve = (name, depth = 0) => {
+    const body = pkg.scripts[name] ?? "";
+    if (depth > 3) return body;
+    return body.replace(/npm run ([\w:-]+)/g, (_, ref) => resolve(ref, depth + 1));
+  };
+  for (const entry of ["build", "build:pages"]) {
+    const resolved = resolve(entry);
+    assert.match(resolved, /generate_resumes\.py[^&|]*--check/, `${entry} must run the artifact gate`);
+    const gateAt = resolved.indexOf("--check");
+    const buildAt = resolved.indexOf("next build");
+    assert.notEqual(buildAt, -1, `${entry} must actually build`);
+    assert.ok(gateAt < buildAt, `${entry} must gate BEFORE building, not after`);
+    assert.match(resolved.slice(gateAt, buildAt), /&&/, `${entry} must fail closed: chain the gate with &&, never ; or ||`);
+  }
+});
+
+test("resume experience entries never render an empty metadata element", async () => {
+  const html = await readOutput("resume/index.html");
+  const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));
+
+  // Fixture sanity: this guard is only meaningful while the record actually contains an
+  // entry with neither a role nor dates. If that stops being true, this test is inert
+  // and should be revisited rather than silently passing.
+  const bare = data.experience.filter((role) => !role.role && role.dates.length === 0);
+  const withMeta = data.experience.filter((role) => role.role || role.dates.length > 0);
+  assert.ok(bare.length >= 1, "fixture sanity: expected an entry with no role and no dates");
+  assert.ok(withMeta.length >= 1, "fixture sanity: expected entries that DO carry metadata");
+
+  assert.doesNotMatch(html, /<p class="resume-role-meta">\s*<\/p>/, "an entry with no metadata must render no metadata element");
+
+  // Positive control: the element is still emitted for entries that do have metadata, so
+  // this cannot pass by removing the line entirely.
+  const metas = html.match(/<p class="resume-role-meta">/g) ?? [];
+  assert.equal(metas.length, withMeta.length, "one metadata line per entry that has metadata, and no more");
+});
+
 test("metadata and footer language align with applied AI workflows positioning", async () => {
   const home = await readOutput("index.html");
   const resume = await readOutput("resume/index.html");
