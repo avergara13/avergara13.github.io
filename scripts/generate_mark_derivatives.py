@@ -9,6 +9,8 @@ Marks render at 112px on desktop and 88px on mobile. Derivatives are emitted at 
 three times the desktop size, which stays crisp through 3x displays while removing
 roughly 94% of the transfer weight of the originals.
 
+Requires Python with `pillow`.
+
     python3 scripts/generate_mark_derivatives.py           # write derivatives
     python3 scripts/generate_mark_derivatives.py --check    # verify without writing
 """
@@ -61,16 +63,35 @@ def build(check_only: bool) -> int:
         if not check_only:
             resized.save(target, "PNG", optimize=True)
 
-        if target.exists():
-            print(
-                f"ok   {rel}\n"
-                f"       source {actual[:16]}… {source.stat().st_size:,} bytes\n"
-                f"       -> {target.relative_to(ROOT)} {sha256(target)[:16]}… "
-                f"{target.stat().st_size:,} bytes ({DERIVATIVE_PX}x{DERIVATIVE_PX})"
-            )
-        else:
+        if not target.exists():
             print(f"FAIL {rel}: derivative missing at {target.relative_to(ROOT)}")
             failures += 1
+            continue
+
+        # Existence is not verification: a stale, truncated, or hand-replaced derivative
+        # would still be a file. Compare the committed derivative's decoded pixels against
+        # the freshly computed ones. Pixel comparison rather than a byte hash so that a
+        # different Pillow build does not raise a false alarm while a wrong image still does.
+        with Image.open(target) as committed:
+            committed_rgb = committed.convert("RGB")
+            if committed_rgb.size != resized.size:
+                print(
+                    f"FAIL {rel}: derivative is {committed_rgb.size[0]}x{committed_rgb.size[1]}, "
+                    f"expected {DERIVATIVE_PX}x{DERIVATIVE_PX}"
+                )
+                failures += 1
+                continue
+            if committed_rgb.tobytes() != resized.tobytes():
+                print(f"FAIL {rel}: derivative does not match the canonical original")
+                failures += 1
+                continue
+
+        print(
+            f"ok   {rel}\n"
+            f"       source {actual[:16]}… {source.stat().st_size:,} bytes\n"
+            f"       -> {target.relative_to(ROOT)} {sha256(target)[:16]}… "
+            f"{target.stat().st_size:,} bytes ({DERIVATIVE_PX}x{DERIVATIVE_PX}) pixels verified"
+        )
 
     return failures
 
