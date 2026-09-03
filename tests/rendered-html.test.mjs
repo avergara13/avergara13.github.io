@@ -430,6 +430,30 @@ test("the production build path refuses to publish a stale resume artifact", asy
   }
 });
 
+test("the resume social card does not advertise the retired variant choice", async () => {
+  // The OG card is the pre-click impression when /resume/ is shared. It previously read
+  // "RESUME SUITE / One career. Three clear views." and named all three targeted lanes --
+  // exactly the choice architecture this pass removed. The HTML sweep could not catch it
+  // because the claim lives in a PNG, so the card's writer is pinned here instead.
+  const cards = await readFile(new URL("scripts/generate_og_images.swift", root), "utf8");
+  const line = cards.split("\n").find((l) => l.includes('filename: "og-resume.png"'));
+  assert.ok(line, "the og-resume card definition is missing");
+
+  assert.doesNotMatch(line, /RESUME SUITE|Three clear views/i, "the card must not sell a resume suite");
+  for (const lane of ["Implementation & Onboarding", "Business Systems & Operations", "AI Workflow & Automation"]) {
+    assert.ok(!line.includes(lane), `the card must not name the retired variant: ${lane}`);
+  }
+  // Positive control: the definition still exists and still carries real copy, so this
+  // cannot pass by deleting the card.
+  assert.match(line, /title: "[^"]{12,}"/);
+  assert.match(line, /subtitle: "[^"]{12,}"/);
+
+  // And the asset the page actually references is still shipped.
+  const html = await readOutput("resume/index.html");
+  assert.match(html, /og-resume\.png/);
+  await access(new URL("out/og-resume.png", root));
+});
+
 test("resume experience entries never render an empty metadata element", async () => {
   const html = await readOutput("resume/index.html");
   const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));

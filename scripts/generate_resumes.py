@@ -595,7 +595,12 @@ def main() -> None:
                 raise SystemExit(
                     f"STALE {WEB_JSON_PATH}: it no longer matches RESUMES[0] in this "
                     "generator, so a build would publish resume content its own source "
-                    "no longer produces.\nRun: python3 scripts/generate_resumes.py --emit-json"
+                    "no longer produces.\n"
+                    "Run: python3 scripts/generate_resumes.py --emit-json\n"
+                    "THEN, if you changed resume CONTENT, rebuild the PDFs too "
+                    "(python3 scripts/generate_resumes.py, needs reportlab) and commit "
+                    "them: /resume/ renders this artifact but hands the reader a PDF, and "
+                    "only the artifact is gated here."
                 )
             print(f"OK {WEB_JSON_PATH} matches the generator")
             return

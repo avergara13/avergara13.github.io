@@ -11,7 +11,10 @@ struct SocialCard {
 
 let cards = [
     SocialCard(filename: "og-home.png", label: "AI WORKFLOWS & BUSINESS SYSTEMS", title: "Practical systems for messy work.", subtitle: "AI-assisted workflows, human controls, and evidence-backed implementation.", accent: NSColor(calibratedRed: 0.04, green: 0.30, blue: 1.0, alpha: 1)),
-    SocialCard(filename: "og-resume.png", label: "RESUME SUITE", title: "One career. Three clear views.", subtitle: "Implementation & Onboarding · Business Systems & Operations · AI Workflow & Automation", accent: NSColor(calibratedRed: 0.71, green: 0.23, blue: 0.12, alpha: 1)),
+    // TSK-966: /resume/ is one canonical career record, not a suite of three. This card
+    // is the pre-click impression a recruiter sees when the link is shared, so it must
+    // not advertise the variant choice the page no longer offers.
+    SocialCard(filename: "og-resume.png", label: "RESUME", title: "The whole career record, in one place.", subtitle: "Readable in full, with the same verified evidence as a downloadable PDF.", accent: NSColor(calibratedRed: 0.71, green: 0.23, blue: 0.12, alpha: 1)),
     SocialCard(filename: "og-hiring.png", label: "FOR HIRING TEAMS", title: "Operations credibility. Implementation discipline.", subtitle: "A concise path from role fit to proof and direct conversation.", accent: NSColor(calibratedRed: 0.04, green: 0.30, blue: 1.0, alpha: 1)),
     SocialCard(filename: "og-resale-scanner-pro.png", label: "SANITIZED CASE STUDY", title: "Resale Scanner Pro", subtitle: "A working decision-support workflow used in a real family resale operation.", accent: NSColor(calibratedRed: 0.05, green: 0.50, blue: 0.30, alpha: 1)),
     SocialCard(filename: "og-loft-os.png", label: "SANITIZED ARCHITECTURE", title: "Loft OS", subtitle: "A governed operating pattern for scope, authority, evidence, repair, and accountable closeout.", accent: NSColor(calibratedRed: 0.71, green: 0.23, blue: 0.12, alpha: 1)),
