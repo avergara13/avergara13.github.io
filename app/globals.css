@@ -406,6 +406,11 @@ section { padding:96px 0; }
 .resume-role li { margin-bottom:6px; }
 .resume-role li:last-child { margin-bottom:0; }
 .resume-fit-section { background:var(--paper); }
+/* The record IS the page's substance, so the supporting section headings must not
+   dwarf it. The global h2 (clamp 2.4rem-4.4rem) reaches 70px next to a 25.6px record
+   heading -- a 2.7x inversion. Scoped to /resume/ only, and floored so the step stays
+   perceptible at 390 too: a fluid heading beside a fixed one converges at some width. */
+.resume-fit-section .split-head h2,.resume-close h2 { font-size:clamp(2.05rem,3.2vw,2.9rem); }
 .material-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
 .material-grid article { min-height:330px; padding:30px; border:1px solid var(--line); background:var(--white); }
 .material-grid h3 { margin:14px 0; font-family:var(--font-playfair),Georgia,serif; font-size:2rem; font-weight:500; }

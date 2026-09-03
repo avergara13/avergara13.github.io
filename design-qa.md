@@ -225,3 +225,92 @@ Recorded rather than silently skipped, per the phase read-back contract:
   and not addressed here.
 
 final result: passed
+
+---
+
+# TSK-966 — Recruiter IA repair (successor to TSK-961)
+
+TSK-961 is complete and is not reopened. This pass changes accepted public information
+architecture after that closeout; it does not repair a defect against it.
+
+## Correction to the record above
+
+The bullet above stating that `/hiring/` has one inbound link from `/resume/` and that
+"that is the locked IA" is **superseded**. It described the state correctly at the time.
+It is preserved rather than rewritten, and this section supersedes it: `/hiring/` is now
+retired, and `/resume/` is the single canonical recruiter surface.
+
+Also superseded: the note that the resume-version rule appears on both `/resume/` and
+`/hiring/`. There are no longer resume versions offered to recruiters, so the rule is gone
+from the public surface entirely.
+
+## What changed
+
+`/resume/` renders the General Resume as readable HTML with one `Download PDF ↓` action,
+the four approved role-fit lanes as context, and direct `View work` / `Contact` exits. The
+recruiter is no longer asked to choose between four resume variants, and the
+Resume → Hiring → Resume loop is gone.
+
+`/hiring/` is retired. It was a static filesystem route, so retirement means deleting
+`app/hiring/`; the export emits nothing for the path and it returns a genuine 404. This is
+the same outcome as The Office Chef retirement by a different mechanism — that one filters
+a dynamic slug out of `generateStaticParams`. No redirect, no stub, no fake destination.
+Its inbound link, sitemap entry, `og-hiring.png`, and the CSS this pass orphaned went with
+it. Pre-existing orphaned rules were left untouched, as before.
+
+## Single writer for resume content
+
+The readable HTML and the downloadable PDF both derive from `RESUMES[0]` in
+`scripts/generate_resumes.py`. A stdlib-only `--emit-json` projects that data into
+`app/resume/general-resume.json`, which the page renders. The reportlab import is guarded
+so the emitter runs in CI, where reportlab is not installed; the PDF path still requires it
+and refuses loudly. A test re-runs the emitter and compares bytes, so the artifact cannot
+drift into a second source of truth.
+
+The artifact is a **projection, not a copy**: employer location segments are dropped at the
+writer. The published site discloses no geography, and the record above pins the phone
+number and city to the PDFs only. That boundary is enforced at the writer and pinned by a
+no-geography control with a positive control (`Florida International University`) proving
+the sweep sees real content.
+
+## Targeted resume variants
+
+Implementation & Onboarding, Business Systems & Operations, and AI Workflow & Automation
+remain untouched application assets: generator sources, verified PDFs, chronology, and
+claims are all preserved, and the test pinning their existence is unchanged. They are
+removed only from recruiter-facing choice architecture. **Their direct URLs remain publicly
+fetchable — this is de-listing, not privacy removal.**
+
+## Verification
+
+Controls were mutation-tested rather than trusted because they passed. Six deliberate
+regressions were each introduced and confirmed to turn the suite red: artifact drift from
+the generator, a restored Resume → Hiring link, a targeted variant offered as a recruiter
+choice, a role-fit lane turned into a link, geography leaked into the HTML, and a whole
+record section dropped from the render. All six were caught.
+
+Rendered audit, not source tests, per the ratified law: 7 routes x 4 widths
+(1440/768/430/390) walked in the DOM for computed contrast against the real painted
+background, horizontal overflow, and tap-target height. 28/28 clean. The audit itself was
+positive-controlled — an injected 1.55:1 element and a 1600px overflow were both detected,
+so the clean result is not vacuous.
+
+Focus was verified with real keyboard `Tab` events. Programmatic `.focus()` does not set
+`:focus-visible` in Chrome and `getComputedStyle(el, ':focus-visible')` returns nothing —
+both probes reported false failures before the method was corrected. Under real keyboard
+focus every control paints its 3px ring, including the contextual white ring on the dark
+closing section.
+
+One real defect was found and fixed during this pass: the global `h2`
+(`clamp(2.4rem,4.4rem)`) rendered the supporting "Where I fit" heading at 70px beside the
+record's own 25.6px section headings — a 2.7x inversion in which the aside outranked the
+page's actual substance. The supporting headings are now floored and capped, scoped to
+`/resume/`, and the ranking was re-verified at matched widths: h1 > section heading >
+record heading with steps of at least 1.46x and 1.28x at every width, so a fluid heading
+cannot converge with a fixed one at some breakpoint.
+
+One harness defect was also caught: an audit run against a stale `out/` produced by an
+earlier mutation round reported a missing Education section. The artifact was rebuilt from
+a clean tree and provenance asserted before the audit was re-run and believed.
+
+final result: passed
