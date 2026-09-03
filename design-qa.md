@@ -314,3 +314,41 @@ earlier mutation round reported a missing Education section. The artifact was re
 a clean tree and provenance asserted before the audit was re-run and believed.
 
 final result: passed
+
+## Repair round (PR #33 review)
+
+**Single-writer enforcement reached the deploy path.** The drift check ran only under
+`npm test`, while the path that produces publishable output did not. `--emit-json --check`
+is a verify-only mode -- it compares and exits non-zero, and never repairs silently, since
+a build that "fixed" drift on its own would push an unreviewed content change to
+production. It is wired as `verify:resume-artifact` and chained ahead of `next build` with
+`&&`, so every build entry point fails closed before anything publishable exists. Proven:
+with a stale artifact `npm run build:pages` exits 1, never reaches `next build`, and emits
+no `out/` at all; a missing artifact fails the same way.
+
+**Empty metadata element.** Experience entries with neither a role nor dates rendered an
+empty `<p class="resume-role-meta">`. Now rendered conditionally, pinned by a test that
+requires one metadata line per entry that has metadata and none for the entry that does
+not.
+
+**The social card was still selling the retired choice.** `public/og-resume.png` read
+"RESUME SUITE / One career. Three clear views." and named all three targeted lanes -- the
+pre-click impression on the exact surface this pass makes canonical. The card was accurate
+before; this pass is what made it false, so it was corrected here on the same principle
+that removed `og-office-chef.png`. Rendering the untouched cards through the same generator
+reproduces four of them byte-for-byte, so only the copy changed. The HTML sweeps could not
+have caught this because the claim lived in a PNG; the card's writer is pinned instead.
+
+**Known gap, deliberately not closed here.** The build gate covers the JSON artifact, not
+the PDF the same page links. Both derive from `RESUMES[0]`, so a content edit that
+regenerates only the artifact would leave the page and its download disagreeing. Verified
+this is **latent, not live**: all 49 content fields of `app/resume/general-resume.json`
+appear verbatim in the committed General PDF (checked with pypdf; positive control
+`May 2018-Dec 2022` present, negative control absent, no `- Present` end date). It is not
+closed here because the PDF branch needs reportlab, which is deliberately absent from this
+environment and from CI -- so any fingerprint or hash gate would have to be seeded with a
+hand-authored claim about the state it verifies, which is the one thing a gate's input must
+never be. Closing it properly means regenerating the PDFs in an environment that has
+reportlab and recording the fingerprint from that run.
+
+final result: passed
