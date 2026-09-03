@@ -73,6 +73,17 @@ def build(check_only: bool) -> int:
         # the freshly computed ones. Pixel comparison rather than a byte hash so that a
         # different Pillow build does not raise a false alarm while a wrong image still does.
         with Image.open(target) as committed:
+            # The generator always writes RGB. Reject anything else before normalising:
+            # an RGBA replacement whose colour channels match but whose alpha is
+            # transparent would survive a convert("RGB") comparison while the browser
+            # painted a faded or missing mark.
+            if committed.mode != "RGB":
+                print(
+                    f"FAIL {rel}: derivative mode is {committed.mode}, expected RGB "
+                    f"(an alpha channel would change what the browser paints)"
+                )
+                failures += 1
+                continue
             committed_rgb = committed.convert("RGB")
             if committed_rgb.size != resized.size:
                 print(
