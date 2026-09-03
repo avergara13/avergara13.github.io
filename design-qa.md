@@ -15,7 +15,7 @@ Phases and dispositions:
 | Phase | Surface | Disposition |
 |---|---|---|
 | 1 | HOME | Implemented — retired the hero proof cue and micro-signals, moved the interactive demo off HOME, locked "Selected work" |
-| 2 | Loft OS | Implemented — locked eight-section sequence; Decision Relay retired as the public label in favour of **Agent Workflow Demo** |
+| 2 | Loft OS | Implemented — locked eight-section sequence; supplied project mark integrated verbatim; Decision Relay retired as the public label in favour of **Agent Workflow Demo** |
 | 3 | Resale Scanner Pro | Implemented — locked seven-step `Capture → … → Learn` flow and the stopping rule |
 | 4 | Portfolio (`/work/`) | Implemented — "Evidence Atlas" retired for `Portfolio`; chooser cards reduced to label + one sentence + CTA |
 | 5 | About | Implemented — locked hospitality → operations → systems → AI narrative |
@@ -130,10 +130,16 @@ Everything below was fixed and re-verified:
 
 Recorded rather than silently skipped, per the phase read-back contract:
 
-- **Loft OS project mark — BLOCKED.** The Phase 2 FINAL LOCK requires Angel's supplied
-  `Loft OS logo.png` as the hero project mark. No such asset exists in the repo or in
-  current production, and it was not recreated or approximated. Owner: Angel. The rest of
-  the locked hero ships verbatim.
+- **Loft OS project mark — RESOLVED.** The Phase 2 FINAL LOCK requires Angel's supplied
+  `Loft OS logo.png` as the hero project mark. The supplied binary was integrated verbatim
+  at `public/images/loft-os/logo.png` (sha256 `b040f524…5b7567`, 1024×1024, 1.15 MB). It was
+  not recreated, re-encoded, resized, or substituted, and the published copy is byte-identical
+  to the file supplied. Its only metadata is a 68-byte `eXIf` chunk carrying ColorSpace and
+  pixel dimensions — no GPS, camera, software, author, or timestamp fields, and no C2PA
+  provenance manifest. It renders 112 px beside the hero at ≥768 and 88 px stacked at ≤430,
+  square at every width, with a reserved box so nothing shifts while it loads. `alt` is
+  deliberately empty: the adjacent `h1` already names Loft OS, so a described image would
+  duplicate it for screen-reader users.
 - **"Preserve the existing five-plane architecture proof" — STALE.** No five-plane construct
   exists in the implementation, in current production, elsewhere in the packet, or in Loft OS
   canon; the canonical architecture document is a three-tier picture. Inventing one would
@@ -159,6 +165,9 @@ Recorded rather than silently skipped, per the phase read-back contract:
   the source branch. Every guard in this document is therefore enforced by local runs and
   review, not by CI. Changing CI was out of scope for this editorial pass and is flagged for
   a separate decision.
+- **The project mark is a 1.15 MB payload** on the flagship page. It is the exact supplied
+  binary and was deliberately not re-encoded. An optimised derivative would be a sensible
+  bounded follow-up; it is the largest single asset the site loads.
 - **Pre-existing unreferenced assets.** `public/og.png` (1.9 MB, unreferenced, and the only
   image carrying a C2PA "AI-generated" provenance manifest), `public/images/rsp/logo.png`,
   `public/images/sous-chef/banner.png`, and `public/images/rsp/agent.png` are shipped but

@@ -322,12 +322,17 @@ function LoftOsCase({ project }: { project: Project }) {
   return (
     <main id="main" data-section="work-loft-os">
       <section className="case-hero">
-        <div className="shell case-hero-single">
+        <div className="shell case-hero-single case-hero-marked">
+          {/* Angel's supplied project mark, used verbatim. alt is empty by design: the
+              adjacent h1 already names Loft OS, so a described image would duplicate it. */}
+          <Image className="case-mark" src="/images/loft-os/logo.png" alt="" width={1024} height={1024} />
+          <div>
           <p className="eyebrow">{project.eyebrow}</p>
           <h1>🛋️ Loft OS</h1>
           <p className="case-descriptor">Governed multi-agent workflow system</p>
           <p className="lede">{project.dek}</p>
           <p className="case-support">Agents can keep work moving autonomously without gaining unchecked authority.</p>
+          </div>
         </div>
       </section>
 
