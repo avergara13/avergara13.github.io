@@ -173,7 +173,7 @@ Recorded rather than silently skipped, per the phase read-back contract:
   position in the hero — while keeping its own intrinsic square geometry. `alt` is empty for
   the same reason as the Loft OS mark, which also guarantees the mark asserts no product
   claim of its own.
-- **The RSP mark carries a 26 KB C2PA provenance manifest, and it is published intact.**
+- **The RSP canonical original carries a 26 KB C2PA provenance manifest, published intact.**
   Decoded before publishing, it contains: generator `OpenAI Media Service API` / `gpt-image`,
   `digitalSourceType: trainedAlgorithmicMedia` (i.e. AI-generated), a 2026-05-11 timestamp,
   content UUIDs, and an SSL.com certificate chain. It contains **no** personal data, account
@@ -182,9 +182,25 @@ Recorded rather than silently skipped, per the phase read-back contract:
   AI-provenance signal from a portfolio whose whole argument is honest AI-assisted work would
   be the wrong call. Flagged here so the decision is explicit rather than incidental. The Loft
   OS mark carries no such manifest — only a 68-byte `eXIf` with colour space and dimensions.
-- **The two project marks are 1.15 MB and 1.21 MB** and are the two largest assets the site
-  loads. Both are the exact supplied binaries and were deliberately not re-encoded. Optimised
-  derivatives would be a sensible bounded follow-up.
+- **Project-mark delivery is optimised, canonical originals untouched.** The pages render
+  336 px derivatives generated from the canonical originals by
+  `scripts/generate_mark_derivatives.py`. That script pins each original's SHA-256 and fails
+  closed if either is ever altered, so every derivative is mechanically traceable to a
+  known-good source. Marks paint at 112 px (desktop) and 88 px (mobile), so 336 px leaves
+  3.00× density available on desktop and 3.82× on mobile — crisp on any real display.
+
+  | Asset | Canonical original | Delivered derivative |
+  |---|---|---|
+  | Loft OS | 1,148,301 B (1024²) | 66,351 B (336²) |
+  | RSP | 1,214,234 B (1254²) | 87,905 B (336²) |
+
+  Mark payload per visit fell from **2,362,535 B to 154,256 B (−93.5%)**. Measured at the
+  sizes the browser actually paints, derivative vs original differs by at most 8/255 on a
+  single channel (RMSE ≤ 0.53) — imperceptible — with aspect ratio 1:1 preserved and no crop.
+  The canonical originals remain in the repo byte-identical and still ship as provenance
+  assets; no page references them, so they cost no page-load transfer. The RSP original keeps
+  its C2PA manifest; the derivatives carry no metadata at all, so the optimisation introduces
+  no new exposure.
 - **Observation, not acted on:** the RSP mark's barcode renders the string `BCANNER1R1`,
   which is not a real word or code. It is part of the supplied canonical artwork, and the
   instruction was explicit not to redraw or regenerate it, so it ships as supplied. Worth

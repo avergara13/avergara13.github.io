@@ -18,6 +18,9 @@ reviewed release build.
 - `components/` — header, footer, and the case-study shell + content
 - `scripts/generate_resumes.py` — generates the downloadable resume PDFs
   (requires Python with `reportlab`)
+- `scripts/generate_mark_derivatives.py` — generates the web-delivery derivatives of the
+  canonical project marks; `--check` verifies the committed derivatives without writing
+  (requires Python with `pillow`)
 - `tests/rendered-html.test.mjs` — claim-boundary and rendering assertions run
   against the built export
 

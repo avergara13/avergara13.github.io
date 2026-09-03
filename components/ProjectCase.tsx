@@ -323,9 +323,11 @@ function LoftOsCase({ project }: { project: Project }) {
     <main id="main" data-section="work-loft-os">
       <section className="case-hero">
         <div className="shell case-hero-single case-hero-marked">
-          {/* Angel's supplied project mark, used verbatim. alt is empty by design: the
+          {/* Web-delivery derivative of Angel's supplied project mark, generated from the
+              canonical original by scripts/generate_mark_derivatives.py. The canonical
+              binary is unchanged at /images/loft-os/logo.png. alt is empty by design: the
               adjacent h1 already names Loft OS, so a described image would duplicate it. */}
-          <Image className="case-mark" src="/images/loft-os/logo.png" alt="" width={1024} height={1024} />
+          <Image className="case-mark" src="/images/loft-os/logo-336.png" alt="" width={336} height={336} />
           <div>
           <p className="eyebrow">{project.eyebrow}</p>
           <h1>🛋️ Loft OS</h1>
@@ -428,9 +430,11 @@ function RspCase({ project }: { project: Project }) {
     <main id="main" data-section="work-resale-scanner-pro">
       <section className="case-hero">
         <div className="shell case-hero-single case-hero-marked">
-          {/* Angel's supplied RSP project mark, used verbatim. alt is empty by design: the
+          {/* Web-delivery derivative of Angel's supplied RSP project mark, generated from
+              the canonical original by scripts/generate_mark_derivatives.py. The canonical
+              binary is unchanged at /images/rsp/mark.png. alt is empty by design: the
               adjacent h1 already names the product, and the mark asserts no product claim. */}
-          <Image className="case-mark" src="/images/rsp/mark.png" alt="" width={1254} height={1254} />
+          <Image className="case-mark" src="/images/rsp/mark-336.png" alt="" width={336} height={336} />
           <div>
           <p className="eyebrow">{project.eyebrow}</p>
           <h1>&#128241; Resale Scanner Pro</h1>
