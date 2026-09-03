@@ -351,4 +351,19 @@ hand-authored claim about the state it verifies, which is the one thing a gate's
 never be. Closing it properly means regenerating the PDFs in an environment that has
 reportlab and recording the fingerprint from that run.
 
+## Second review round
+
+**The OG generator was fighting the retirement.** `public/og-hiring.png` is deleted and
+pinned absent by two tests, but `scripts/generate_og_images.swift` still defined the card.
+Running the generator to refresh any card recreated the asset -- verified byte-identical to
+the one this pass removed -- and a later build would copy it back into the export. The
+entry is gone. The Office Chef card stays and a control now pins that: `/hiring/` is fully
+retired with nothing left to reproduce, while The Office Chef still ships as a labelled
+concept on `/lab/`, which is why its card remains reproducible. The asymmetry is
+deliberate, not an oversight.
+
+**Python is now a build prerequisite.** `npm run build` shells out to `python3` for the
+artifact gate, so a Node-only environment cannot build. Stated in the README beside the
+build description, with the reason.
+
 final result: passed
