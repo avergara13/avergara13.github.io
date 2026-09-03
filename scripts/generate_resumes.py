@@ -332,8 +332,23 @@ def _dash_split(value: str) -> tuple[str, str]:
 
 
 def general_resume_document() -> dict:
-    """Deterministic structured view of the General Resume."""
-    resume = next(item for item in RESUMES if item["filename"] == GENERAL_RESUME_FILENAME)
+    """Deterministic structured view of the General Resume.
+
+    RESUMES[0] IS the General Resume. That is an invariant -- it is the public default the
+    site serves and the provenance recorded in the emitted artifact -- so index 0 is used
+    directly and its identity is asserted. Searching by filename instead would keep
+    working after a reorder and quietly turn the recorded "RESUMES[0]" provenance into a
+    false claim about where the published content came from.
+    """
+    resume = RESUMES[0]
+    if resume["filename"] != GENERAL_RESUME_FILENAME:
+        raise SystemExit(
+            f"RESUMES[0] is {resume['filename']!r}, expected {GENERAL_RESUME_FILENAME!r}.\n"
+            "The General Resume must stay at index 0: it is the public default served by "
+            "/resume/ and the provenance stamped into app/resume/general-resume.json.\n"
+            "Move the General Resume back to index 0, or update GENERAL_RESUME_FILENAME "
+            "if the public default has genuinely changed."
+        )
 
     experience = []
     for title, bullets in resume["experience"]:
@@ -362,9 +377,9 @@ def general_resume_document() -> dict:
 
     return {
         "generated_by": "scripts/generate_resumes.py --emit-json",
-        "source": f"RESUMES[0] / {GENERAL_RESUME_FILENAME}",
+        "source": f"RESUMES[{RESUMES.index(resume)}] / {resume['filename']}",
         "name": "Angel Vergara",
-        "pdf": GENERAL_RESUME_FILENAME,
+        "pdf": resume["filename"],
         "headline": resume["headline"],
         "profile": resume["profile"],
         "strengths": _pipe_parts(resume["strengths"]),

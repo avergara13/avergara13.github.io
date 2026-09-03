@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { access, readFile, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -398,6 +401,54 @@ test("the committed General Resume artifact matches generator output (single wri
   assert.equal(emitted, committed, "app/resume/general-resume.json is stale — run: python3 scripts/generate_resumes.py --emit-json");
   // Control: prove the comparison is capable of failing at all.
   assert.notEqual(emitted.replace("Angel Vergara", "Angel Vergarra"), committed, "control: byte comparison must be able to detect drift");
+});
+
+test("the General Resume is mechanically RESUMES[0], and the artifact says so truthfully", async () => {
+  // The artifact records its provenance as "RESUMES[0] / <file>", and the page comment,
+  // the generator header and design-qa all repeat that claim. Selecting the resume by
+  // filename would keep working after a reorder and quietly turn every one of those into
+  // a false statement about where the published content came from. So index 0 is used
+  // directly, its identity is asserted, and the provenance string is derived from the
+  // object actually used rather than hand-typed beside it.
+  const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));
+  assert.equal(data.pdf, "Angel_Vergara_Resume_General.pdf");
+  assert.equal(data.source, `RESUMES[0] / ${data.pdf}`, "recorded provenance must name index 0 and the file actually used");
+
+  // The page must download the very file the artifact names — provenance that disagrees
+  // with what a recruiter receives would be worse than no provenance at all.
+  const html = await readOutput("resume/index.html");
+  assert.ok(html.includes(`href="/downloads/${data.pdf}"`), "the page must offer the file the artifact names");
+
+  // Executable control: reorder RESUMES in a throwaway copy and the generator must refuse.
+  const dir = mkdtempSync(join(tmpdir(), "resume-order-"));
+  try {
+    mkdirSync(join(dir, "scripts"));
+    const source = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
+    const anchor = 'if __name__ == "__main__":';
+    assert.ok(source.includes(anchor), "fixture sanity: generator entry point not found");
+
+    // Positive control FIRST: an unmodified copy in the same temp harness must succeed,
+    // so a failure below is attributable to the reorder and not to the copy itself.
+    const clean = join(dir, "scripts", "clean.py");
+    writeFileSync(clean, source);
+    const ok = execFileSync("python3", [clean, "--emit-json", "--stdout"], { encoding: "utf8" });
+    assert.ok(ok.includes('"source": "RESUMES[0]'), "control: an unmodified copy must emit normally");
+
+    const reordered = join(dir, "scripts", "reordered.py");
+    writeFileSync(reordered, source.replace(anchor, `RESUMES.reverse()\n\n${anchor}`));
+    let threw = false;
+    let message = "";
+    try {
+      execFileSync("python3", [reordered, "--emit-json", "--stdout"], { encoding: "utf8", stdio: "pipe" });
+    } catch (error) {
+      threw = true;
+      message = `${error.stderr ?? ""}${error.stdout ?? ""}`;
+    }
+    assert.ok(threw, "the generator must refuse when the General Resume is not RESUMES[0]");
+    assert.match(message, /RESUMES\[0\] is/, "the refusal must name the index-0 invariant");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("the production build path refuses to publish a stale resume artifact", async () => {
