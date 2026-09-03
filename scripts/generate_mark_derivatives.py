@@ -14,10 +14,18 @@ Marks render at 112px on desktop and 88px on mobile. Derivatives are emitted at 
 three times the desktop size, which stays crisp through 3x displays while removing roughly
 94% of the transfer weight of the originals.
 
-Requires Python with `pillow`.
+Because the pin is byte-exact, a different Pillow or zlib build can encode the same pixels
+into different bytes. Writing is therefore non-destructive: if the bytes this machine
+produces do not match the pin, the committed derivative is left alone and the encoder
+versions are reported, so a toolchain difference can never silently clobber a reviewed
+asset. Regenerating on purpose is an explicit act via --force, after which the pin above
+must be updated in the same commit.
 
-    python3 scripts/generate_mark_derivatives.py           # write derivatives
+Generated with the encoder recorded in ENCODER below. Requires Python with `pillow`.
+
+    python3 scripts/generate_mark_derivatives.py           # write if bytes match the pin
     python3 scripts/generate_mark_derivatives.py --check    # verify without writing
+    python3 scripts/generate_mark_derivatives.py --force    # rewrite, then update the pin
 """
 
 from __future__ import annotations
@@ -45,6 +53,10 @@ MARKS = {
         "c6c863b8a61bb7ac24e0a31c1eefc2f7074e946a0ec7d3e97f5129bfa8e3175c",
     ),
 }
+
+# Encoder the committed derivatives were produced with. Recorded so a byte mismatch can be
+# attributed to a toolchain difference rather than to a corrupted asset.
+ENCODER = {"pillow": "12.3.0", "python": "3.14"}
 
 # PNG chunks that are not image data. Derivatives must carry none of them.
 ANCILLARY_CHUNKS = {"tEXt", "iTXt", "zTXt", "eXIf", "caBX", "iCCP"}
@@ -94,7 +106,15 @@ def explain(committed: bytes, expected: bytes) -> str:
     return "byte content differs while pixels match — likely re-encoded; regenerate and update the pin"
 
 
-def build(check_only: bool) -> int:
+def encoder_now() -> str:
+    import zlib
+
+    import PIL
+
+    return f"pillow {PIL.__version__}, zlib {zlib.ZLIB_VERSION} (recorded: pillow {ENCODER['pillow']})"
+
+
+def build(check_only: bool, force: bool) -> int:
     failures = 0
     for rel, (source_digest, derivative_digest) in MARKS.items():
         source = ROOT / rel
@@ -112,7 +132,18 @@ def build(check_only: bool) -> int:
         target = derivative_path(source)
 
         if not check_only:
-            target.write_bytes(expected_bytes)
+            # Never overwrite a reviewed asset with bytes that would fail the pin: a
+            # different encoder producing valid but different output must not clobber it.
+            if force or sha256_bytes(expected_bytes) == derivative_digest:
+                target.write_bytes(expected_bytes)
+            else:
+                print(
+                    f"SKIP {target.relative_to(ROOT)}: this encoder produces different bytes,\n"
+                    f"       so the committed derivative was left unchanged.\n"
+                    f"       encoder: {encoder_now()}\n"
+                    f"       re-run with --force if regenerating is intended, then update the\n"
+                    f"       pinned digest in MARKS in the same commit."
+                )
 
         if not target.exists():
             print(f"FAIL {rel}: derivative missing at {target.relative_to(ROOT)}")
@@ -124,6 +155,7 @@ def build(check_only: bool) -> int:
         if actual_derivative != derivative_digest:
             print(
                 f"FAIL {target.relative_to(ROOT)}: {explain(committed, expected_bytes)}\n"
+                f"       encoder: {encoder_now()}\n"
                 f"       expected {derivative_digest}\n"
                 f"       actual   {actual_derivative}"
             )
@@ -143,8 +175,13 @@ def build(check_only: bool) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="verify without writing derivatives")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="rewrite derivatives even if this encoder's bytes differ from the pin",
+    )
     args = parser.parse_args()
-    if build(args.check):
+    if build(args.check, args.force):
         raise SystemExit(1)
 
 
