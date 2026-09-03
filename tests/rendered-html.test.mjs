@@ -448,6 +448,12 @@ test("the resume social card does not advertise the retired variant choice", asy
   assert.match(line, /title: "[^"]{12,}"/);
   assert.match(line, /subtitle: "[^"]{12,}"/);
 
+  // The generator must not define a card for the retired route either: running it would
+  // recreate public/og-hiring.png byte-for-byte and undo the asset retirement two other
+  // tests pin. og-office-chef stays on purpose -- that concept still ships on /lab/.
+  assert.ok(!cards.includes('filename: "og-hiring.png"'), "the generator must not recreate the retired hiring card");
+  assert.ok(cards.includes('filename: "og-office-chef.png"'), "control: the Office Chef card is deliberately retained");
+
   // And the asset the page actually references is still shipped.
   const html = await readOutput("resume/index.html");
   assert.match(html, /og-resume\.png/);

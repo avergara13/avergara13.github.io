@@ -7,6 +7,13 @@ a Next.js static-export site with a recruiter-first structure — practical
 AI-assisted workflows up front, public-safe case studies, one readable career
 record with a downloadable PDF, and direct contact links.
 
+Building needs **Node 22+ and Python 3**. `npm run build` runs
+`scripts/generate_resumes.py --emit-json --check` before `next build`: the readable
+resume on `/resume/` is rendered from `app/resume/general-resume.json`, which that
+script generates from the same data that builds the PDFs, so the build refuses to
+produce output when the committed artifact has drifted from its source. A Node-only
+environment cannot build for that reason.
+
 The `main` branch of this repository carries only the generated static export
 that GitHub Pages serves; it is never edited by hand. Durable changes happen
 here (`app/`, `components/`, `scripts/`, `tests/`) and reach `main` through a
