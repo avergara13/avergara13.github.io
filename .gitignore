@@ -43,3 +43,6 @@ next-env.d.ts
 /tmp/
 /work/
 /evidence/
+
+# typescript incremental build artifact
+tsconfig.tsbuildinfo

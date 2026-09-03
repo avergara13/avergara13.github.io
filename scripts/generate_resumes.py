@@ -193,8 +193,6 @@ RESUMES = [
             "publishing workflows, and operating records within a family-use context.",
             "Loft OS - Sanitized architecture case study: governed workflow patterns for scope, authorization, evidence, "
             "recovery, and closeout, focused on visible ownership and fail-closed controls.",
-            "The Office Chef - Concept in design: restaurant back-office automation concept for invoice intake, vendor "
-            "price changes, food costing, inventory review, menu-margin analysis, and owner briefings.",
         ],
         "experience": [
             (

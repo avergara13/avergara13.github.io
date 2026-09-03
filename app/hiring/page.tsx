@@ -2,77 +2,91 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Hiring Brief — Angel Vergara",
-  description: "A concise hiring brief: what Angel Vergara does, the role families he fits, the systems he has built, and where to verify the proof.",
+  title: "Hiring — Angel Vergara",
+  description: "Where Angel Vergara fits, what to look at first, and what proves it: operations experience, systems implementation, and applied AI.",
   alternates: { canonical: "/hiring/" },
   openGraph: {
     type: "website",
     url: "/hiring/",
-    title: "Angel Vergara — Hiring Brief",
-    description: "What Angel does, the role families he fits, the systems he has built, and where to verify the proof.",
+    title: "Angel Vergara — Hiring",
+    description: "Where Angel fits, what to look at first, and what proves it.",
     images: [{ url: "/og-hiring.png", width: 1200, height: 630, alt: "Angel Vergara hiring brief" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Angel Vergara — Hiring Brief",
-    description: "What Angel does, the role families he fits, the systems he has built, and where to verify the proof.",
+    title: "Angel Vergara — Hiring",
+    description: "Where Angel fits, what to look at first, and what proves it.",
     images: ["/og-hiring.png"],
   },
 };
 
 const generalResume = "/downloads/Angel_Vergara_Resume_General.pdf";
 
+// TSK-961 Phase 6: a decision surface, not a biography. Fit -> what to open -> contact.
+const fitLanes = [
+  ["AI workflow & automation", "Applied AI workflows, automation, human decision points, evaluation, and practical controls."],
+  ["Implementation & business systems", "Requirements, process mapping, onboarding, rollout, adoption, and the handoff between business needs and technical teams."],
+  ["Hospitality technology", "Restaurant and hospitality systems where operating knowledge strengthens implementation, product, onboarding, and AI-workflow decisions."],
+  ["Business / process analysis", "Turning operational friction into requirements, workflows, decision logic, and implementable system changes."],
+];
+
 export default function HiringPage() {
   return (
     <main id="main" data-section="hiring">
       <section className="subpage-hero app-hero">
         <div className="shell compact-hero">
-          <p className="eyebrow light-eyebrow">Hiring brief</p>
-          <h1>Applied AI workflows and business systems, grounded in operating reality.</h1>
-          <p className="lede">I design and build practical AI-assisted workflows and business systems that turn messy operational problems into usable, testable tools. This page is the short version for hiring teams: the roles I fit, what I have built, and where to verify it.</p>
+          <p className="eyebrow light-eyebrow">Hiring</p>
+          <h1>Operations experience. Systems implementation. Applied AI.</h1>
+          <p className="lede">I bring hands-on operating leadership into workflow design, implementation, business systems, and human-controlled AI.</p>
+          <p className="hiring-support">The strongest fit is where business context, users, systems, and implementation have to work together.</p>
           <div className="actions">
-            <a className="button light-button" href={generalResume} download>Download resume (PDF) <span aria-hidden="true">↓</span></a>
-            <a className="button outline-light" href="mailto:avergara13@me.com">Contact Angel <span aria-hidden="true">→</span></a>
+            <a className="button light-button" href={generalResume} download>Download resume <span aria-hidden="true">↓</span></a>
+            <Link className="button outline-light" href="/work/">View portfolio <span aria-hidden="true">→</span></Link>
+            <a className="button outline-light" href="mailto:avergara13@me.com">Contact <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </section>
 
       <section className="hiring-fit-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Role fit</p><h2>Three role families, one consistent skill set.</h2></div><p>The same core questions repeat across domains: what failed, who owns the handoff, what decision matters next, and where humans review outcomes.</p></div>
+          <div className="split-head"><div><p className="eyebrow">Role fit</p><h2>Where I fit</h2></div><p>These are role-fit lanes, not claims of prior paid titles.</p></div>
           <div className="fit-list">
-            <article><span className="card-tag">Role family</span><h2>AI workflow automation</h2><p>Designing assisted workflows with explicit scope, review points, and human approval where the decision matters.</p></article>
-            <article><span className="card-tag">Role family</span><h2>Systems implementation</h2><p>Requirements mapping, handoff ownership, rollout support, and accountable delivery.</p></article>
-            <article><span className="card-tag">Role family</span><h2>Business systems &amp; operations</h2><p>Operational reporting, process mapping, and the operating detail that comes from running the floor, not observing it.</p></article>
+            {fitLanes.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}
           </div>
         </div>
       </section>
 
-      <section className="dark-section">
+      <section className="case-section tinted-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">Proof</p><h2>A flagship system and a working product.</h2></div><p>Start with fit, verify delivery proof, then discuss team-specific implementation constraints.</p></div>
-          <div className="proof-path">
-            <article><span>01 · FIT</span><h3>Resume</h3><p>Applied AI workflow and business-systems capability in one concise baseline.</p></article>
-            <span aria-hidden="true">→</span>
-            <article><span>02 · PROOF</span><h3>Loft OS + Resale Scanner Pro</h3><p>Loft OS is the flagship governed system: scoped work, separate execution and merge authority, and documented failure and recovery. Resale Scanner Pro is a working product in real operating use.</p></article>
-            <span aria-hidden="true">→</span>
-            <article><span>03 · CONVERSATION</span><h3>Discuss the operating problem</h3><p>Connect business context, implementation constraints, and practical human-in-the-loop controls.</p></article>
+          <div className="split-head"><div><p className="eyebrow">Proof</p><h2>Start here</h2></div><p>Detailed proof stays inside the case studies.</p></div>
+          <div className="work-additional-list">
+            <a className="work-additional-row" href={generalResume} download>
+              <div><h3>Resume</h3><p className="work-index-label">Baseline</p><p>The concise baseline for experience, transferable capability, and current systems/AI work.</p></div>
+              <p className="work-index-cta">Download General Resume<span aria-hidden="true"> ↓</span></p>
+            </a>
+            <Link className="work-additional-row" href="/work/loft-os/">
+              <div><h3>🛋️ Loft OS</h3><p className="work-index-label">Flagship proof</p><p>Flagship proof of governed multi-agent workflow design, implementation discipline, and controlled autonomous execution.</p></div>
+              <p className="work-index-cta">View Loft OS<span aria-hidden="true"> →</span></p>
+            </Link>
+            <Link className="work-additional-row" href="/work/resale-scanner-pro/">
+              <div><h3>📱 Resale Scanner Pro</h3><p className="work-index-label">Working-product proof</p><p>Working-product proof: AI-assisted research and workflow automation grounded in a real operating decision.</p></div>
+              <p className="work-index-cta">View Resale Scanner Pro<span aria-hidden="true"> →</span></p>
+            </Link>
           </div>
-          <div className="actions"><a className="button outline-light" href={generalResume} download>Download resume (PDF) <span aria-hidden="true">↓</span></a><Link className="button outline-light" href="/work/loft-os/">Open Loft OS case study <span aria-hidden="true">→</span></Link><Link className="button outline-light" href="/work/resale-scanner-pro/">Open Resale Scanner Pro case study <span aria-hidden="true">→</span></Link></div>
+          <p className="hiring-resume-rule">The General Resume is the baseline. Targeted versions reorder the same verified evidence for AI Workflow Automation, Implementation &amp; Onboarding, and Business Systems &amp; Operations.</p>
         </div>
       </section>
 
       <section className="hiring-close-section">
         <div className="shell application-grid">
           <div>
-            <p className="eyebrow">Resume &amp; contact</p>
-            <h2>Start with the General Resume; the role-specific versions change the proof order, not the facts.</h2>
-            <p>Four versions are published: a General Resume plus AI Workflow Automation, Implementation &amp; Onboarding, and Business Systems &amp; Operations.</p>
+            <p className="eyebrow">Conversation</p>
+            <h2>If the role sits between operations and technology, I’d like to talk.</h2>
+            <p>I’m especially interested in implementation, business-systems, hospitality-technology, workflow-automation, and applied-AI roles where understanding the real operation matters as much as choosing the technology.</p>
           </div>
           <div className="application-links ink-links">
-            <a href="mailto:avergara13@me.com"><span>Start a conversation</span><span>→</span></a>
-            <a href={generalResume} download><span>Download the resume (PDF)</span><span>↓</span></a>
-            <Link href="/resume/"><span>Compare all four resumes</span><span>→</span></Link>
+            <a href="mailto:avergara13@me.com"><span>Start a conversation</span><span aria-hidden="true">→</span></a>
+            <Link href="/resume/"><span>Compare resume versions</span><span aria-hidden="true">→</span></Link>
           </div>
         </div>
       </section>
