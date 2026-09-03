@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { DecisionRelay } from "@/components/DecisionRelay";
 import HumanGatedHandoff from "@/components/HumanGatedHandoff";
 
 export const metadata: Metadata = {
@@ -17,17 +16,17 @@ const selectedProof = [
     title: "Loft OS",
     href: "/work/loft-os/",
     flagship: true,
-    kind: "Flagship systems proof · Governed multi-agent workflow orchestration",
-    summary: "Scoped intake, role-separated execution, human approval, evidence, and accountable closeout.",
-    // Verbatim from the Loft OS case study's own proof array — not new claims.
-    signals: ["Scoped execution", "Human authority", "Evidence chain", "Repair loops"],
+    kind: "Flagship · Governed multi-agent workflow system",
+    summary: "Scoped work, human authority, independent review, and verified closeout.",
+    // The demo itself lives on the case study; HOME only advertises that it is there.
+    cue: "Includes interactive agent workflow demo",
   },
   {
     number: "02",
     title: "Resale Scanner Pro",
     href: "/work/resale-scanner-pro/",
     kind: "Working product · In operating use",
-    summary: "A real mobile workflow connecting capture, research, human judgment, and operating evidence.",
+    summary: "A mobile workflow for evaluating resale finds with market evidence and human judgment.",
   },
 ];
 
@@ -38,23 +37,19 @@ export default function Home() {
         <h1 id="hero-title">Angel Vergara</h1>
         <p className="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems</p>
         <p className="hero-value">I turn messy operating problems into clear, controlled systems people can actually use.</p>
-        <p className="hero-proof-cue">Governed AI systems · Working products · Implementation discipline</p>
         <div className="hero-ctas">
           <Link className="button primary" href="/work/loft-os/">View flagship work <span aria-hidden="true">→</span></Link>
           <Link className="button" href="/resume/">Resume</Link>
         </div>
       </div>
-      <div className="editorial-handoff" aria-label="Human-gated handoff proof">
+      <div className="editorial-handoff" role="group" aria-label="Human-gated handoff proof">
         <HumanGatedHandoff />
       </div>
     </section>
 
-    <DecisionRelay />
-
     <section className="proof-bridge shell" aria-labelledby="proof-bridge-title">
       <div className="proof-bridge-head">
-        <p className="eyebrow">Selected proof</p>
-        <h2 id="proof-bridge-title">Systems that were built, shipped, and used.</h2>
+        <h2 id="proof-bridge-title">Selected work</h2>
       </div>
       <div className="proof-bridge-list">
         {selectedProof.map((item) => <Link className={`proof-bridge-row${item.flagship ? " is-flagship" : ""}`} href={item.href} key={item.href}>
@@ -62,20 +57,18 @@ export default function Home() {
           <div>
             <h3>{item.title}</h3>
             <p className="proof-bridge-kind">{item.kind}</p>
-            <p>{item.summary}</p>
-            {item.signals && <ul className="proof-signals" aria-label="Governed run signals">
-              {item.signals.map((signal) => <li key={signal}>{signal}</li>)}
-            </ul>}
+            <p className="proof-bridge-summary">{item.summary}</p>
+            {item.cue && <p className="proof-bridge-cue">{item.cue}<span aria-hidden="true"> →</span></p>}
           </div>
           <span className="proof-bridge-arrow" aria-hidden="true">→</span>
         </Link>)}
       </div>
-      <Link className="lab-link" href="/work/">See the full work index <span aria-hidden="true">→</span></Link>
+      <Link className="lab-link" href="/work/">View portfolio <span aria-hidden="true">→</span></Link>
     </section>
 
     <section className="story-bridge shell" aria-labelledby="story-title">
-      <h2 id="story-title">Operating Reality → Systems Thinking</h2>
-      <p>I learned systems by running the work they have to support. Progressing from hands-on culinary roles to executive chef and general manager taught me to translate operating pressure into clearer workflows and usable systems.</p>
+      <h2 id="story-title">Operating reality → systems thinking</h2>
+      <p>I learned systems by running the operations they have to support—from kitchens and restaurant leadership to AI workflows and business systems.</p>
       <Link href="/about/">Read the story <span aria-hidden="true">→</span></Link>
     </section>
   </main>;

@@ -7,7 +7,8 @@ export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = ["", "/work", "/about", "/resume", "/hiring", "/lab"];
-  // The Office Chef is a labeled concept, not production proof: reachable by URL, excluded from the primary sitemap.
+  // TSK-961 Phase 9: The Office Chef is retired from the public surface and is no longer
+  // emitted as a route, so it cannot appear in the sitemap either.
   const projectRoutes = projects.filter((project) => project.slug !== "office-chef").map((project) => `/work/${project.slug}`);
 
   return [...staticRoutes, ...projectRoutes].map((route) => ({

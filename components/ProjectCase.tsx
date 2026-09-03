@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import HumanGatedHandoff from "@/components/HumanGatedHandoff";
+import { DecisionRelay } from "@/components/DecisionRelay";
 
 export type Project = {
   slug: string;
@@ -13,8 +14,9 @@ export type Project = {
   proof: string[];
   links?: { label: string; href: string; primary?: boolean }[];
   facts: { label: string; value: string }[];
+  role?: string;
+  boundaryNote?: string;
   workflow: { number: string; title: string; copy: string }[];
-  proofChain?: { stage: string; note: string; authority?: boolean }[];
   sections: {
     number: string;
     label: string;
@@ -27,9 +29,9 @@ export type Project = {
 const projectData: Record<string, Project> = {
   "resale-scanner-pro": {
     slug: "resale-scanner-pro",
-    eyebrow: "Working product · Sanitized visual case study",
+    eyebrow: "Working product · In operating use",
     title: "Resale Scanner Pro",
-    dek: "A mobile-first decision system built for a real family resale operation: photograph a thrift-store find, identify the item, research comparable sales, evaluate margin and risk, prepare a listing, and track the result.",
+    dek: "A mobile decision system for evaluating resale finds, comparing market evidence, preparing listings, and learning from outcomes.",
     status: "In real operating use",
     statusTone: "green",
     proof: ["Photo → decision", "Human gates", "Market evidence", "Real operating use"],
@@ -53,9 +55,9 @@ const projectData: Record<string, Project> = {
   },
   "loft-os": {
     slug: "loft-os",
-    eyebrow: "Architecture and operations case study",
+    eyebrow: "Flagship case study",
     title: "Loft OS",
-    dek: "A governed operating model for moving AI-assisted work from intake to verified closeout. The design treats scope, authority, evidence, and recoverability as product requirements—not administrative afterthoughts.",
+    dek: "Loft OS coordinates specialized AI agents from request to verified closeout, with scope, review, and release authority built into the workflow.",
     status: "Sanitized by design",
     statusTone: "copper",
     proof: ["Scoped execution", "Human authority", "Evidence chain", "Repair loops"],
@@ -72,15 +74,6 @@ const projectData: Record<string, Project> = {
       { number: "04", title: "Human decision", copy: "Keep high-impact choices under explicit human control." },
       { number: "05", title: "Closeout", copy: "Reconcile evidence and confirm accountable ownership." },
     ],
-    proofChain: [
-      { stage: "Request", note: "Intent enters as a plain request." },
-      { stage: "Scoped work contract", note: "An explicit contract names what may change and what \u201cdone\u201d means." },
-      { stage: "Execution authority", note: "A separate authority grants permission to execute.", authority: true },
-      { stage: "Agent execution", note: "Work happens only inside the declared scope." },
-      { stage: "Review", note: "Independent review before anything lands." },
-      { stage: "Merge authority", note: "A different authority again decides whether it merges.", authority: true },
-      { stage: "Frozen evidence", note: "Closeout is refused if the evidence is incomplete." },
-    ],
     sections: [
       { number: "02", label: "Control design", title: "Governance expressed as usable product behavior.", copy: "Each control answers a delivery question: what may change, who may approve it, and what proves the result.", kind: "controls" },
       { number: "03", label: "Evidence continuity", title: "A public-safe rail from request to closeout.", copy: "The visible pattern keeps scope, review, verification, and completion connected without exposing private implementation details.", kind: "evidence" },
@@ -91,9 +84,11 @@ const projectData: Record<string, Project> = {
   },
   "sous-chef": {
     slug: "sous-chef",
-    eyebrow: "Hospitality-domain application",
+    eyebrow: "AI-assisted domain workflow",
     title: "Sous Chef",
-    dek: "An AI-assisted culinary workspace that organizes recipe creation, pantry and ingredient signals, cookbooks, and cooking-session continuity around the way a real kitchen thinks.",
+    dek: "A recipe and kitchen-knowledge workspace that applies AI-assisted workflows to practical culinary work.",
+    role: "Domain workflow design · Product implementation · Hospitality / culinary translation",
+    boundaryNote: "This is a public application / product-delivery case study, not a commercial customer deployment.",
     status: "Public application repository",
     statusTone: "cobalt",
     proof: ["Domain-first UX", "Recipe workflows", "Pantry signals", "AI-assisted creation"],
@@ -143,11 +138,13 @@ const projectData: Record<string, Project> = {
   },
   "assistant-recruiter-pro": {
     slug: "assistant-recruiter-pro",
-    eyebrow: "Recruiter workflow proof",
+    eyebrow: "AI workflow",
     title: "Assistant Recruiter Pro",
-    dek: "A recruiter-focused AI workflow that generates and iteratively refines Boolean search strategy from job-description constraints and structured user feedback.",
+    dek: "A recruiter-focused AI assistant for turning role requirements into structured Boolean search strategies and refining them through user feedback.",
+    role: "AI assistant design · Workflow design · Requirements translation · Evaluation / feedback loop",
+    boundaryNote: "Customer identity, candidate information, proprietary prompts, private search data, and internal instructions remain private.",
     ogImage: "/og-home.png",
-    status: "Workflow proof · client-safe framing",
+    status: "Workflow proof · public-safe framing",
     statusTone: "cobalt",
     proof: ["Role map", "Boolean strategy", "Human review", "Refinement loop"],
     facts: [
@@ -183,9 +180,9 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
     return (
       <div className="case-screens">
         {[
-          ["/images/rsp/session.png", "01 · Evaluate", "Session-level signals and sourcing decisions."],
-          ["/images/rsp/listings.png", "02 · Act", "Comparable listings beside the item decision."],
-          ["/images/rsp/sold.png", "03 · Learn", "Sold evidence closes the loop."],
+          ["/images/rsp/session.png", "01 · Evaluate", "Sourcing signals and the buy/pass decision."],
+          ["/images/rsp/listings.png", "02 · Prepare", "Comparable-market evidence and listing work."],
+          ["/images/rsp/sold.png", "03 · Learn", "Sold/outcome evidence for the next decision."],
         ].map(([src, label, caption]) => (
           <figure className="phone" key={src}>
             <Image src={src} alt={`${project.title} ${label} screen`} width={780} height={1688} sizes="(max-width: 620px) 46vw, 28vw" />
@@ -221,15 +218,15 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
   if (kind === "failure") {
     const beats: [string, string, string][] = [
       ["01", "Active work", "An execution lane was working normally. Inside a ninety-minute window it produced two commits folding reviewer findings, resolved seven review threads, and stood with an open change and all required checks passing."],
-      ["02", "A false verdict", "A liveness watchdog concluded the lane was dead. Its stated reason: the lane\u2019s heartbeat signal had aged past its threshold, with no corroborating evidence of activity."],
+      ["02", "False stale verdict", "A liveness watchdog concluded the lane was dead. Its stated reason: the lane\u2019s heartbeat signal had aged past its threshold, with no corroborating evidence of activity."],
       ["03", "Containment", "The system did what it is designed to do with a dead lane. It closed the work timer, set the task aside, and returned the execution lock to its owner \u2014 while the lane was mid-review with open, passing work."],
-      ["04", "The evidence was kept", "The containment record was left intact. It was not edited, deleted, or explained away. The timer had been closed with an end time equal to its start time, recording zero duration for roughly two hours of real work, and that false record was preserved as evidence."],
-      ["05", "Root cause", "The signal was stale about the heartbeat, never about the lane. The heartbeat is created when work starts and finalized when it ends, and no automated path in the production flow refreshes it in between. A refresh command exists, but nothing in production calls it."],
-      ["06", "Recovery", "The lane resumed the way the rules require: a fresh start record, the heartbeat recreated, the lock re-claimed with the full reason recorded. The lost time was not backfilled with an invented duration. A contained lane also cannot revive itself \u2014 reversing a containment requires a separate party, by design."],
-      ["07", "What changed, and what hasn\u2019t", "The fix is not to weaken the watchdog. Two corrections are specified: require positive evidence of death, and never close a timer to zero duration. This is tracked as open work, not described as solved."],
+      ["04", "Preserved evidence", "The containment record was left intact. It was not edited, deleted, or explained away. The timer had been closed with an end time equal to its start time, recording zero duration for roughly two hours of real work, and that false record was preserved as evidence."],
+      ["05", "Root-cause discovery", "The signal was stale about the heartbeat, never about the lane. The heartbeat is created when work starts and finalized when it ends, and no automated path in the production flow refreshes it in between. A refresh command exists, but nothing in production calls it."],
+      ["06", "Lawful recovery", "The lane resumed the way the rules require: a fresh start record, the heartbeat recreated, the lock re-claimed with the full reason recorded. The lost time was not backfilled with an invented duration. A contained lane also cannot revive itself \u2014 reversing a containment requires a separate party, by design."],
+      ["07", "System hardening", "The fix is not to weaken the watchdog. Two corrections are specified: require positive evidence of death, and never close a timer to zero duration. This is tracked as open work, not described as solved."],
     ];
     return (
-      <div className="failure-lab" aria-label="Documented failure and recovery">
+      <div className="failure-lab" role="group" aria-label="Documented failure and recovery">
         {beats.map(([n, title, copy]) => (
           <article key={n}><span>{n}</span><b>{title}</b><p>{copy}</p></article>
         ))}
@@ -238,16 +235,21 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
   }
 
   if (kind === "boundary") {
+    const [shown, withheld] = project.slug === "assistant-recruiter-pro"
+      ? [["Workflow stages and the recruiter review step", "Requirements translation into search strategy", "The refinement loop", "Evaluation criteria in plain terms"],
+         ["Customer and client identity", "Candidate information", "Proprietary prompts and internal instructions", "Private search data"]]
+      : [["Workflow stages and role separation", "Approval, verification, and repair patterns", "How operational risk maps to controls", "Employer-relevant systems thinking"],
+         ["Private source and repository details", "Live infrastructure and internal links", "Secrets, security posture, and customer data", "Internal identifiers and release evidence"]];
     return (
       <div className="boundary-grid">
-        <article><h3>Shown</h3><ul><li>Workflow stages and role separation</li><li>Approval, verification, and repair patterns</li><li>How operational risk maps to controls</li><li>Employer-relevant systems thinking</li></ul></article>
-        <article><h3>Withheld</h3><ul><li>Private source and repository details</li><li>Live infrastructure and internal links</li><li>Secrets, security posture, and customer data</li><li>Internal identifiers and release evidence</li></ul></article>
+        <article><h3>Shown</h3><ul>{shown.map((item) => <li key={item}>{item}</li>)}</ul></article>
+        <article><h3>Withheld</h3><ul>{withheld.map((item) => <li key={item}>{item}</li>)}</ul></article>
       </div>
     );
   }
 
   if (project.slug === "loft-os" && kind === "evidence") {
-    return <div className="evidence-rail" aria-label="Public-safe evidence continuity"><article><span>01</span><b>Request</b><p>Intent and scope become explicit.</p></article><i aria-hidden="true">→</i><article><span>02</span><b>Work</b><p>Authorized surfaces stay bounded.</p></article><i aria-hidden="true">→</i><article><span>03</span><b>Review</b><p>Human judgment remains visible.</p></article><i aria-hidden="true">→</i><article><span>04</span><b>Close</b><p>Evidence confirms the result.</p></article></div>;
+    return <div className="evidence-rail" role="group" aria-label="Public-safe evidence continuity"><article><span>01</span><b>Request</b><p>Intent and scope become explicit.</p></article><i aria-hidden="true">→</i><article><span>02</span><b>Work</b><p>Authorized surfaces stay bounded.</p></article><i aria-hidden="true">→</i><article><span>03</span><b>Review</b><p>Human judgment remains visible.</p></article><i aria-hidden="true">→</i><article><span>04</span><b>Close</b><p>Evidence confirms the result.</p></article></div>;
   }
 
   if (project.slug === "loft-os" && kind === "implementation") {
@@ -290,16 +292,217 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
 
   return (
     <div className="system-grid">
-      {project.slug === "resale-scanner-pro"
-        ? [["Interface", "Mobile workflow"], ["Orchestration", "Agent session"], ["Evidence", "Market signals"], ["Learning loop", "Tracked results"]].map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)
-        : project.slug === "sous-chef"
-          ? [["Recipes", "Structured creation"], ["Pantry", "Ingredient signals"], ["Cookbooks", "Reusable organization"], ["Sessions", "Cooking continuity"]].map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)
-          : [["Discover", "Current-state work"], ["Define", "Future-state workflow"], ["Prepare", "Implementation requirements"], ["Adopt", "Operator-ready handoff"]].map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)}
+      {(project.slug === "sous-chef"
+        ? [["Recipes", "Structured creation"], ["Pantry", "Ingredient signals"], ["Cookbooks", "Reusable organization"], ["Sessions", "Cooking continuity"]]
+        : [["Inputs", "Role requirements"], ["Strategy", "Boolean search variants"], ["Review", "Recruiter relevance feedback"], ["Loop", "Refined search strategy"]]
+      ).map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)}
     </div>
   );
 }
 
+// TSK-961 Phase 2 locked sequence: hero -> my role -> architecture -> how control works
+// -> Agent Workflow Demo -> control stack -> Failure Lab -> Public Boundary.
+const controlIdeas: [string, string, string][] = [
+  ["01", "Scoped", "Explicit objective, boundaries, and acceptance criteria."],
+  ["02", "Authorized", "Execution begins only through the required authority path."],
+  ["03", "Independently reviewed", "The executor does not approve its own protected release."],
+  ["04", "Verified", "Completion requires evidence and closeout, not merely generated output."],
+];
+
+const controlStack: [string, string, string][] = [
+  ["01", "Work-state integrity", "Task lifecycle automation keeps execution state, timers, and closeout synchronized."],
+  ["02", "Bounded execution", "Scoped work orders, clean-state checks, allowlisted surfaces, and capability boundaries limit what an executor may change."],
+  ["03", "Durable authorization", "Execution authority is recorded through the governed Agent SDK path\u2014not inferred from a prompt, message, or session."],
+  ["04", "Independent review", "Automated review and PR custody inspect the work before protected release."],
+  ["05", "Fail-closed gates", "Missing authority, evidence, capability, or expected state stops the protected action instead of letting the agent guess through ambiguity."],
+  ["06", "Verified closeout", "Completion requires the lane\u2019s full evidence and delivery chain\u2014not simply generated output or a passing local build."],
+];
+
+function LoftOsCase({ project }: { project: Project }) {
+  return (
+    <main id="main" data-section="work-loft-os">
+      <section className="case-hero">
+        <div className="shell case-hero-single">
+          <p className="eyebrow">{project.eyebrow}</p>
+          <h1>🛋️ Loft OS</h1>
+          <p className="case-descriptor">Governed multi-agent workflow system</p>
+          <p className="lede">{project.dek}</p>
+          <p className="case-support">Agents can keep work moving autonomously without gaining unchecked authority.</p>
+        </div>
+      </section>
+
+      <section className="case-role-band" aria-label="Contribution">
+        <div className="shell">
+          <p className="case-role"><span>My role</span>Systems architecture &#183; Governance design &#183; Workflow implementation</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">01 &#183; Architecture</p><h2>How Loft OS is structured</h2></div>
+            <p>Control lives in three boundaries every piece of work passes through: what may change, who may approve it, and what proves the result. The strip below shows where the human gate sits; the full governed lifecycle is named once, in the Agent Workflow Demo.</p>
+          </div>
+          <SectionVisual project={project} kind="controls" />
+        </div>
+      </section>
+
+      <section className="case-section tinted-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">02 &#183; Control model</p><h2>How control works</h2></div>
+            <p>Autonomy does not mean unchecked authority.</p>
+          </div>
+          <div className="control-grid">
+            {controlIdeas.map(([n, title, copy]) => <article key={n}><span>{n}</span><b>{title}</b><p>{copy}</p></article>)}
+          </div>
+          <p className="case-principle">The party that did the work cannot approve its own merge.</p>
+        </div>
+      </section>
+
+      <DecisionRelay />
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">03 &#183; Control stack</p><h2>The control stack</h2></div>
+            <p>The automation behind safe autonomous work.</p>
+          </div>
+          <div className="control-stack">
+            {controlStack.map(([n, title, copy]) => <article key={n}><span>{n}</span><b>{title}</b><p>{copy}</p></article>)}
+          </div>
+          <p className="case-principle">The goal isn&#8217;t to assume agents are always right. It&#8217;s to make unsupported action difficult, detectable, reviewable, and recoverable.</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">04 &#183; Failure lab</p><h2>Failure Lab</h2></div>
+            <p>What happens when the system gets the state wrong?</p>
+          </div>
+          <SectionVisual project={project} kind="failure" />
+          <p className="case-gap-note">Any remaining gap stays visible until it is verified closed.</p>
+          <p className="case-principle">Loft OS is designed not only to execute governed work, but to fail safely, preserve evidence, recover lawfully, and improve after failure.</p>
+        </div>
+      </section>
+
+      <section className="case-section blue-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">05 &#183; Public boundary</p><h2>Public Boundary</h2></div>
+            <p>The case study shows the operating pattern, not the private operating environment. Public proof is intentionally sanitized. It shows the workflow, control model, architecture, curated Agent Workflow Demo, and failure-recovery pattern without exposing private runtime infrastructure, credentials, internal identifiers, non-public data, or protected operating details.</p>
+          </div>
+          <SectionVisual project={project} kind="boundary" />
+          <p className="case-gap-note">The Agent Workflow Demo is curated and deterministic. It demonstrates the governed interaction model; it is not a direct public interface to the private Loft OS runtime.</p>
+          <p className="case-principle">Enough is public to evaluate the system. The private boundary stays intact.</p>
+        </div>
+      </section>
+
+      <section id="next-step" className="case-next-step">
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume/">Review the resume <span aria-hidden="true">&#8594;</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">&#8594;</span></a></div></div>
+      </section>
+    </main>
+  );
+}
+
+// TSK-961 Phase 3 locked sequence: hero -> my role -> product proof -> workflow ->
+// stopping rule -> outcome loop -> contribution -> Public Boundary.
+const rspFlow: [string, string, string, boolean][] = [
+  ["01", "Capture", "Photograph or scan the item and record the purchase context.", false],
+  ["02", "Research", "AI-assisted identification and comparable-market research.", false],
+  ["03", "Decide", "The user makes the BUY / MAYBE / PASS judgment.", true],
+  ["04", "Prepare", "Approved items move into listing preparation with photos, description, category, pricing, and item details enriched where supported.", false],
+  ["05", "Review", "Required checks and warnings are surfaced before publication.", false],
+  ["06", "List", "Publication is explicitly reviewed and confirmed by the operator.", false],
+  ["07", "Learn", "Sold and outcome evidence updates the operating record where the current implementation supports it.", false],
+];
+
+function RspCase({ project }: { project: Project }) {
+  return (
+    <main id="main" data-section="work-resale-scanner-pro">
+      <section className="case-hero">
+        <div className="shell case-hero-single">
+          <p className="eyebrow">{project.eyebrow}</p>
+          <h1>&#128241; Resale Scanner Pro</h1>
+          <p className="lede">{project.dek}</p>
+          <p className="case-support">AI helps with research and preparation. Human judgment controls the buy decision and final listing.</p>
+        </div>
+      </section>
+
+      <section className="case-role-band" aria-label="Contribution">
+        <div className="shell">
+          <p className="case-role"><span>My role</span>Product design &#183; Workflow architecture &#183; Implementation &#183; Delivery</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">01 &#183; Product proof</p><h2>A working product, not a concept rendering.</h2></div>
+            <p>These screens come from the working application and show the resale workflow in use.</p>
+          </div>
+          <SectionVisual project={project} kind="screens" />
+        </div>
+      </section>
+
+      <section className="workflow-section dark-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">02 &#183; Product workflow</p><h2>From find to listing</h2></div>
+            <p>The sequence separates observation, assisted work, and human judgment. Each stage produces usable context for the next.</p>
+          </div>
+          <div className="workflow-steps">
+            {rspFlow.map(([n, title, copy, active]) => <article className={active ? "active-step" : ""} key={n}><span>{n}</span><h3>{title}</h3><p>{copy}</p></article>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="case-section tinted-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">03 &#183; Decision design</p><h2>Useful automation has a stopping rule.</h2></div>
+            <p>RSP automates research and preparation, then stops where judgment matters. The user decides whether to buy, reviews the listing, and explicitly approves publication.</p>
+          </div>
+          <SectionVisual project={project} kind="decision" />
+          <p className="case-principle">AI reduces the research and preparation burden. Human judgment remains accountable for the decision and release.</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">04 &#183; Learning loop</p><h2>The workflow gets smarter from outcomes.</h2></div>
+            <p>RSP carries the decision past research and listing preparation. Outcome evidence can return to the operating record so future evaluations have better context where the current implementation supports it.</p>
+          </div>
+          <p className="case-principle">I designed the workflow around a real operating decision: capture the item, reduce the research burden, preserve human judgment, prepare the work, and carry the outcome back into the system.</p>
+        </div>
+      </section>
+
+      <section className="case-section blue-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">05 &#183; Public boundary</p><h2>Public Boundary</h2></div>
+            <p>The case study shows the product workflow and sanitized operating proof without exposing the private operating environment.</p>
+          </div>
+          <div className="boundary-grid">
+            <article><h3>Shown</h3><ul><li>The mobile workflow and decision model</li><li>Sanitized product screenshots</li><li>The human approval boundary</li><li>The implementation pattern</li></ul></article>
+            <article><h3>Withheld</h3><ul><li>Credentials and deployment details</li><li>Internal identifiers and database records</li><li>Non-public inventory or customer data</li><li>Protected operating details</li></ul></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="next-step" className="case-next-step">
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume/">Review the resume <span aria-hidden="true">&#8594;</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">&#8594;</span></a></div></div>
+      </section>
+    </main>
+  );
+}
+
 export function ProjectCase({ project }: { project: Project }) {
+  if (project.slug === "loft-os") return <LoftOsCase project={project} />;
+  if (project.slug === "resale-scanner-pro") return <RspCase project={project} />;
+
   return (
     <main id="main" data-section={`work-${project.slug}`}>
       <section className="case-hero">
@@ -317,43 +520,17 @@ export function ProjectCase({ project }: { project: Project }) {
         </div>
       </section>
 
-      <section id="project-facts" className="case-evidence-section" aria-label={`${project.title} evidence summary`}>
-        <div className="shell">
-          <div className="case-evidence-head">
-            <p className="eyebrow">Evidence summary</p>
-            <div className="case-proof-list">{project.proof.map((item) => <span key={item}>{item}</span>)}</div>
-          </div>
-          <div className="case-facts-grid">
-            {project.facts.map((fact) => <div key={fact.label}><span>{fact.label}</span><b>{fact.value}</b></div>)}
-          </div>
-        </div>
-      </section>
-
-      {project.proofChain && (
-        <section id="governed-run" className="case-section proof-surface" aria-label="Governed run: request to frozen evidence">
+      {project.role && (
+        <section className="case-role-band" aria-label="Contribution">
           <div className="shell">
-            <div className="split-head">
-              <div><p className="eyebrow">Governed run</p><h2>One path, and two gates held by different parties.</h2></div>
-              <p>A request becomes an explicit contract naming what may change and what &ldquo;done&rdquo; means. A separate authority grants permission to execute. Agents do the work inside that scope and open it for review. The party that did the work cannot approve its own merge. Each stage leaves evidence, and closeout is refused if that evidence is incomplete.</p>
-            </div>
-            <ol className="proof-chain">
-              {project.proofChain.map((step, index) => (
-                <li className={step.authority ? "authority-gate" : ""} key={step.stage}>
-                  <article>
-                    <span>{step.authority ? `Stage ${index + 1} \u00b7 Authority gate` : `Stage ${index + 1}`}</span>
-                    <b>{step.stage}</b>
-                    <p>{step.note}</p>
-                  </article>
-                </li>
-              ))}
-            </ol>
+            <p className="case-role"><span>My role</span>{project.role}</p>
           </div>
         </section>
       )}
 
       <section id="workflow" className="workflow-section dark-section">
         <div className="shell">
-          <div className="split-head"><div><p className="eyebrow">01 · Product workflow</p><h2>{project.slug === "resale-scanner-pro" ? "From uncertainty to an informed listing." : project.slug === "loft-os" ? "A workflow that knows when to stop." : project.slug === "sous-chef" ? "From inspiration to kitchen continuity." : "From paperwork to an operating signal."}</h2></div><p>The sequence separates observation, assisted work, and human judgment. Each stage produces usable context for the next.</p></div>
+          <div className="split-head"><div><p className="eyebrow">01 · Product workflow</p><h2>{project.slug === "sous-chef" ? "From inspiration to kitchen continuity." : "From intake to a refined strategy."}</h2></div><p>The sequence separates observation, assisted work, and human judgment. Each stage produces usable context for the next.</p></div>
           <div className="workflow-steps">{project.workflow.map((step, index) => <article className={index === Math.floor(project.workflow.length / 2) ? "active-step" : ""} key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div>
         </div>
       </section>
@@ -367,8 +544,16 @@ export function ProjectCase({ project }: { project: Project }) {
         </section>
       ))}
 
+      {project.boundaryNote && (
+        <section className="case-section tinted-section" aria-label="Public boundary">
+          <div className="shell">
+            <p className="case-principle">{project.boundaryNote}</p>
+          </div>
+        </section>
+      )}
+
       <section id="next-step" className="case-next-step">
-        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume">Review the resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume/">Review the resume <span aria-hidden="true">→</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">→</span></a></div></div>
       </section>
     </main>
   );

@@ -11,7 +11,7 @@ const nodes = [
 
 export default function HumanGatedHandoff({ variant = "light" }: HandoffProps) {
   return (
-    <div className={`handoff handoff-${variant}`} aria-label="Human-gated handoff">
+    <div className={`handoff handoff-${variant}`} role="group" aria-label="Human-gated handoff">
       <div className="handoff-flow">
         {nodes.map(([number, label], index) => (
           <div className={`handoff-node ${index === 4 ? "handoff-decision" : ""}`} key={number}>
@@ -20,7 +20,7 @@ export default function HumanGatedHandoff({ variant = "light" }: HandoffProps) {
           </div>
         ))}
       </div>
-      <div className="handoff-recovery" aria-label="Recovery path">
+      <div className="handoff-recovery" role="group" aria-label="Recovery path">
         <span>Recovery</span>
         <b>Review + Evidence</b>
         <span aria-hidden="true">↩ Specialist work</span>

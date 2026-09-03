@@ -4,8 +4,15 @@ import { getProject, ProjectCase, projects } from "../../../components/ProjectCa
 
 export const dynamicParams = false;
 
+// TSK-961 Phase 9: The Office Chef is retired from the public portfolio surface. The
+// project data stays in the repo as canonical internal evidence; it is simply no longer
+// emitted as a public route. dynamicParams = false means an unlisted slug 404s cleanly.
+const RETIRED_PUBLIC_SLUGS = new Set(["office-chef"]);
+
 export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+  return projects
+    .filter((project) => !RETIRED_PUBLIC_SLUGS.has(project.slug))
+    .map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -13,8 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const project = getProject(slug);
   const path = `/work/${project?.slug}/`;
   const ogImage = project?.ogImage ?? `/og-${project?.slug}.png`;
-  // The Office Chef is a labeled concept, not production proof: reachable by URL, kept out of the search index.
-  const conceptOnly = slug === "office-chef";
+  // Retired public slugs are not emitted at all (see generateStaticParams); this guard
+  // stays as defence in depth if a concept route is ever re-enabled.
+  const conceptOnly = RETIRED_PUBLIC_SLUGS.has(slug);
   return project ? {
     title: `${project.title} — Angel Vergara`,
     description: project.dek,

@@ -177,6 +177,18 @@ function MissionView({ mission }: { mission: Mission }) {
   </div>;
 }
 
+// Locked TSK-961 Phase 2 lifecycle. Two authority gates are held by parties other than
+// the executor: work may not begin, and may not ship, on the executor's own say-so.
+const lifecycle: { stage: string; note: string; authority?: boolean }[] = [
+  { stage: "Request", note: "Intent enters as a plain request." },
+  { stage: "Task", note: "The request becomes a tracked task with an explicit objective." },
+  { stage: "Scoped execution", note: "A scoped contract names what may change and what \u201cdone\u201d means, and execution begins only through the required authority path.", authority: true },
+  { stage: "Agent work", note: "Assigned agents change only the surfaces the scope allows." },
+  { stage: "Independent review", note: "Review and change custody inspect the work before anything ships." },
+  { stage: "Protected release", note: "A separate authority decides whether the work merges.", authority: true },
+  { stage: "Verified closeout", note: "Closeout is refused if the required evidence is incomplete." },
+];
+
 export function DecisionRelay() {
   const [input, setInput] = useState("");
   const [fixtureId, setFixtureId] = useState<string | null>(null);
@@ -201,7 +213,7 @@ export function DecisionRelay() {
     setSummaries(["", "", ""]);
     setMission(null);
     setWarning("");
-    setAnnouncement("Decision Relay reset.");
+    setAnnouncement("Agent Workflow Demo reset.");
     setConstraint("");
     setRefinement("");
     setRevision(0);
@@ -233,7 +245,7 @@ export function DecisionRelay() {
 
   const runDemo = async () => {
     if (!fixtureId || input !== fixtures[fixtureId].input) {
-      setWarning("Custom input is not processed in this public demo. Choose a curated example to run Decision Relay.");
+      setWarning("Custom input is not processed in this public demo. Choose a curated example to run the demo.");
       setAnnouncement("Custom input is not processed. Choose a curated example.");
       return;
     }
@@ -283,8 +295,22 @@ export function DecisionRelay() {
   return <section className="relay-section shell" id="decision-relay" aria-labelledby="relay-title">
     <div className="relay-header">
       <p className="relay-eyebrow">Interactive proof</p>
-      <div className="relay-title-row"><h2 id="relay-title">Decision Relay</h2><span>Curated demo</span></div>
-      <p>See how messy input becomes a scoped, reviewable plan through a bounded AI workflow.</p>
+      <div className="relay-title-row"><h2 id="relay-title">Agent Workflow Demo</h2><span>Curated demo</span></div>
+      <p>A curated walkthrough of one governed run. See how a request becomes bounded agent work, moves through protected review, and reaches verified closeout.</p>
+      <p className="relay-disclosure">Curated demonstration · deterministic fixture · not a live autonomous production run.</p>
+    </div>
+    <div className="proof-surface relay-chain">
+    <ol className="proof-chain" id="governed-run" aria-label="Governed run: request to verified closeout">
+      {lifecycle.map((step, index) => (
+        <li className={step.authority ? "authority-gate" : ""} key={step.stage}>
+          <article>
+            <span>{step.authority ? `Stage ${index + 1} \u00b7 Authority gate` : `Stage ${index + 1}`}</span>
+            <b>{step.stage}</b>
+            <p>{step.note}</p>
+          </article>
+        </li>
+      ))}
+    </ol>
     </div>
     <div className="relay-layout">
       <div className="relay-input-panel">
@@ -293,11 +319,11 @@ export function DecisionRelay() {
         <textarea id="relay-input" value={input} disabled={running} onChange={(event) => { const value = event.target.value; setInput(value); setFixtureId((current) => current && value === fixtures[current].input ? current : null); setWarning(""); }} placeholder="Dump everything here — tasks, deadlines, worries, ideas, reminders, things you’re waiting on…" />
         {warning && <p className="relay-warning" aria-live="polite">{warning}</p>}
         <button className="relay-run" type="button" onClick={runDemo} disabled={running}>{running ? "Relay running…" : "Run demo"}</button>
-        <div className="relay-samples" aria-label="Curated examples">{Object.entries(fixtures).map(([id, fixture]) => <button type="button" key={id} onClick={() => chooseFixture(id)} disabled={running}>{fixture.label}</button>)}</div>
+        <div className="relay-samples" role="group" aria-label="Curated examples">{Object.entries(fixtures).map(([id, fixture]) => <button type="button" key={id} onClick={() => chooseFixture(id)} disabled={running}>{fixture.label}</button>)}</div>
         <p className="relay-privacy">Do not paste confidential or sensitive information.</p>
       </div>
       <div className="relay-output">
-        <div className="relay-pipeline" aria-label="Decision Relay agents">
+        <div className="relay-pipeline" role="group" aria-label="Agent Workflow Demo agents">
           {stageNames.map((name, index) => <article className={statuses[index] === "WORKING" ? "is-working" : ""} key={name}>
             <div><span>0{index + 1} {name}</span><b className={`relay-status ${statuses[index].toLowerCase()}`}>{statuses[index]}</b></div>
             {summaries[index] ? <p>{summaries[index]}</p> : <p>{stageDescriptions[index]}</p>}
