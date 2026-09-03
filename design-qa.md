@@ -366,4 +366,26 @@ deliberate, not an oversight.
 artifact gate, so a Node-only environment cannot build. Stated in the README beside the
 build description, with the reason.
 
+## Third review round — the provenance claim made mechanical
+
+`general_resume_document()` recorded the artifact's provenance as `RESUMES[0]` while
+selecting the General Resume by filename. Those can diverge: reorder `RESUMES` and the
+search keeps working while the recorded provenance quietly becomes a false claim about
+where the published content came from. The claim is repeated in seven places -- generator
+header, emitted artifact, the STALE message, the page comment and this document -- and all
+of them rested on that search.
+
+Index 0 is now used directly with its identity asserted, so the invariant fails closed on
+the build path. The `source` and `pdf` fields are derived from the object actually used
+rather than hand-typed beside it, so provenance cannot disagree with selection. Hardening
+only: the emitted artifact is byte-identical.
+
+The control is executable rather than a source-text pin. It reorders `RESUMES` in a
+throwaway copy of the generator and requires a refusal naming the index-0 invariant, and it
+first runs an unmodified copy through the same temp harness so a failure is attributable to
+the reorder and not to the copy. Three mutations were each confirmed to turn the suite red:
+selection reverted to the filename search (the reported defect), the identity assertion
+removed, and the provenance string pointed at the wrong index -- that last one with the
+artifact regenerated so the drift test still passed, isolating the provenance assertion.
+
 final result: passed
