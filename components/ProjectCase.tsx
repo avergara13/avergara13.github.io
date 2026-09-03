@@ -427,11 +427,16 @@ function RspCase({ project }: { project: Project }) {
   return (
     <main id="main" data-section="work-resale-scanner-pro">
       <section className="case-hero">
-        <div className="shell case-hero-single">
+        <div className="shell case-hero-single case-hero-marked">
+          {/* Angel's supplied RSP project mark, used verbatim. alt is empty by design: the
+              adjacent h1 already names the product, and the mark asserts no product claim. */}
+          <Image className="case-mark" src="/images/rsp/mark.png" alt="" width={1254} height={1254} />
+          <div>
           <p className="eyebrow">{project.eyebrow}</p>
           <h1>&#128241; Resale Scanner Pro</h1>
           <p className="lede">{project.dek}</p>
           <p className="case-support">AI helps with research and preparation. Human judgment controls the buy decision and final listing.</p>
+          </div>
         </div>
       </section>
 

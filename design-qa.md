@@ -165,9 +165,30 @@ Recorded rather than silently skipped, per the phase read-back contract:
   the source branch. Every guard in this document is therefore enforced by local runs and
   review, not by CI. Changing CI was out of scope for this editorial pass and is flagged for
   a separate decision.
-- **The project mark is a 1.15 MB payload** on the flagship page. It is the exact supplied
-  binary and was deliberately not re-encoded. An optimised derivative would be a sensible
-  bounded follow-up; it is the largest single asset the site loads.
+- **Resale Scanner Pro project mark — RESOLVED.** The supplied RSP mark was integrated
+  verbatim at `public/images/rsp/mark.png` (sha256 `3df20812…532006`, 1254×1254, 1.21 MB),
+  matching the identity recorded for it. It was not redrawn, regenerated, approximated,
+  recoloured, or substituted, and no other RSP image was used in its place. It takes the same
+  project-mark role as the Loft OS mark — same 112 px / 88 px sizing, same frame, same
+  position in the hero — while keeping its own intrinsic square geometry. `alt` is empty for
+  the same reason as the Loft OS mark, which also guarantees the mark asserts no product
+  claim of its own.
+- **The RSP mark carries a 26 KB C2PA provenance manifest, and it is published intact.**
+  Decoded before publishing, it contains: generator `OpenAI Media Service API` / `gpt-image`,
+  `digitalSourceType: trainedAlgorithmicMedia` (i.e. AI-generated), a 2026-05-11 timestamp,
+  content UUIDs, and an SSL.com certificate chain. It contains **no** personal data, account
+  identifier, credential, or internal infrastructure reference. It was left in place on two
+  grounds: stripping it would alter the exact supplied binary, and removing a truthful
+  AI-provenance signal from a portfolio whose whole argument is honest AI-assisted work would
+  be the wrong call. Flagged here so the decision is explicit rather than incidental. The Loft
+  OS mark carries no such manifest — only a 68-byte `eXIf` with colour space and dimensions.
+- **The two project marks are 1.15 MB and 1.21 MB** and are the two largest assets the site
+  loads. Both are the exact supplied binaries and were deliberately not re-encoded. Optimised
+  derivatives would be a sensible bounded follow-up.
+- **Observation, not acted on:** the RSP mark's barcode renders the string `BCANNER1R1`,
+  which is not a real word or code. It is part of the supplied canonical artwork, and the
+  instruction was explicit not to redraw or regenerate it, so it ships as supplied. Worth
+  Angel's attention if the mark is ever revised.
 - **Pre-existing unreferenced assets.** `public/og.png` (1.9 MB, unreferenced, and the only
   image carrying a C2PA "AI-generated" provenance manifest), `public/images/rsp/logo.png`,
   `public/images/sous-chef/banner.png`, and `public/images/rsp/agent.png` are shipped but
