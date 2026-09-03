@@ -7,8 +7,9 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:pages": "next build",
+    "verify:resume-artifact": "python3 scripts/generate_resumes.py --emit-json --check",
+    "build": "npm run verify:resume-artifact && next build",
+    "build:pages": "npm run build",
     "test": "npm run build:pages && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },

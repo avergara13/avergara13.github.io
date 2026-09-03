@@ -6,7 +6,9 @@ const baseUrl = "https://avergara13.github.io";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/work", "/about", "/resume", "/hiring", "/lab"];
+  // TSK-966: /hiring/ is retired. Its route is no longer emitted (app/hiring/ was
+  // deleted), so advertising it here would point crawlers at a genuine 404.
+  const staticRoutes = ["", "/work", "/about", "/resume", "/lab"];
   // TSK-961 Phase 9: The Office Chef is retired from the public surface and is no longer
   // emitted as a route, so it cannot appear in the sitemap either.
   const projectRoutes = projects.filter((project) => project.slug !== "office-chef").map((project) => `/work/${project.slug}`);

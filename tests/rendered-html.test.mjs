@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { access, readFile, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const output = new URL("../out/", import.meta.url);
@@ -279,47 +284,262 @@ test("assistant recruiter route exists and is client-safe inspectable proof", as
   assert.doesNotMatch(html, /private runtime|WO_ENQ|TSK-\d|credentials|candidate identity/i);
 });
 
-test("hiring route is a decision surface whose named proof matches its links", async () => {
-  const html = await readOutput("hiring/index.html");
+// Rendered text with tags stripped and the entities React emits decoded, so an
+// assertion can compare against the generator's own strings rather than against a
+// hand-copied HTML-escaped duplicate of them.
+const decodeEntities = (value) => value
+  .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+  .replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&");
+const visibleText = (html) => decodeEntities(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 
-  assert.match(html, /Operations experience\. Systems implementation\. Applied AI\./);
-  // Fit lanes must stay labelled as fit, never as held titles.
-  assert.match(html, /These are role-fit lanes, not claims of prior paid titles\./);
+test("hiring route is retired: no artifact, no inbound link, no redirect or stub", async () => {
+  // /hiring/ was a static filesystem route, so retirement means app/hiring/ is deleted
+  // and the export emits nothing for the path. This is the same OUTCOME as the Office
+  // Chef retirement (genuine 404, never a redirect or stub) by a different mechanism:
+  // that one filters a dynamic slug out of generateStaticParams.
+  await assert.rejects(access(new URL("app/hiring/page.tsx", root)), undefined, "app/hiring/page.tsx must not exist");
+  await assert.rejects(access(new URL("out/hiring/index.html", root)), undefined, "out/hiring/index.html must not exist");
+  await assert.rejects(access(new URL("public/og-hiring.png", root)), undefined, "the orphaned hiring OG asset must not remain");
+  await assert.rejects(access(new URL("out/og-hiring.png", root)), undefined, "the orphaned hiring OG asset must not ship");
 
-  // The named proof and the actual proof links must not drift apart again.
-  assert.match(html, /Loft OS/);
-  assert.match(html, /Resale Scanner Pro/);
-  assert.match(html, /href="\/work\/loft-os\/"/);
-  assert.match(html, /href="\/work\/resale-scanner-pro\/"/);
-  assert.match(html, /href="\/downloads\/Angel_Vergara_Resume_General\.pdf"/);
+  // The genuine 404 depends on this artifact existing; without it Pages would fall
+  // back to its own generic page and the retirement claim would be untested.
+  await access(new URL("out/404.html", root));
 
-  // The resume-version rule is stated exactly once (TSK-961 Phase 6). Scope the count to
-  // <main>: Next also serialises the same copy into the RSC payload later in the file.
+  // Zero internal inbound links or asset references, across every emitted page.
+  const routes = [
+    "index.html", "work/index.html", "about/index.html", "lab/index.html",
+    "resume/index.html", "404.html", "work/loft-os/index.html",
+    "work/resale-scanner-pro/index.html", "work/sous-chef/index.html",
+    "work/assistant-recruiter-pro/index.html",
+  ];
+  for (const route of routes) {
+    const html = await readOutput(route);
+    assert.doesNotMatch(html, /href="\/hiring\/?"/, `${route} still links to /hiring/`);
+    assert.doesNotMatch(html, /og-hiring\.png/, `${route} still references the hiring OG asset`);
+  }
+
+  const sitemap = await readOutput("sitemap.xml");
+  assert.doesNotMatch(sitemap, /\/hiring\//, "a retired route must not be advertised to crawlers");
+});
+
+test("resume is the one canonical recruiter surface: readable record, single download, no variant choice", async () => {
+  const html = await readOutput("resume/index.html");
   const mainAt = html.indexOf('<main id="main"');
-  assert.notEqual(mainAt, -1, "hiring <main> landmark is missing");
+  assert.notEqual(mainAt, -1, "resume <main> landmark is missing");
   const main = html.slice(mainAt, html.indexOf("</main>", mainAt));
-  const versionRule = main.match(/The General Resume is the baseline\./g) ?? [];
-  assert.equal(versionRule.length, 1, "the resume-version rule must be stated once");
+  const text = visibleText(main);
 
-  // Retired framing must stay gone.
-  assert.doesNotMatch(html, /keeps compatibility/i);
-  assert.doesNotMatch(html, /About \/ career bridge/i);
-  assert.doesNotMatch(html, /Use this route for additional context/i);
-  assert.doesNotMatch(html, /Operations credibility, built for implementation\./i);
-  assert.doesNotMatch(html, /Three role families, one consistent skill set/i);
-  assert.doesNotMatch(html, /This page is the short version for hiring teams/i);
-  assert.doesNotMatch(html, /01 · FIT|02 · PROOF|03 · CONVERSATION/);
+  // 1. The General Resume is READABLE as HTML, not merely downloadable. Every field the
+  // generator emits must appear in the rendered page, so a stub or a partially wired
+  // render cannot pass. Fixture sanity first: an empty artifact would satisfy the loops.
+  const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));
+  assert.ok(data.profile.length > 200, "fixture sanity: profile should be substantial");
+  assert.ok(data.strengths.length >= 8 && data.experience.length >= 4 && data.projects.length >= 4 && data.education.length >= 3 && data.tools.length >= 8, "fixture sanity: the artifact should carry a full record");
+
+  assert.ok(text.includes(data.profile), "the General Resume profile must render in the page");
+  for (const item of data.strengths) assert.ok(text.includes(item), `core strength must render: ${item}`);
+  for (const tool of data.tools) assert.ok(text.includes(tool), `tool must render: ${tool}`);
+  for (const project of data.projects) {
+    assert.ok(text.includes(project.name), `project must render: ${project.name}`);
+    assert.ok(text.includes(project.summary), `project summary must render: ${project.name}`);
+  }
+  for (const role of data.experience) {
+    assert.ok(text.includes(role.organization), `experience must render: ${role.organization}`);
+    for (const line of role.bullets) assert.ok(text.includes(line), `experience bullet must render under ${role.organization}`);
+  }
+  for (const entry of data.education) assert.ok(text.includes(entry.institution), `education must render: ${entry.institution}`);
+
+  // 2. Exactly ONE download, and it is the General Resume.
+  const downloads = main.match(/href="\/downloads\/[^"]+"/g) ?? [];
+  assert.deepEqual(downloads, ['href="/downloads/Angel_Vergara_Resume_General.pdf"'], "the recruiter surface offers exactly one resume download");
+
+  // 3. The three targeted variants are absent from recruiter choice architecture.
+  for (const file of [
+    "Angel_Vergara_Resume_Implementation_Onboarding.pdf",
+    "Angel_Vergara_Resume_Business_Systems_Operations.pdf",
+    "Angel_Vergara_Resume_AI_Workflow_Automation.pdf",
+  ]) {
+    assert.ok(!html.includes(file), `${file} must not be offered as a recruiter choice`);
+  }
+  assert.doesNotMatch(html, /Targeted versions|Compare resume versions|The General Resume is the baseline\.|Best for/i);
+
+  // 4. The four approved role-fit lanes survive concisely -- as context, never as cards,
+  // CTAs or downloads, and never as claims of held titles.
+  const fitAt = main.indexOf('class="fit-list"');
+  assert.notEqual(fitAt, -1, "the role-fit lanes are missing");
+  const fitBlock = main.slice(fitAt, main.indexOf("</section>", fitAt));
+  for (const lane of ["AI Workflow & Automation", "Systems Implementation", "Business Systems & Operations", "Hospitality Technology"]) {
+    assert.ok(visibleText(fitBlock).includes(lane), `approved role-fit lane missing: ${lane}`);
+  }
+  assert.doesNotMatch(fitBlock, /<a[\s>]/, "role-fit lanes must not become links, CTAs, or downloads");
+  assert.match(main, /These are role-fit lanes, not claims of prior paid titles\./);
+
+  // 5. Direct exits, and no Resume -> Hiring edge.
+  assert.match(main, /href="\/work\/"/);
+  assert.match(main, /href="mailto:avergara13@me\.com"/);
+  assert.doesNotMatch(html, /href="\/hiring\/?"/);
+
+  // 6. Privacy: the resume PDFs carry a phone number and city; the public HTML must not.
+  // The institution name is the positive control proving this sweep sees real content.
+  assert.match(html, /Florida International University/);
+  assert.doesNotMatch(html, /407-432-6959/);
+  assert.doesNotMatch(html, /\bOrlando\b|\bDavie\b|\bMassachusetts\b/);
+});
+
+test("the committed General Resume artifact matches generator output (single writer)", async () => {
+  // The readable HTML and the downloadable PDF must both derive from RESUMES[0]. This
+  // re-runs the emitter and fails on any byte difference, so the artifact cannot drift
+  // into a second, hand-maintained source of truth. A missing python3 fails the test
+  // rather than skipping it -- a skipped control reads as a pass.
+  const committed = await readFile(new URL("app/resume/general-resume.json", root), "utf8");
+  const emitted = execFileSync("python3", ["scripts/generate_resumes.py", "--emit-json", "--stdout"], {
+    cwd: fileURLToPath(root),
+    encoding: "utf8",
+  });
+  assert.ok(emitted.length > 2000, "fixture sanity: the emitter should produce a full document");
+  assert.equal(emitted, committed, "app/resume/general-resume.json is stale — run: python3 scripts/generate_resumes.py --emit-json");
+  // Control: prove the comparison is capable of failing at all.
+  assert.notEqual(emitted.replace("Angel Vergara", "Angel Vergarra"), committed, "control: byte comparison must be able to detect drift");
+});
+
+test("the General Resume is mechanically RESUMES[0], and the artifact says so truthfully", async () => {
+  // The artifact records its provenance as "RESUMES[0] / <file>", and the page comment,
+  // the generator header and design-qa all repeat that claim. Selecting the resume by
+  // filename would keep working after a reorder and quietly turn every one of those into
+  // a false statement about where the published content came from. So index 0 is used
+  // directly, its identity is asserted, and the provenance string is derived from the
+  // object actually used rather than hand-typed beside it.
+  const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));
+  assert.equal(data.pdf, "Angel_Vergara_Resume_General.pdf");
+  assert.equal(data.source, `RESUMES[0] / ${data.pdf}`, "recorded provenance must name index 0 and the file actually used");
+
+  // The page must download the very file the artifact names — provenance that disagrees
+  // with what a recruiter receives would be worse than no provenance at all.
+  const html = await readOutput("resume/index.html");
+  assert.ok(html.includes(`href="/downloads/${data.pdf}"`), "the page must offer the file the artifact names");
+
+  // Executable control: reorder RESUMES in a throwaway copy and the generator must refuse.
+  const dir = mkdtempSync(join(tmpdir(), "resume-order-"));
+  try {
+    mkdirSync(join(dir, "scripts"));
+    const source = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
+    const anchor = 'if __name__ == "__main__":';
+    assert.ok(source.includes(anchor), "fixture sanity: generator entry point not found");
+
+    // Positive control FIRST: an unmodified copy in the same temp harness must succeed,
+    // so a failure below is attributable to the reorder and not to the copy itself.
+    const clean = join(dir, "scripts", "clean.py");
+    writeFileSync(clean, source);
+    const ok = execFileSync("python3", [clean, "--emit-json", "--stdout"], { encoding: "utf8" });
+    assert.ok(ok.includes('"source": "RESUMES[0]'), "control: an unmodified copy must emit normally");
+
+    const reordered = join(dir, "scripts", "reordered.py");
+    writeFileSync(reordered, source.replace(anchor, `RESUMES.reverse()\n\n${anchor}`));
+    let threw = false;
+    let message = "";
+    try {
+      execFileSync("python3", [reordered, "--emit-json", "--stdout"], { encoding: "utf8", stdio: "pipe" });
+    } catch (error) {
+      threw = true;
+      message = `${error.stderr ?? ""}${error.stdout ?? ""}`;
+    }
+    assert.ok(threw, "the generator must refuse when the General Resume is not RESUMES[0]");
+    assert.match(message, /RESUMES\[0\] is/, "the refusal must name the index-0 invariant");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the production build path refuses to publish a stale resume artifact", async () => {
+  // The drift test above proves the artifact CAN be checked. This proves the check is
+  // actually WIRED to the path that produces publishable output -- a gate nothing calls
+  // is capability, not enforcement. Pinning the wiring here means a future edit cannot
+  // silently unhook it and still ship green.
+  const pkg = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const verify = pkg.scripts["verify:resume-artifact"];
+  assert.ok(verify, "verify:resume-artifact script is missing");
+  assert.match(verify, /generate_resumes\.py/, "the verification must invoke the generator");
+  assert.match(verify, /--check/, "the verification must be the verify-only mode, never a silent rewrite");
+  assert.doesNotMatch(verify, /--stdout/, "the gate must compare the committed artifact, not print to stdout");
+
+  // Every build entry point must pass through the gate before next build runs. Resolve
+  // one level of npm indirection so "build:pages": "npm run build" still counts.
+  const resolve = (name, depth = 0) => {
+    const body = pkg.scripts[name] ?? "";
+    if (depth > 3) return body;
+    return body.replace(/npm run ([\w:-]+)/g, (_, ref) => resolve(ref, depth + 1));
+  };
+  for (const entry of ["build", "build:pages"]) {
+    const resolved = resolve(entry);
+    assert.match(resolved, /generate_resumes\.py[^&|]*--check/, `${entry} must run the artifact gate`);
+    const gateAt = resolved.indexOf("--check");
+    const buildAt = resolved.indexOf("next build");
+    assert.notEqual(buildAt, -1, `${entry} must actually build`);
+    assert.ok(gateAt < buildAt, `${entry} must gate BEFORE building, not after`);
+    assert.match(resolved.slice(gateAt, buildAt), /&&/, `${entry} must fail closed: chain the gate with &&, never ; or ||`);
+  }
+});
+
+test("the resume social card does not advertise the retired variant choice", async () => {
+  // The OG card is the pre-click impression when /resume/ is shared. It previously read
+  // "RESUME SUITE / One career. Three clear views." and named all three targeted lanes --
+  // exactly the choice architecture this pass removed. The HTML sweep could not catch it
+  // because the claim lives in a PNG, so the card's writer is pinned here instead.
+  const cards = await readFile(new URL("scripts/generate_og_images.swift", root), "utf8");
+  const line = cards.split("\n").find((l) => l.includes('filename: "og-resume.png"'));
+  assert.ok(line, "the og-resume card definition is missing");
+
+  assert.doesNotMatch(line, /RESUME SUITE|Three clear views/i, "the card must not sell a resume suite");
+  for (const lane of ["Implementation & Onboarding", "Business Systems & Operations", "AI Workflow & Automation"]) {
+    assert.ok(!line.includes(lane), `the card must not name the retired variant: ${lane}`);
+  }
+  // Positive control: the definition still exists and still carries real copy, so this
+  // cannot pass by deleting the card.
+  assert.match(line, /title: "[^"]{12,}"/);
+  assert.match(line, /subtitle: "[^"]{12,}"/);
+
+  // The generator must not define a card for the retired route either: running it would
+  // recreate public/og-hiring.png byte-for-byte and undo the asset retirement two other
+  // tests pin. og-office-chef stays on purpose -- that concept still ships on /lab/.
+  assert.ok(!cards.includes('filename: "og-hiring.png"'), "the generator must not recreate the retired hiring card");
+  assert.ok(cards.includes('filename: "og-office-chef.png"'), "control: the Office Chef card is deliberately retained");
+
+  // And the asset the page actually references is still shipped.
+  const html = await readOutput("resume/index.html");
+  assert.match(html, /og-resume\.png/);
+  await access(new URL("out/og-resume.png", root));
+});
+
+test("resume experience entries never render an empty metadata element", async () => {
+  const html = await readOutput("resume/index.html");
+  const data = JSON.parse(await readFile(new URL("app/resume/general-resume.json", root), "utf8"));
+
+  // Fixture sanity: this guard is only meaningful while the record actually contains an
+  // entry with neither a role nor dates. If that stops being true, this test is inert
+  // and should be revisited rather than silently passing.
+  const bare = data.experience.filter((role) => !role.role && role.dates.length === 0);
+  const withMeta = data.experience.filter((role) => role.role || role.dates.length > 0);
+  assert.ok(bare.length >= 1, "fixture sanity: expected an entry with no role and no dates");
+  assert.ok(withMeta.length >= 1, "fixture sanity: expected entries that DO carry metadata");
+
+  assert.doesNotMatch(html, /<p class="resume-role-meta">\s*<\/p>/, "an entry with no metadata must render no metadata element");
+
+  // Positive control: the element is still emitted for entries that do have metadata, so
+  // this cannot pass by removing the line entirely.
+  const metas = html.match(/<p class="resume-role-meta">/g) ?? [];
+  assert.equal(metas.length, withMeta.length, "one metadata line per entry that has metadata, and no more");
 });
 
 test("metadata and footer language align with applied AI workflows positioning", async () => {
   const home = await readOutput("index.html");
-  const hiring = await readOutput("hiring/index.html");
+  const resume = await readOutput("resume/index.html");
 
   assert.match(home, /AI workflows and business systems/i);
   assert.match(home, /Email →/);
   assert.match(home, /LinkedIn ↗/);
   assert.match(home, /GitHub ↗/);
-  assert.match(hiring, /og-hiring\.png/);
+  assert.match(resume, /og-resume\.png/);
 
   const layoutSource = await readFile(new URL("app/layout.tsx", root), "utf8");
   assert.match(layoutSource, /Applied AI Workflow and Business Systems Implementation/);
@@ -333,7 +553,6 @@ test("claim-boundary and privacy scan passes across recruiter-facing routes", as
     readOutput("about/index.html"),
     readOutput("lab/index.html"),
     readOutput("resume/index.html"),
-    readOutput("hiring/index.html"),
     readOutput("work/resale-scanner-pro/index.html"),
     readOutput("work/loft-os/index.html"),
     readOutput("work/assistant-recruiter-pro/index.html"),
@@ -359,7 +578,7 @@ test("sitemap and route inventory include formal work, about, lab, and inspectab
   assert.match(sitemap, /https:\/\/avergara13\.github\.io\/work\//);
   assert.match(sitemap, /https:\/\/avergara13\.github\.io\/about\//);
   assert.match(sitemap, /https:\/\/avergara13\.github\.io\/lab\//);
-  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/hiring\//);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\/resume\//);
 });
 
 test("private application artifacts remain absent", async () => {

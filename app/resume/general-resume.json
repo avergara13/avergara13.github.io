@@ -1,0 +1,109 @@
+{
+  "generated_by": "scripts/generate_resumes.py --emit-json",
+  "source": "RESUMES[0] / Angel_Vergara_Resume_General.pdf",
+  "name": "Angel Vergara",
+  "pdf": "Angel_Vergara_Resume_General.pdf",
+  "headline": "HOSPITALITY TECHNOLOGY & OPERATIONS | IMPLEMENTATION, BUSINESS SYSTEMS & AI WORKFLOWS",
+  "profile": "Bilingual hospitality operations leader and systems builder with verified Executive Chef to General Manager progression. Translates frontline operating pressure into clear requirements, repeatable workflows, practical tools, and confident adoption - spanning business-process mapping, operational reporting, implementation support, and human-controlled AI-assisted workflow design. Builds from real operating friction, with working application and systems proof and a clear boundary between employment experience and personal project evidence.",
+  "strengths": [
+    "Operations leadership & training",
+    "business-process mapping",
+    "requirements gathering",
+    "implementation & adoption support",
+    "workflow and exception design",
+    "operational reporting (inventory, food cost, vendor pricing, payroll, P&L awareness)",
+    "human-in-the-loop AI workflow design",
+    "LLM API integration",
+    "documentation & handoffs",
+    "vendor & purchasing coordination",
+    "bilingual English/Spanish"
+  ],
+  "projects": [
+    {
+      "name": "Hobbyst Resale",
+      "summary": "Active family resale venture: sourcing, inventory, pricing, listings, sales, shipping, marketplace workflows, KPI tracking, and automation."
+    },
+    {
+      "name": "Resale Scanner Pro",
+      "summary": "Working personal AI-assisted application used in the family resale workflow: item capture, AI-assisted identification, market research, BUY / MAYBE / PASS decision support, listing preparation, publishing, and operating records."
+    },
+    {
+      "name": "Loft OS",
+      "summary": "Sanitized architecture case study: governed multi-agent AI workflows with scoped roles, human authorization, evidence-backed review, fail-closed controls, recovery paths, and deterministic closeout."
+    },
+    {
+      "name": "Sous Chef",
+      "summary": "Public AI-assisted culinary workspace: authenticated recipe workflows, pantry and inventory signals, cookbooks, and cooking-session history."
+    }
+  ],
+  "experience": [
+    {
+      "organization": "Cafe Linger",
+      "role": "Executive Chef to General Manager",
+      "dates": [
+        "May 2018-Dec 2022"
+      ],
+      "bullets": [
+        "Became General Manager in Jan 2019 as administrative and financial responsibilities expanded beyond culinary leadership.",
+        "Led production, purchasing, inventory, vendors, scheduling, training, POS reporting, payroll-data review, QuickBooks workflows, P&L review, compliance, and customer experience.",
+        "Continued paid closure administration and restaurant consulting through Jan 2024 after operations ended in Dec 2022."
+      ]
+    },
+    {
+      "organization": "Farm-Haus / Farm & Haus",
+      "role": "Chef de Cuisine",
+      "dates": [
+        "Sep 2015-Apr 2018"
+      ],
+      "bullets": [
+        "Helped establish the kitchen workflow, then led culinary execution, production, ordering, food quality, and team coordination while partnering with ownership on operating consistency and growth support."
+      ]
+    },
+    {
+      "organization": "Southern Swank Kitchen",
+      "role": "Head Chef",
+      "dates": [
+        "Jul 2013-May 2014"
+      ],
+      "bullets": [
+        "Built opening-stage menu and recipe systems; hired, trained, and scheduled approximately 12 employees for a roughly 200-seat venue."
+      ]
+    },
+    {
+      "organization": "Earlier Culinary Experience & Leadership",
+      "role": "",
+      "dates": [],
+      "bullets": [
+        "Progressed from line and pastry work into Sous Chef and Head Chef responsibilities across high-volume restaurants, openings, and hotel operations."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Florida International University",
+      "credential": "B.S., Hospitality Management; Minor, Beverage Management"
+    },
+    {
+      "institution": "The Culinary Institute of America",
+      "credential": "A.S., Culinary Arts; May 2007-Apr 2010"
+    },
+    {
+      "institution": "Valencia Community College",
+      "credential": "A.A., General Studies"
+    }
+  ],
+  "tools": [
+    "Notion",
+    "Excel & spreadsheets",
+    "Git and GitHub",
+    "Railway",
+    "Supabase integration",
+    "Postgres/SQL exposure",
+    "React",
+    "TypeScript",
+    "Node/Express",
+    "Gemini",
+    "Claude API",
+    "n8n-style automation"
+  ]
+}

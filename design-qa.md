@@ -225,3 +225,167 @@ Recorded rather than silently skipped, per the phase read-back contract:
   and not addressed here.
 
 final result: passed
+
+---
+
+# TSK-966 — Recruiter IA repair (successor to TSK-961)
+
+TSK-961 is complete and is not reopened. This pass changes accepted public information
+architecture after that closeout; it does not repair a defect against it.
+
+## Correction to the record above
+
+The bullet above stating that `/hiring/` has one inbound link from `/resume/` and that
+"that is the locked IA" is **superseded**. It described the state correctly at the time.
+It is preserved rather than rewritten, and this section supersedes it: `/hiring/` is now
+retired, and `/resume/` is the single canonical recruiter surface.
+
+Also superseded: the note that the resume-version rule appears on both `/resume/` and
+`/hiring/`. There are no longer resume versions offered to recruiters, so the rule is gone
+from the public surface entirely.
+
+## What changed
+
+`/resume/` renders the General Resume as readable HTML with one `Download PDF ↓` action,
+the four approved role-fit lanes as context, and direct `View work` / `Contact` exits. The
+recruiter is no longer asked to choose between four resume variants, and the
+Resume → Hiring → Resume loop is gone.
+
+`/hiring/` is retired. It was a static filesystem route, so retirement means deleting
+`app/hiring/`; the export emits nothing for the path and it returns a genuine 404. This is
+the same outcome as The Office Chef retirement by a different mechanism — that one filters
+a dynamic slug out of `generateStaticParams`. No redirect, no stub, no fake destination.
+Its inbound link, sitemap entry, `og-hiring.png`, and the CSS this pass orphaned went with
+it. Pre-existing orphaned rules were left untouched, as before.
+
+## Single writer for resume content
+
+The readable HTML and the downloadable PDF both derive from `RESUMES[0]` in
+`scripts/generate_resumes.py`. A stdlib-only `--emit-json` projects that data into
+`app/resume/general-resume.json`, which the page renders. The reportlab import is guarded
+so the emitter runs in CI, where reportlab is not installed; the PDF path still requires it
+and refuses loudly. A test re-runs the emitter and compares bytes, so the artifact cannot
+drift into a second source of truth.
+
+The artifact is a **projection, not a copy**: employer location segments are dropped at the
+writer. The published site discloses no geography, and the record above pins the phone
+number and city to the PDFs only. That boundary is enforced at the writer and pinned by a
+no-geography control with a positive control (`Florida International University`) proving
+the sweep sees real content.
+
+## Targeted resume variants
+
+Implementation & Onboarding, Business Systems & Operations, and AI Workflow & Automation
+remain untouched application assets: generator sources, verified PDFs, chronology, and
+claims are all preserved, and the test pinning their existence is unchanged. They are
+removed only from recruiter-facing choice architecture. **Their direct URLs remain publicly
+fetchable — this is de-listing, not privacy removal.**
+
+## Verification
+
+Controls were mutation-tested rather than trusted because they passed. Six deliberate
+regressions were each introduced and confirmed to turn the suite red: artifact drift from
+the generator, a restored Resume → Hiring link, a targeted variant offered as a recruiter
+choice, a role-fit lane turned into a link, geography leaked into the HTML, and a whole
+record section dropped from the render. All six were caught.
+
+Rendered audit, not source tests, per the ratified law: 7 routes x 4 widths
+(1440/768/430/390) walked in the DOM for computed contrast against the real painted
+background, horizontal overflow, and tap-target height. 28/28 clean. The audit itself was
+positive-controlled — an injected 1.55:1 element and a 1600px overflow were both detected,
+so the clean result is not vacuous.
+
+Focus was verified with real keyboard `Tab` events. Programmatic `.focus()` does not set
+`:focus-visible` in Chrome and `getComputedStyle(el, ':focus-visible')` returns nothing —
+both probes reported false failures before the method was corrected. Under real keyboard
+focus every control paints its 3px ring, including the contextual white ring on the dark
+closing section.
+
+One real defect was found and fixed during this pass: the global `h2`
+(`clamp(2.4rem,4.4rem)`) rendered the supporting "Where I fit" heading at 70px beside the
+record's own 25.6px section headings — a 2.7x inversion in which the aside outranked the
+page's actual substance. The supporting headings are now floored and capped, scoped to
+`/resume/`, and the ranking was re-verified at matched widths: h1 > section heading >
+record heading with steps of at least 1.46x and 1.28x at every width, so a fluid heading
+cannot converge with a fixed one at some breakpoint.
+
+One harness defect was also caught: an audit run against a stale `out/` produced by an
+earlier mutation round reported a missing Education section. The artifact was rebuilt from
+a clean tree and provenance asserted before the audit was re-run and believed.
+
+final result: passed
+
+## Repair round (PR #33 review)
+
+**Single-writer enforcement reached the deploy path.** The drift check ran only under
+`npm test`, while the path that produces publishable output did not. `--emit-json --check`
+is a verify-only mode -- it compares and exits non-zero, and never repairs silently, since
+a build that "fixed" drift on its own would push an unreviewed content change to
+production. It is wired as `verify:resume-artifact` and chained ahead of `next build` with
+`&&`, so every build entry point fails closed before anything publishable exists. Proven:
+with a stale artifact `npm run build:pages` exits 1, never reaches `next build`, and emits
+no `out/` at all; a missing artifact fails the same way.
+
+**Empty metadata element.** Experience entries with neither a role nor dates rendered an
+empty `<p class="resume-role-meta">`. Now rendered conditionally, pinned by a test that
+requires one metadata line per entry that has metadata and none for the entry that does
+not.
+
+**The social card was still selling the retired choice.** `public/og-resume.png` read
+"RESUME SUITE / One career. Three clear views." and named all three targeted lanes -- the
+pre-click impression on the exact surface this pass makes canonical. The card was accurate
+before; this pass is what made it false, so it was corrected here on the same principle
+that removed `og-office-chef.png`. Rendering the untouched cards through the same generator
+reproduces four of them byte-for-byte, so only the copy changed. The HTML sweeps could not
+have caught this because the claim lived in a PNG; the card's writer is pinned instead.
+
+**Known gap, deliberately not closed here.** The build gate covers the JSON artifact, not
+the PDF the same page links. Both derive from `RESUMES[0]`, so a content edit that
+regenerates only the artifact would leave the page and its download disagreeing. Verified
+this is **latent, not live**: all 49 content fields of `app/resume/general-resume.json`
+appear verbatim in the committed General PDF (checked with pypdf; positive control
+`May 2018-Dec 2022` present, negative control absent, no `- Present` end date). It is not
+closed here because the PDF branch needs reportlab, which is deliberately absent from this
+environment and from CI -- so any fingerprint or hash gate would have to be seeded with a
+hand-authored claim about the state it verifies, which is the one thing a gate's input must
+never be. Closing it properly means regenerating the PDFs in an environment that has
+reportlab and recording the fingerprint from that run.
+
+## Second review round
+
+**The OG generator was fighting the retirement.** `public/og-hiring.png` is deleted and
+pinned absent by two tests, but `scripts/generate_og_images.swift` still defined the card.
+Running the generator to refresh any card recreated the asset -- verified byte-identical to
+the one this pass removed -- and a later build would copy it back into the export. The
+entry is gone. The Office Chef card stays and a control now pins that: `/hiring/` is fully
+retired with nothing left to reproduce, while The Office Chef still ships as a labelled
+concept on `/lab/`, which is why its card remains reproducible. The asymmetry is
+deliberate, not an oversight.
+
+**Python is now a build prerequisite.** `npm run build` shells out to `python3` for the
+artifact gate, so a Node-only environment cannot build. Stated in the README beside the
+build description, with the reason.
+
+## Third review round — the provenance claim made mechanical
+
+`general_resume_document()` recorded the artifact's provenance as `RESUMES[0]` while
+selecting the General Resume by filename. Those can diverge: reorder `RESUMES` and the
+search keeps working while the recorded provenance quietly becomes a false claim about
+where the published content came from. The claim is repeated in seven places -- generator
+header, emitted artifact, the STALE message, the page comment and this document -- and all
+of them rested on that search.
+
+Index 0 is now used directly with its identity asserted, so the invariant fails closed on
+the build path. The `source` and `pdf` fields are derived from the object actually used
+rather than hand-typed beside it, so provenance cannot disagree with selection. Hardening
+only: the emitted artifact is byte-identical.
+
+The control is executable rather than a source-text pin. It reorders `RESUMES` in a
+throwaway copy of the generator and requires a refusal naming the index-0 invariant, and it
+first runs an unmodified copy through the same temp harness so a failure is attributable to
+the reorder and not to the copy. Three mutations were each confirmed to turn the suite red:
+selection reverted to the filename search (the reported defect), the identity assertion
+removed, and the provenance string pointed at the wrong index -- that last one with the
+artifact regenerated so the drift test still passed, isolating the provenance assertion.
+
+final result: passed
