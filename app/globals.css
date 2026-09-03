@@ -667,6 +667,10 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .work-index-row p { margin:16px 0 0; color:var(--muted); }
 .work-index-row img { width:230px; height:150px; object-fit:cover; object-position:top; border:1px solid var(--line); filter:saturate(.85); transition:filter .18s ease,transform .18s ease; }
 .work-index-row:hover img { filter:saturate(1); transform:translateY(-3px); }
+/* Product marks are square and carry their own plate: contain them in the landscape card
+   frame rather than cropping, and leave their colour untouched. Frame geometry is unchanged. */
+.work-index-row img.work-index-mark { object-fit:contain; object-position:center; padding:12px; background:var(--white); filter:none; }
+.work-index-row:hover img.work-index-mark { filter:none; }
 /* TSK-961 Phase 5 — About narrative sections. Existing tokens only. */
 .about-section { margin-top:64px; }
 .about-section>h2 { margin:10px 0 26px; font-size:clamp(1.75rem,2.6vw,2.3rem); max-width:840px; }
@@ -702,6 +706,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .relay-input-panel { max-width:none; }
   .work-index-row { grid-template-columns:44px 1fr; }
   .work-index-row img { grid-column:2; width:100%; height:240px; }
+  .work-index-row img.work-index-mark { height:180px; }
 }
 
 @media (max-width:620px) {
