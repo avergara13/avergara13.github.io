@@ -238,7 +238,15 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
   assert.match(component, /disabled=\{running \|\| !fixtureId\}/);
 
   // Refinements are presets only — no free-text field implying open-ended replanning.
-  assert.doesNotMatch(relay, /<input /, "the demo must expose no text input at all");
+  // Ban FREEFORM TEXT entry, not every <input>: a hidden or checkbox input says nothing
+  // about whether the demo still invites typing, and banning all of them would fail for a
+  // reason unrelated to the property this test names.
+  const TEXTLIKE = new Set(["text", "search", "email", "url", "tel", "password", "number", "textarea"]);
+  const textInputs = [...relay.matchAll(/<input\b[^>]*>/g)].filter((m) => {
+    const type = m[0].match(/\btype="([^"]*)"/);
+    return !type || TEXTLIKE.has(type[1].toLowerCase()); // an omitted type defaults to text
+  });
+  assert.deepEqual(textInputs.map((m) => m[0]), [], "the demo must expose no freeform text entry");
   assert.match(component, /These are the refinements this example supports/);
 
   // Both button clusters must be grouped and named. The presets replaced a labelled text
@@ -308,7 +316,11 @@ test("no stylesheet rule has lost a selector separator", async () => {
     );
     const selector = clean.slice(prevEnd + 1, brace);
     cursor = brace + 1;
-    if (/@media|@supports|@keyframes|@font-face|^\s*\d/.test(selector)) continue;
+    // Skip at-rule preludes and keyframe steps. Keyframe selectors are percentages OR the
+    // keywords `from` / `to`; matching only digits would read a future `from {` as a
+    // selector and report a phantom missing comma.
+    if (/@media|@supports|@keyframes|@font-face/.test(selector)) continue;
+    if (/^\s*(?:-?\d|from\b|to\b)/.test(selector.trim())) continue;
     const lines = selector.split("\n").map((l) => l.trim()).filter(Boolean);
     // In this file's convention a multi-line selector list is comma-separated, so every
     // line but the last must end with a comma. An interior line that does not is a lost
@@ -323,6 +335,27 @@ test("no stylesheet rule has lost a selector separator", async () => {
   // Fixture sanity: the scan must actually be looking at multi-line selector lists.
   const multiLine = clean.split("\n").filter((l) => l.trim().endsWith(",") && !l.includes("{")).length;
   assert.ok(multiLine >= 5, `expected several multi-line selector lists to scan, found ${multiLine}`);
+
+  // Controls: the scan must tolerate keyframe keywords AND still catch a real omission.
+  const withKeyframes = `${clean}\n@keyframes probe { from { opacity:0; } to { opacity:1; } }`;
+  const scanFor = (text) => {
+    const found = [];
+    let at = 0;
+    while (true) {
+      const brace = text.indexOf("{", at);
+      if (brace === -1) break;
+      const prev = Math.max(text.lastIndexOf("}", brace), text.lastIndexOf("{", brace - 1), text.lastIndexOf(";", brace));
+      const sel = text.slice(prev + 1, brace);
+      at = brace + 1;
+      if (/@media|@supports|@keyframes|@font-face/.test(sel)) continue;
+      if (/^\s*(?:-?\d|from\b|to\b)/.test(sel.trim())) continue;
+      const ls = sel.split("\n").map((l) => l.trim()).filter(Boolean);
+      for (let i = 0; i < ls.length - 1; i++) if (!ls[i].endsWith(",")) found.push(ls[i]);
+    }
+    return found;
+  };
+  assert.deepEqual(scanFor(withKeyframes), [], "a keyframes block with from/to must not be read as selectors");
+  assert.ok(scanFor(`${clean}\n.a,\n.b\n.c { color:red; }`).length > 0, "control: the scan must still catch a real missing separator");
 
   // And braces must balance — the other way an edit to a shared rule fails silently.
   assert.equal((clean.match(/\{/g) ?? []).length, (clean.match(/\}/g) ?? []).length, "unbalanced braces in the stylesheet");
