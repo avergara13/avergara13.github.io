@@ -1165,3 +1165,18 @@ test("RSP captions claim only what the captures show", async () => {
   // The stopping rule is the page's core claim and must stay stated.
   assert.match(main, /does not publish or purchase anything/);
 });
+
+test("the RSP dek claims only what the page evidences, in the lede and in metadata", async () => {
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+  const main = await readRspMain();
+
+  // TSK-974 retired the outcome-loop section and the capture that carried it, so the
+  // "learning from outcomes" clause lost its evidence. It rendered in BOTH the hero lede and
+  // the meta/og description, which is the search snippet — scan the whole document, not main.
+  assert.ok(!html.includes("learning from outcomes"), "the retired outcome-loop claim must not return");
+
+  const dek = "A mobile decision system for evaluating resale finds, comparing market evidence, and preparing listings.";
+  assert.ok(main.includes(dek), "the approved dek must render as the case-study lede");
+  assert.match(html, new RegExp(`<meta name="description" content="${dek.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`),
+    "the approved dek must be the page description");
+});

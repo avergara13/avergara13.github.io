@@ -31,7 +31,7 @@ const projectData: Record<string, Project> = {
     slug: "resale-scanner-pro",
     eyebrow: "Working product · In operating use",
     title: "Resale Scanner Pro",
-    dek: "A mobile decision system for evaluating resale finds, comparing market evidence, preparing listings, and learning from outcomes.",
+    dek: "A mobile decision system for evaluating resale finds, comparing market evidence, and preparing listings.",
     status: "In real operating use",
     statusTone: "green",
     proof: ["Photo → decision", "Human gates", "Market evidence", "Real operating use"],
