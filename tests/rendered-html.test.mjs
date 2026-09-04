@@ -237,8 +237,12 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
 
   // Both button clusters must be grouped and named. The presets replaced a labelled text
   // input, so without this they reach assistive tech as an unlabelled set of toggles.
+  // The chooser is server-rendered so it is checked in the OUTPUT; the refinements only
+  // mount after a run, so they are checked in the SOURCE — asserting them against the
+  // rendered HTML would fail for the wrong reason and teach nothing.
   assert.match(loft, /role="group" aria-label="Curated examples"/);
-  assert.match(loft, /role="group" aria-label="Available refinements"/);
+  assert.match(component, /role="group" aria-label="Available refinements"/);
+  assert.doesNotMatch(loft, /class="relay-refinement"/, "fixture sanity: the refinement block is not server-rendered, so the source check above is the right layer");
   assert.match(loft, /Curated demonstration · deterministic fixture · not a live autonomous production run\./);
 });
 
