@@ -39,7 +39,7 @@ different item, so it would repeat a capability rather than add one.
 
 ## Non-evidence images in the same directory
 
-`public/images/rsp/` also holds the project marks and four retired placeholder screenshots
+`public/images/rsp/` also holds the project marks and the retired placeholder screenshots
 that no longer have a referrer. They are recorded here so the allowlist below can tell
 "known non-evidence asset" from "a binary nobody vouched for" — anything in that directory
 matching neither table fails.
@@ -54,76 +54,74 @@ matching neither table fails.
 | `session.png` | `7713298fc0bd85e463ec8d5248b42a15` |
 | `sold.png` | `8d6311fa55c060dcd6c5b5f7ebf33ea0` |
 
-`session.png`, `listings.png`, `sold.png`, `agent.png` and `logo.png` are unreferenced but
-still published — five files, not four. Deleting them is deferred to separate follow-up work.
+`session.png`, `listings.png`, `sold.png`, `agent.png`, `logo.png` and `mark.png` are all
+unreferenced by the export and still published — six files. (`mark.png` is the canonical
+source `scripts/generate_mark_derivatives.py` reads to produce `mark-336.png`, which IS
+referenced; it is kept deliberately.) Deleting the rest is deferred to separate follow-up work.
 
 ## What actually enforces this — and what does not
 
-Three independent reviews found earlier versions of this section overstating its own guards.
-Each sentence below has been tested by trying to break it.
+Four independent reviews have now found some version of this section overstating its own
+guards. The pattern is the point: a text-inspecting test suite cannot prove a *rendered*
+property, and every round that claimed otherwise was refuted within minutes. This version
+claims no soundness for the crop guards at all.
 
-### Enforced soundly
+### Checked by hash or by shape
 
-These are properties of the published artifact, checked by shape or by hash rather than by
-reasoning about CSS:
-
-- **Every file** in `public/images/rsp/` and `out/images/rsp/` must hash to an md5 recorded in
-  one of the tables above — no extension list, no format reasoning. An earlier version
-  allowlisted only raster extensions, and an SVG wrapping a withheld capture as a base64
-  `<image href>` published straight through it.
+- **Every file at or below** `public/images/rsp/` and `out/images/rsp/` must hash to an md5 in
+  a table above — no extension list, no format reasoning, subdirectories included.
 - No withheld md5 may appear anywhere under `public/` or `out/`.
-- **No exported page** may inline an image as a `data:` URI. Hash guards cannot see bytes
-  inside an HTML file, and scoping this check to one route let the same payload publish on
-  another.
-- Every referenced evidence binary exists in the export, so a figure cannot ship a broken
-  image under a caption describing what should be there.
-- **An evidence figure has no surface for a crop to attach to:** it contains exactly an
-  `<img>` and a `<figcaption>`, the image is the figure's first child, it carries no class,
-  and its only inline style is the `color:transparent` next/image emits. This replaces the
-  hunt for cropping declarations, because that hunt cannot be sound — `app/globals.css`
-  begins with `@import "tailwindcss"`, so a utility class such as
-  `max-h-[620px] object-cover` compiles into a built chunk that no source scan reads. A
-  wrapper `<div style="max-height:620px;overflow:hidden">` did the same. Pinning the shape
-  removes both vectors instead of chasing them.
-- Every screenshot **on the RSP case study** renders inside an accounted-for evidence figure
-  with a label and describing caption text. HOME is scoped differently: it carries the same
-  capture with descriptive alt text and, by the approved composition, no caption — so alt is
-  the only description there, and it is pinned.
-- The approved dek is pinned in the lede and in `<meta name="description">`, and the exact
-  retired phrase family (`learning from outcomes` and its inflections) is banned across the
-  whole document, metadata included.
+- No exported HTML page may inline an image as a `data:` URI.
+- Every referenced evidence binary exists in the export.
+- Inside an evidence figure there is no surface for a crop: it holds exactly an `<img>` and a
+  `<figcaption>`, the image is the first child, carries no class, and its only inline style is
+  the one next/image emits.
+- Each RSP evidence image has a label and describing caption text; HOME carries the same
+  capture with pinned alt and, by the approved composition, no caption.
+- The approved dek is pinned in the lede and in `<meta name="description">`, and the phrase
+  family `learning from outcomes` (plus `learns`/`learned`/`smarter from outcomes`) is banned
+  document-wide. Close paraphrases such as "learning from *its* outcomes" are not caught.
 
-### A tripwire, not a proof
+### Not proven — and here is exactly where it leaks
 
-The stylesheet scan for cropping rules reads `app/globals.css` as text. It catches the defect
-that actually happened and the obvious variants — `@media`, `@supports`, `@container`,
-`@layer`, later duplicates, more specific selectors, logical properties, `clip-path`, decimal
-`aspect-ratio`. It cannot be sound: it does not read the built Tailwind output, and a rule
-that reaches these images without naming an `rsp-` class is outside it. Treat green here as
-"no known crop pattern in the source stylesheet", never as "no crop". The structural pin
-above is what actually holds.
+The crop guards are layers, not proofs. Known open vectors, each demonstrated by review:
 
-### Not enforced at all — recorded so nothing implies otherwise
+- **Ancestors are unchecked.** A sizing utility class or an inline `max-height`/`overflow` on
+  any element ABOVE an evidence figure crops it, and nothing looks there.
+- **The stylesheet scan is partial.** It reads `app/globals.css` for `object-fit`, `clip-path`,
+  height and aspect-ratio. It does not check `margin`, `transform`, `translate`, `position`,
+  `inset` or `object-position`; a negative margin on `.rsp-proof-frame img` crops with the
+  suite green. It also cannot read the built Tailwind chunk.
+- **CSS can substitute the image entirely** via `content:url(data:…)`, which no hash sees and
+  the HTML-only `data:` ban does not reach.
+- **HOME deliberately crops.** `.product-evidence-slot img` uses `object-fit:cover` at
+  `aspect-ratio:900/1215`, showing the top 62.3% of the capture. That framing is intentional
+  and accepted; the whole capture is published uncropped on the case study. No test pins the
+  ratio, so a change there would be silent.
 
-- **Whether a caption is TRUE of its image.** Nothing machine-checks correspondence between
-  a caption and the pixels it describes. A caption can be relabelled from PASS to BUY, with
-  figures that contradict the capture, and every gate stays green. Caption accuracy is a
-  human review responsibility, and it is the reason each of these captures was read against
-  its image by more than one reviewer.
-- **Content placed outside `images/rsp/`.** The allowlist covers the evidence directory only;
-  elsewhere, only the withheld-hash blocklist applies, and a re-encode defeats a hash.
-- **Alt-text quality beyond length and a generic-label check**, and uniqueness across images.
-- **The tables are hand-maintained** from this script's own output, so they record "the bytes
+Only a rendered-geometry measurement — loading the built page in a browser and comparing each
+evidence image's painted box against its natural ratio and its ancestors' clip rects — would
+close this class. That is tracked as follow-up work, not claimed here.
+
+### Not enforced at all
+
+- **Whether a caption is TRUE of its image.** A PASS figure can be relabelled BUY with
+  invented figures and every gate stays green. This is a human review responsibility, and it
+  is why each capture was read against its pixels by more than one reviewer.
+- Content placed outside `images/rsp/`; alt-text quality beyond length and a generic-label
+  check; uniqueness across images.
+- **The tables are hand-maintained** from the script's own output, so they record "the bytes
   last published", not "these bytes are not a withheld capture". Re-running
-  `scripts/generate_rsp_evidence.sh` against the originals and confirming a clean tree is
-  what actually proves the derivatives are what they claim to be.
+  `scripts/generate_rsp_evidence.sh` against the originals and confirming a clean tree is what
+  actually proves the derivatives are what they claim to be.
 
 ### Nothing runs on the deploy path
 
-`main` carries only the generated export and no workflow, so
-`.github/workflows/deploy-pages.yml` (which triggers on push to `main`) never fires, and
-GitHub's built-in Pages deployment runs no npm gate. Every guard above is a release
-precondition a human runs locally with `npm test`. It is not CI.
+`main` carries only the generated export and no workflow at all, so
+`.github/workflows/deploy-pages.yml` — which exists only on source branches and triggers on
+push to `main` plus manual dispatch — never fires there, and GitHub's built-in Pages
+deployment runs no npm gate. Every guard above is a release precondition a human runs locally
+with `npm test`. It is not CI.
 
 ## A published capture with a visible app defect
 

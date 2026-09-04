@@ -85,17 +85,20 @@ test("homepage opening is role family, then the approved concise value propositi
   for (const seg of mediaSegments(heroCss)) {
     for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
       if (!/\.hero-role-family(?![\w-])/.test(selector)) continue;
-      const declared = body.match(/font-size\s*:\s*([^;]+)/);
+      // Read the longhand AND the `font:` shorthand — a shorthand carries the size with no
+      // `font-size` token at all, so matching the longhand alone never saw it.
+      const declared = body.match(/(?:^|[;{\s])font-size\s*:\s*([^;]+)/) ?? body.match(/(?:^|[;{\s])font\s*:\s*([^;]+)/);
       if (!declared) continue;
       sizes += 1;
-      // Read EVERY length in the declaration and take the largest. Matching a leading `rem`
-      // ignored `font-size:80px` entirely, and read `clamp(.72rem,6vw,72px)` as .72rem while
-      // its ceiling made the line the page headline.
-      const rem = [...declared[1].matchAll(/([\d.]+)rem/g)].map((m) => Number(m[1]));
-      const px = [...declared[1].matchAll(/([\d.]+)px/g)].map((m) => Number(m[1]) / 16);
-      const largest = Math.max(...rem, ...px, 0);
+      // Convert EVERY length in the declaration to rem and take the largest. Matching a
+      // leading `rem` ignored `font-size:80px`, read `clamp(.72rem,6vw,72px)` as .72rem, and
+      // never saw `4em`.
+      const perRem = { rem: 1, em: 1, px: 1 / 16, pt: 1 / 12, ch: 0.5, ex: 0.5, vw: 1.5, vh: 1.5, "%": 1 / 100 };
+      const lengths = [...declared[1].matchAll(/([\d.]+)\s*(rem|em|px|pt|ch|ex|vw|vh|%)/g)]
+        .map((m) => Number(m[1]) * perRem[m[2]]);
+      const largest = Math.max(...lengths, 0);
       assert.ok(largest <= 1,
-        `the role family must stay a small supporting line — ${selector.trim()} sets font-size:${declared[1].trim()}`);
+        `the role family must stay a small supporting line — ${selector.trim()} sets ${declared[0].trim()}`);
     }
   }
   assert.ok(sizes > 0, "no font-size found for .hero-role-family — the scan is not reading the stylesheet");
@@ -1132,14 +1135,17 @@ test("every published RSP capture carries alt text and a caption", async () => {
   }
 });
 
-test("an evidence figure has no surface for a crop to attach to", async () => {
-  // SOUND, because it pins SHAPE rather than hunting for cropping declarations. A CSS text
-  // scan cannot be sound here at all: `app/globals.css` starts with `@import "tailwindcss"`,
-  // so a utility class compiles into the built chunk that no scan reads. Two vectors were
-  // proven — a wrapper <div style="max-height:…;overflow:hidden"> around the image, and
-  // `className="max-h-[620px] object-cover"` on it. Both are impossible if the figure holds
-  // exactly an <img> and a <figcaption>, the image carries no class, and the only inline
-  // style is the one next/image emits.
+test("nothing INSIDE an evidence figure can attach a crop", async () => {
+  // Pins SHAPE rather than hunting for cropping declarations, because a CSS text scan cannot
+  // be sound here: globals.css starts with `@import "tailwindcss"`, so a utility class
+  // compiles into a built chunk no scan reads. Two proven in-figure vectors — a wrapper
+  // element around the image, and a sizing utility class on it — become unrepresentable when
+  // the figure holds exactly an <img> and a <figcaption> with no class on the image.
+  //
+  // SCOPE, stated because an earlier version of this comment overclaimed: this covers only
+  // what is INSIDE the figure. The same two techniques applied to an ANCESTOR still crop, and
+  // nothing here or elsewhere checks ancestors. Only a rendered-geometry measurement would
+  // close that, and this suite has no browser. Treat this as one strong layer, not a proof.
   const main = await readRspMain();
   const figures = [...main.matchAll(/<figure class="([^"]*)">([\s\S]*?)<\/figure>/g)]
     .filter(([, cls]) => cls.includes("rsp-proof-frame"));
@@ -1183,7 +1189,9 @@ test("no rendered evidence frame can be cropped from the page itself", async () 
   }
 
   // A data: URI is content with no file behind it, so every hash-based guard is blind to it.
-  // Scoping this to one page let the same payload publish on another route.
+  // Scoping this to one page let the same payload publish on another route. Note the limit:
+  // this reads exported HTML only, so a data: URI reached through CSS `content:url(...)` or
+  // a JS chunk is outside it.
   const { readdir } = await import("node:fs/promises");
   const walk = async (dir) => {
     const found = [];
@@ -1295,10 +1303,11 @@ test("withheld RSP captures never reach the public build", async () => {
       const md5 = createHash("md5").update(bytes).digest("hex");
       assert.ok(!withheld.has(md5), `withheld capture ${withheld.get(md5)} is published as ${base}…/${name}`);
 
-      // Allowlist EVERY file in the evidence directory. An extension list is a denylist wearing
-      // an allowlist's clothes: an SVG wrapping the capture as a base64 <image href> published
-      // straight through one. No format reasoning — if it lives here, it must be vouched for.
-      if (/images\/rsp\/[^/]+$/i.test(path)) {
+      // Allowlist EVERY file at or below the evidence directory. An extension list is a
+      // denylist wearing an allowlist's clothes — an SVG wrapping the capture as a base64
+      // <image href> published straight through one — and `[^/]+$` reintroduced the gap it
+      // was meant to close, letting a subdirectory escape vouching. `.+` crosses separators.
+      if (/images\/rsp\/.+$/i.test(path)) {
         assert.ok(published.has(md5) || known.has(md5),
           `unvouched binary ${base}…/${name} (md5 ${md5}) — record it in rsp-evidence-provenance.md or remove it`);
       }
