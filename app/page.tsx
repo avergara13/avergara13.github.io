@@ -6,7 +6,7 @@ import { SystemsLattice } from "@/components/SystemsLattice";
 
 export const metadata: Metadata = {
   title: "Angel Vergara — AI Workflows & Business Systems",
-  description: "I turn messy operating problems into clear, controlled systems people can actually use—governed AI systems, working products, and implementation discipline.",
+  description: "I turn messy operations into clear, controlled systems people can use.",
   alternates: { canonical: "/" },
   openGraph: { type: "website", url: "/", title: "Angel Vergara — AI workflows and business systems", description: "Practical AI-assisted workflows, business systems, and implementation proof.", images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "Angel Vergara — AI workflows and business systems." }] },
   twitter: { card: "summary_large_image", title: "Angel Vergara — AI workflows and business systems", description: "Practical AI-assisted workflows, business systems, and implementation proof.", images: ["/og-home.png"] },
@@ -28,14 +28,6 @@ const verdicts: { key: VerdictKind; label: string }[] = [
   { key: "buy", label: "Buy" },
   { key: "maybe", label: "Maybe" },
   { key: "pass", label: "Pass" },
-];
-
-const evidence: { src: string; title: string; note: string; alt?: string }[] = [
-  { src: "/images/rsp/session.png", title: "Capture", note: "An item enters the workflow." },
-  { src: "/images/rsp/listings.png", title: "Market evidence", note: "Comparable listings are gathered." },
-  // The Sold tab ships as an empty state. It shows where completed sales land, not what
-  // anything sold for — the caption must not assert data the screenshot contradicts.
-  { src: "/images/rsp/sold.png", title: "Sold", note: "Where completed sales are recorded.", alt: "Resale Scanner Pro — the sold tab, with no sales recorded yet" },
 ];
 
 // Typed to the three real variants: as `string` a typo compiled fine and rendered an
@@ -71,7 +63,7 @@ export default function Home() {
       <div className="shell proof-hero-grid">
         <div className="proof-hero-copy">
           <p className="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems</p>
-          <h1 id="hero-title">I turn messy operating problems into clear, controlled systems people can actually use.</h1>
+          <h1 id="hero-title">I turn messy operations into clear, controlled systems people can use.</h1>
         </div>
       </div>
       {/* Decorative only — the copy above carries the meaning. See ArchitecturalField. */}
@@ -94,28 +86,34 @@ export default function Home() {
     </section>
 
     <section className="product-stage" aria-labelledby="product-title">
-      <div className="shell">
-        <div className="stage-head">
-          <p className="eyebrow">Product</p>
-          <h2 id="product-title">Resale Scanner Pro</h2>
-          <p className="stage-lede">Working product. In operating use.</p>
+      <div className="shell product-stage-grid">
+        <div className="product-stage-copy">
+          <Image className="stage-mark product-stage-mark" src="/images/rsp/mark-336.png" alt="" width={336} height={336} sizes="(max-width:800px) 64px, 72px" />
+          <div className="stage-head">
+            <p className="eyebrow">Product</p>
+            <h2 id="product-title">Resale Scanner Pro</h2>
+            <p className="stage-lede">Working product. In operating use.</p>
+          </div>
+
+          <ul className="verdict-row">
+            {verdicts.map((verdict) => <li key={verdict.key}>
+              <span className="verdict-icon"><VerdictMark kind={verdict.key} /></span>
+              <b>{verdict.label}</b>
+            </li>)}
+          </ul>
+
+          <Link className="stage-cta is-ink" href="/work/resale-scanner-pro/">View case study <span aria-hidden="true">→</span></Link>
         </div>
 
-        <ul className="verdict-row">
-          {verdicts.map((verdict) => <li key={verdict.key}>
-            <span className="verdict-icon"><VerdictMark kind={verdict.key} /></span>
-            <b>{verdict.label}</b>
-          </li>)}
-        </ul>
-
-        <div className="product-evidence case-screens">
-          {evidence.map((shot) => <figure className="phone" key={shot.src}>
-            <Image src={shot.src} alt={shot.alt ?? `Resale Scanner Pro — ${shot.title.toLowerCase()} screen`} width={780} height={1688} sizes="(max-width:620px) 31vw, (max-width:960px) 30vw, 320px" />
-            <figcaption><b>{shot.title}</b><span>{shot.note}</span></figcaption>
-          </figure>)}
-        </div>
-
-        <Link className="stage-cta is-ink" href="/work/resale-scanner-pro/">View case study <span aria-hidden="true">→</span></Link>
+        <figure className="product-evidence-slot" data-evidence-slot="temporary-rsp-home">
+          <Image
+            src="/images/rsp/session.png"
+            alt="Resale Scanner Pro — active session screen showing buy, maybe, and pass decisions"
+            width={780}
+            height={1688}
+            sizes="(max-width:800px) calc(100vw - 40px), (max-width:1180px) 52vw, 560px"
+          />
+        </figure>
       </div>
     </section>
 
