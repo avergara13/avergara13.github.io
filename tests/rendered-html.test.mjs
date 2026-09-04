@@ -46,7 +46,7 @@ test("top navigation preserves Work, About, Resume, and Contact", async () => {
   assert.match(html, /href="\/about\/"/);
 });
 
-test("homepage opening leads with the role family, the full value proposition, then CTAs", async () => {
+test("homepage opening is role family, then the full value proposition, then the architectural field — and no CTA row", async () => {
   const main = await readHomeMain();
 
   // TSK-970 lock: the VALUE PROPOSITION is the page h1. Identity moved to the header
