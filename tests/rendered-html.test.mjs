@@ -19,7 +19,12 @@ const readHomeMain = async () => {
   const html = await readOutput("index.html");
   const at = html.indexOf('<main id="main"');
   assert.notEqual(at, -1, "homepage <main> landmark is missing");
-  return html.slice(at);
+  const end = html.indexOf("</main>", at);
+  assert.notEqual(end, -1, "homepage <main> is never closed");
+  // Slice to </main>. Running to end-of-document meant the footer — which repeats the
+  // wordmark, the value proposition and the mailto — could satisfy assertions about the
+  // page body, so removing a link from <main> still passed.
+  return html.slice(at, end);
 };
 
 // Each marker must appear EXACTLY once and in the given order. Uniqueness is part
@@ -55,8 +60,48 @@ test("homepage opening is role family, then the approved concise value propositi
   assert.doesNotMatch(main, /<h1[^>]*>Angel Vergara<\/h1>/);
 
   // The role family stays a subordinate mono line and is never promoted into a heading.
-  assert.match(main, /<p class="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems<\/p>/);
-  assert.doesNotMatch(main, /<h[12][^>]*>[^<]*AI Workflow Automation/);
+  // TSK-974 segments the line so wraps never dangle a separator, so the contract is the
+  // READING, not the markup: strip the segment spans and compare the text exactly.
+  const roleFamily = main.match(/<p class="hero-role-family">([\s\S]*?)<\/p>/);
+  assert.ok(roleFamily, "the role family line is missing");
+  const roleText = roleFamily[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  assert.equal(roleText, "Hospitality Technology · AI Workflow Automation · Systems Implementation · Business Systems");
+  // Strip tags before testing promotion. Anchoring on the text immediately after ">" stopped
+  // working the moment this line was wrapped in <span>s — the guard could no longer see the
+  // very markup shape it exists to catch.
+  // Guard h1..h6, not just h1/h2 — an <h3> carrying the whole line passed — and guard every
+  // phrase in it, since banning only the first two let the tail be promoted on its own.
+  for (const [, , inner] of main.matchAll(/<(h[1-6])[^>]*>([\s\S]*?)<\/\1>/g)) {
+    const heading = inner.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    assert.doesNotMatch(heading, /Hospitality Technology|AI Workflow Automation|Systems Implementation|Business Systems/,
+      `the role family must stay a subordinate line, never a heading: ${heading}`);
+  }
+  // ...and it must stay visually subordinate. Nothing pinned its size, so a font-size bump
+  // alone could make it the page headline while every text assertion still passed.
+  const heroCss = (await readFile(new URL("app/globals.css", root), "utf8")).replace(/\/\*[\s\S]*?\*\//g, "");
+  // EVERY declaration, at every breakpoint — reading only the first rule is exactly the hole
+  // that made the crop guard decorative, and a later override is how a line gets promoted.
+  let sizes = 0;
+  for (const seg of mediaSegments(heroCss)) {
+    for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+      if (!/\.hero-role-family(?![\w-])/.test(selector)) continue;
+      // Read the longhand AND the `font:` shorthand — a shorthand carries the size with no
+      // `font-size` token at all, so matching the longhand alone never saw it.
+      const declared = body.match(/(?:^|[;{\s])font-size\s*:\s*([^;]+)/) ?? body.match(/(?:^|[;{\s])font\s*:\s*([^;]+)/);
+      if (!declared) continue;
+      sizes += 1;
+      // Convert EVERY length in the declaration to rem and take the largest. Matching a
+      // leading `rem` ignored `font-size:80px`, read `clamp(.72rem,6vw,72px)` as .72rem, and
+      // never saw `4em`.
+      const perRem = { rem: 1, em: 1, px: 1 / 16, pt: 1 / 12, ch: 0.5, ex: 0.5, vw: 1.5, vh: 1.5, "%": 1 / 100 };
+      const lengths = [...declared[1].matchAll(/([\d.]+)\s*(rem|em|px|pt|ch|ex|vw|vh|%)/g)]
+        .map((m) => Number(m[1]) * perRem[m[2]]);
+      const largest = Math.max(...lengths, 0);
+      assert.ok(largest <= 1,
+        `the role family must stay a small supporting line — ${selector.trim()} sets ${declared[0].trim()}`);
+    }
+  }
+  assert.ok(sizes > 0, "no font-size found for .hero-role-family — the scan is not reading the stylesheet");
   // The retired proof cue must stay retired, and it must not creep back in prose form.
   // The class pin alone was not enough: a support line reintroduced the same three
   // concepts as a sentence, so the CONCEPTS are pinned too, in any order.
@@ -92,10 +137,20 @@ test("HOME strengthens Angel's identity and presents RSP as one replaceable genu
 
   const product = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="home-bridge'));
   assert.match(product, /src="\/images\/rsp\/mark-336\.png"/);
-  assert.match(product, /data-evidence-slot="temporary-rsp-home"/);
-  assert.match(product, /src="\/images\/rsp\/session\.png"/);
+  assert.match(product, /data-evidence-slot="rsp-home-overview"/);
+  assert.match(product, /\/images\/rsp\/session-overview\.jpg/);
   assert.equal((product.match(/<img/g) ?? []).length, 2, "RSP stage contains one project mark and exactly one screenshot");
-  assert.doesNotMatch(product, /\/images\/rsp\/(?:listings|sold|agent)\.png/);
+  // HOME's copy of the capture sat outside the whole evidence contract: every alt/caption
+  // assertion was scoped to the case study, so an empty alt here passed. HOME carries no
+  // figcaption by design, which makes the alt the only description a screen reader gets.
+  const evidence = product.match(/<figure class="product-evidence-slot"[\s\S]*?<\/figure>/);
+  assert.ok(evidence, "the HOME evidence slot is missing");
+  const alt = evidence[0].match(/alt="([^"]*)"/);
+  assert.ok(alt && alt[1].trim().length > 20, "the HOME evidence image needs descriptive alt text");
+  assert.doesNotMatch(alt[1], /^(?:a\s+|the\s+)?(?:screenshot|image|photo)\b|screenshot number/i,
+    "HOME alt must describe the capture, not label it");
+  // The retired placeholder and the three-phone strip must both stay gone.
+  assert.doesNotMatch(product, /\/images\/rsp\/(?:session|listings|sold|agent)\.png/);
 });
 
 test("homepage is three proof stages then one career bridge, with Loft OS first", async () => {
@@ -217,7 +272,7 @@ test("the HOME architectural field is decorative, project-owned, and carries no 
   // Loft stage stays compact — mark, title, lede, one CTA — so the lattice is hidden
   // rather than shrunk. Pinned against the phone media block specifically.
   const css = await readFile(new URL("app/globals.css", root), "utf8");
-  const phoneBlocks = mediaSegments(css).filter((seg) => seg.max <= 620).map((seg) => seg.body).join("\n");
+  const phoneBlocks = mediaSegments(css).filter((seg) => seg.plain && seg.max <= 620).map((seg) => seg.body).join("\n");
   assert.ok(phoneBlocks.length > 0, "media scan must find the phone block");
   assert.match(phoneBlocks, /\.flagship-visual\s*\{[^}]*display:\s*none/, "the lattice must be hidden at phone widths");
   // Control: it is still present for desktop/tablet.
@@ -282,10 +337,22 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
 // none of this file's media blocks, which silently made the prominence check read only
 // base rules. Scan braces instead, and assert the scan actually found blocks.
 const mediaSegments = (css) => {
-  const segments = [{ max: Infinity, body: "" }];
+  const segments = [{ max: Infinity, body: "", plain: true, condition: "" }];
   let i = 0, base = "";
+  // Scan EVERY rule-wrapping at-rule, not only @media. A rule inside @supports, @container
+  // or @layer is a real rule; leaving those blocks folded into `base` made the inner
+  // selectors unreadable, because a flat selector regex stops at the wrapper's brace.
+  const nextBlock = (from) => {
+    const re = /@(media|supports|container|layer)\b/g;
+    re.lastIndex = from;
+    for (let m = re.exec(css); m; m = re.exec(css)) {
+      const brace = css.indexOf("{", m.index), semi = css.indexOf(";", m.index);
+      if (brace !== -1 && (semi === -1 || brace < semi)) return m.index;
+    }
+    return -1;
+  };
   while (i < css.length) {
-    const at = css.indexOf("@media", i);
+    const at = nextBlock(i);
     if (at === -1) { base += css.slice(i); break; }
     base += css.slice(i, at);
     const open = css.indexOf("{", at);
@@ -296,12 +363,18 @@ const mediaSegments = (css) => {
     }
     const condition = css.slice(at, open);
     const maxWidth = condition.match(/max-width:\s*(\d+)px/);
-    // Only a PLAIN `(max-width: N px)` block participates. The earlier form skipped just
-    // `min-width`, so `screen and (max-width: …)` would have been folded in despite the
-    // comment claiming compound conditions were excluded. Match the whole condition.
-    if (maxWidth && /^@media\s*\(\s*max-width:\s*\d+px\s*\)\s*$/.test(condition.trim())) {
-      segments.push({ max: Number.parseInt(maxWidth[1], 10), body: css.slice(open + 1, end - 1) });
-    }
+    // EVERY block is returned. Only a PLAIN `(max-width: N px)` block takes part in the
+    // width cascade (`plain`), but a non-plain block's rules still exist and must remain
+    // readable: the earlier form skipped such blocks entirely — their bodies reached
+    // neither `base` nor a segment — so `@media screen and (max-width:900px)` was invisible
+    // to every scan built on this helper.
+    const plain = Boolean(maxWidth) && /^@media\s*\(\s*max-width:\s*\d+px\s*\)\s*$/.test(condition.trim());
+    segments.push({
+      max: plain ? Number.parseInt(maxWidth[1], 10) : Infinity,
+      body: css.slice(open + 1, end - 1),
+      plain,
+      condition: condition.trim(),
+    });
     i = end;
   }
   segments[0].body = base;
@@ -394,7 +467,7 @@ test("homepage visual prominence follows the intended ranking at every width", a
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     let value = null;
     for (const seg of segments) {
-      if (width > seg.max) continue;
+      if (!seg.plain || width > seg.max) continue;
       for (const rule of seg.body.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, "g"))) {
         const found = rule[1].match(/font-size\s*:\s*([^;]+)/);
         if (found) value = found[1].trim();
@@ -972,4 +1045,320 @@ test("resume generator source honors the public claim boundary", async () => {
   assert.doesNotMatch(source, /up\.railway\.app/i);
   assert.doesNotMatch(source, /github\.com\/avergara13\/(loft_os|resale-scanner-pro)/i);
   assert.doesNotMatch(source, /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+});
+
+// ── TSK-974: RSP evidence spread ──────────────────────────────────────────────
+// The published captures are the case study's actual argument, so the contract worth
+// pinning is about EVIDENCE, not layout: which captures ship, in what narrative order,
+// that each one is described, and that the defective/identifying captures never leak.
+
+// A Next static export repeats every image path three times: a <head> preload for the
+// priority image, the real <img>, and the RSC flight payload inside a <script>. Only the
+// rendered markup is the contract, so scripts are stripped before anything is asserted.
+const readRspMain = async () => {
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+  const markup = html.replace(/<script[\s\S]*?<\/script>/g, "");
+  const at = markup.indexOf('<main id="main"');
+  assert.notEqual(at, -1, "RSP case study <main> landmark is missing");
+  const end = markup.indexOf("</main>", at);
+  assert.notEqual(end, -1, "RSP case study <main> is never closed");
+  return markup.slice(at, end);
+};
+
+const rspEvidenceOrder = [
+  "/images/rsp/session-overview.jpg",
+  "/images/rsp/capture-ai-lens.jpg",
+  "/images/rsp/analysis-buy.jpg",
+  "/images/rsp/decision-pass.jpg",
+  "/images/rsp/listing-preparation.jpg",
+  "/images/rsp/agent-scans.jpg",
+  "/images/rsp/agent-recap.jpg",
+];
+
+test("RSP case study tells the evidence story in capability order, once each", async () => {
+  const main = await readRspMain();
+
+  // capture -> analysis -> decision -> listing -> agent support. Each marker must also be
+  // unique, so a duplicated screenshot cannot satisfy the ordering claim.
+  assertOrder(main, rspEvidenceOrder);
+
+  // The retired three-phone strip and its placeholder assets stay retired.
+  assert.doesNotMatch(main, /\/images\/rsp\/(?:session|listings|sold|agent)\.png/);
+  assert.doesNotMatch(main, /class="case-screens"/);
+
+  const frames = main.match(/class="rsp-proof-frame/g) ?? [];
+  assert.equal(frames.length, rspEvidenceOrder.length, "every evidence frame is accounted for");
+});
+
+test("every published RSP capture carries alt text and a caption", async () => {
+  const main = await readRspMain();
+
+  // Parse the figures FIRST, then ask which one owns each image. Locating the nearest
+  // <figure> around an offset instead let an <img> that sits OUTSIDE any figure borrow the
+  // neighbouring figure's alt and caption, so an image with no alt at all passed.
+  const figures = [...main.matchAll(/<figure class="rsp-proof-frame[^"]*">([\s\S]*?)<\/figure>/g)].map((m) => m[1]);
+  assert.equal(figures.length, rspEvidenceOrder.length, "every evidence frame is accounted for");
+  const inside = figures.join("");
+
+  for (const src of rspEvidenceOrder) {
+    const owning = figures.filter((body) => body.includes(src));
+    assert.equal(owning.length, 1, `exactly one evidence figure must contain ${src}`);
+    const [frame] = owning;
+    assert.equal((frame.match(/<img/g) ?? []).length, 1, `one image per evidence figure: ${src}`);
+    const alt = frame.match(/alt="([^"]*)"/);
+    assert.ok(alt && alt[1].trim().length > 20, `evidence image needs descriptive alt: ${src}`);
+    // A generic alt is not a description — it names the file's position, not its content.
+    assert.doesNotMatch(alt[1], /^(?:screenshot|image|photo)\b|screenshot number/i, `alt must describe the capture, not label it: ${src}`);
+    // Assert the caption has TEXT. Matching the tag alone passed for <figcaption><p></p>.
+    const caption = frame.match(/<figcaption>([\s\S]*?)<\/figcaption>/);
+    assert.ok(caption, `evidence image needs a caption: ${src}`);
+    const label = caption[1].match(/<span>([\s\S]*?)<\/span>/);
+    const body = caption[1].match(/<p>([\s\S]*?)<\/p>/);
+    assert.ok(label && label[1].replace(/<[^>]+>/g, "").trim().length > 3, `caption needs a label: ${src}`);
+    assert.ok(body && body[1].replace(/<[^>]+>/g, "").trim().length > 20, `caption needs describing text: ${src}`);
+
+    // An evidence image may not render anywhere except inside its frame.
+    // (Enforced page-wide below as well: an image added outside every figure shipped with
+    // no alt and no caption because nothing asserted the page had no such image.)
+    const needle = new RegExp(src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+    assert.equal((main.match(needle) ?? []).length, (inside.match(needle) ?? []).length,
+      `${src} must appear only inside an evidence figure`);
+  }
+
+  // Every screenshot on the page must be an accounted-for evidence frame. Only the project
+  // mark is allowed outside one, and it is decorative with an intentionally empty alt.
+  for (const [, tag] of main.matchAll(/(<img\b[^>]*>)/g)) {
+    const src = tag.match(/src="([^"]*)"/)?.[1] ?? "";
+    if (!src.includes("/images/rsp/")) continue;
+    if (src.endsWith("/mark-336.png")) continue;
+    assert.ok(inside.includes(src), `screenshot rendered outside an evidence figure: ${src}`);
+  }
+});
+
+test("nothing INSIDE an evidence figure can attach a crop", async () => {
+  // Pins SHAPE rather than hunting for cropping declarations, because a CSS text scan cannot
+  // be sound here: globals.css starts with `@import "tailwindcss"`, so a utility class
+  // compiles into a built chunk no scan reads. Two proven in-figure vectors — a wrapper
+  // element around the image, and a sizing utility class on it — become unrepresentable when
+  // the figure holds exactly an <img> and a <figcaption> with no class on the image.
+  //
+  // SCOPE, stated because an earlier version of this comment overclaimed: this covers only
+  // what is INSIDE the figure. The same two techniques applied to an ANCESTOR still crop, and
+  // nothing here or elsewhere checks ancestors. Only a rendered-geometry measurement would
+  // close that, and this suite has no browser. Treat this as one strong layer, not a proof.
+  const main = await readRspMain();
+  const figures = [...main.matchAll(/<figure class="([^"]*)">([\s\S]*?)<\/figure>/g)]
+    .filter(([, cls]) => cls.includes("rsp-proof-frame"));
+  assert.equal(figures.length, 7, "every evidence frame is accounted for");
+
+  const modifiers = new Set(["dominant", "offset", "analysis", "pass", "listing", "scans", "agent"]);
+  for (const [, cls, body] of figures) {
+    const classes = cls.trim().split(/\s+/);
+    assert.equal(classes.length, 2, `an evidence figure carries exactly its frame and modifier class: "${cls}"`);
+    assert.equal(classes[0], "rsp-proof-frame");
+    assert.ok(modifiers.has(classes[1].replace("rsp-proof-", "")), `unknown evidence modifier: ${classes[1]}`);
+
+    // Nothing may sit between the figure and its image — a wrapper is a crop vector.
+    assert.match(body, /^<img\b[^>]*>\s*<figcaption>/, `an evidence image must be the figure's first child: ${cls}`);
+    const tags = [...body.matchAll(/<(\w+)\b/g)].map((m) => m[1]);
+    assert.deepEqual(tags, ["img", "figcaption", "span", "p"], `unexpected structure inside ${cls}: ${tags.join(",")}`);
+
+    const img = body.match(/<img\b[^>]*>/)[0];
+    assert.doesNotMatch(img, /\sclass="/, `an evidence image carries no class — a utility class is a crop vector: ${cls}`);
+    const style = img.match(/\sstyle="([^"]*)"/);
+    assert.ok(!style || style[1] === "color:transparent", `unexpected inline style on an evidence image: ${style?.[1]}`);
+  }
+});
+
+test("no rendered evidence frame can be cropped from the page itself", async () => {
+  // SOUND checks on the emitted markup. The stylesheet scan below is a tripwire and cannot
+  // prove absence; these two can, for the routes that carry evidence: a page that ships no
+  // <style> element and no inline style on an evidence image cannot crop one from the page.
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+  const markup = html.replace(/<script[\s\S]*?<\/script>/g, "");
+
+  assert.doesNotMatch(markup, /<style[\s>]/i, "an inline <style> element can crop evidence past every stylesheet scan");
+
+  const main = await readRspMain();
+  for (const [, tag] of main.matchAll(/(<img\b[^>]*>)/g)) {
+    if (!/\/images\/rsp\//.test(tag)) continue;
+    const style = tag.match(/\sstyle="([^"]*)"/);
+    // next/image emits style="color:transparent"; anything geometric is a crop vector.
+    assert.ok(!style || !/object-fit|aspect-ratio|clip-path|height|max-block-size|block-size/i.test(style[1]),
+      `evidence image carries a geometric inline style: ${style?.[1]}`);
+  }
+
+  // A data: URI is content with no file behind it, so every hash-based guard is blind to it.
+  // Scoping this to one page let the same payload publish on another route. Note the limit:
+  // this reads exported HTML only, so a data: URI reached through CSS `content:url(...)` or
+  // a JS chunk is outside it.
+  const { readdir } = await import("node:fs/promises");
+  const walk = async (dir) => {
+    const found = [];
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const child = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, dir);
+      found.push(...(entry.isDirectory() ? await walk(child) : [child]));
+    }
+    return found;
+  };
+  const pages = (await walk(new URL("out/", root))).filter((f) => f.pathname.endsWith(".html"));
+  assert.ok(pages.length > 5, "export should contain several HTML pages");
+  for (const page of pages) {
+    const body = await readFile(page, "utf8");
+    assert.ok(!/data:image\//i.test(body), `images must be files, not data URIs: ${page.pathname}`);
+  }
+});
+
+test("no stylesheet rule crops an evidence frame", async () => {
+  const raw = await readFile(new URL("app/globals.css", root), "utf8");
+  // Strip comments first. Reading them as selector text made this guard fail on an unrelated
+  // comment that merely mentioned a class, and let commented-out text mask a real rule.
+  const css = raw.replace(/\/\*[\s\S]*?\*\//g, "");
+  const segments = mediaSegments(css);
+  assert.ok(segments.some((seg) => seg.plain && seg.max <= 900), "media scan must find the single-column block");
+  // Control: prove the scan reaches inside NON-plain blocks too, which it previously could not.
+  assert.ok(segments.some((seg) => !seg.plain) || !/@media(?!\s*\(\s*max-width)/.test(css),
+    "scan must return non-plain media blocks when the stylesheet has any");
+
+  // This is a REGRESSION TRIPWIRE for the defect that occurred (a cover-crop on the evidence
+  // frames), not a proof of absence: a CSS text scan cannot enumerate every selector that
+  // could reach these images. The sound guarantees live in the test above.
+  const cropping = /^(cover|none)$/;
+  let sawRatio = false, sawSegmentedRule = false;
+  for (const seg of segments) {
+    for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+      // Match the whole rsp- family: a rule can reach an evidence image through the layout
+      // wrappers (.rsp-decision-feature img), not only through a .rsp-proof-* class.
+      if (!/\brsp-[a-z-]+/.test(selector)) continue;
+      if (!seg.plain || seg.max < Infinity) sawSegmentedRule = true;
+      const where = `${selector.trim()}${seg.condition ? ` in ${seg.condition}` : ""}`;
+
+      const fit = body.match(/object-fit\s*:\s*([\w-]+)/);
+      assert.ok(!fit || !cropping.test(fit[1]), `evidence frame must not crop — ${where} sets object-fit:${fit?.[1]}`);
+      assert.doesNotMatch(body, /clip-path\s*:/, `evidence frame must not clip — ${where} sets clip-path`);
+
+      // Logical properties crop exactly like their physical twins.
+      for (const prop of ["height", "max-height", "block-size", "max-block-size"]) {
+        const found = body.match(new RegExp(`(?:^|[;{\\s])${prop}\\s*:\\s*([^;]+)`));
+        const value = found?.[1].trim();
+        assert.ok(!value || value === "auto" || value === "none",
+          `evidence frame must not clamp ${prop} — ${where} sets ${prop}:${value}`);
+      }
+
+      // aspect-ratio accepts a slash form AND a bare decimal; the slash-only form let
+      // `aspect-ratio:0.72` through.
+      const ratio = body.match(/aspect-ratio\s*:\s*([\d.]+)(?:\s*\/\s*([\d.]+))?/);
+      if (ratio) {
+        sawRatio = true;
+        const value = ratio[2] ? Number(ratio[1]) / Number(ratio[2]) : Number(ratio[1]);
+        assert.ok(Math.abs(value - 900 / 1950) < 1e-4,
+          `evidence frames must keep the capture's own ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+      }
+    }
+  }
+  assert.ok(sawRatio, "scan found no aspect-ratio rule for an evidence frame — it is not reading the stylesheet");
+  assert.ok(sawSegmentedRule, "scan found no evidence rule inside a media block — it is reading only base rules");
+});
+
+test("withheld RSP captures never reach the public build", async () => {
+  // IMG_0550 exposes an order identifier and a ZIP; IMG_0527 renders "Invalid Date".
+  // Enforcement is by CONTENT, not by name: a filename check let the same bytes through as
+  // `recent-sales.jpg`, or from a subdirectory `readdir` never descended into.
+  const { readdir } = await import("node:fs/promises");
+  const { createHash } = await import("node:crypto");
+
+  const provenance = await readFile(new URL("rsp-evidence-provenance.md", root), "utf8");
+  const published = new Set([...provenance.matchAll(/\|\s*`[a-z0-9-]+\.jpg`\s*\|[^|]*\|[^|]*\|\s*`([0-9a-f]{32})`\s*\|/g)].map((m) => m[1]));
+  // The marks and the retired placeholders share the evidence directory, so they are vouched
+  // for too. Anything there matching NEITHER table is a binary nobody has accounted for.
+  const knownSection = provenance.slice(provenance.indexOf("## Non-evidence images"), provenance.indexOf("## What actually enforces"));
+  const known = new Set([...knownSection.matchAll(/\|\s*`[a-z0-9.-]+`\s*\|\s*`([0-9a-f]{32})`\s*\|/g)].map((m) => m[1]));
+  assert.equal(known.size, 7, "provenance must account for every non-evidence image in the evidence directory");
+  // Scope to the withheld table: the published table also names an IMG_ source per row, and
+  // a document-wide scan swept all seven originals in as if they were withheld.
+  const withheldSection = provenance.slice(provenance.indexOf("## Withheld captures"));
+  assert.ok(withheldSection.length > 0, "provenance is missing its withheld-captures section");
+  const withheld = new Map([...withheldSection.matchAll(/\|\s*`(IMG_\d+\.jpg)`\s*\|\s*`([0-9a-f]{32})`\s*\|/g)].map((m) => [m[2], m[1]]));
+  // Harness control: a table this scan failed to read would make every assertion below vacuous.
+  assert.equal(published.size, 7, "provenance must list an md5 for all 7 published derivatives");
+  assert.equal(withheld.size, 2, "provenance must list an md5 for both withheld captures");
+
+  const walk = async (dir) => {
+    const found = [];
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const child = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, dir);
+      if (entry.isDirectory()) found.push(...await walk(child));
+      else found.push(child);
+    }
+    return found;
+  };
+
+  for (const base of ["public/", "out/"]) {
+    for (const file of await walk(new URL(base, root))) {
+      const path = decodeURIComponent(file.pathname);
+      const name = path.split("/").pop();
+      assert.doesNotMatch(name, /^IMG_/i, `raw camera-roll capture must not ship: ${base}…/${name}`);
+
+      const bytes = await readFile(file);
+      const md5 = createHash("md5").update(bytes).digest("hex");
+      assert.ok(!withheld.has(md5), `withheld capture ${withheld.get(md5)} is published as ${base}…/${name}`);
+
+      // Allowlist EVERY file at or below the evidence directory. An extension list is a
+      // denylist wearing an allowlist's clothes — an SVG wrapping the capture as a base64
+      // <image href> published straight through one — and `[^/]+$` reintroduced the gap it
+      // was meant to close, letting a subdirectory escape vouching. `.+` crosses separators.
+      if (/images\/rsp\/.+$/i.test(path)) {
+        assert.ok(published.has(md5) || known.has(md5),
+          `unvouched binary ${base}…/${name} (md5 ${md5}) — record it in rsp-evidence-provenance.md or remove it`);
+      }
+    }
+  }
+
+  // A referenced binary that does not exist ships a broken image inside a figure whose
+  // caption still describes what should be there.
+  for (const src of rspEvidenceOrder) {
+    await assert.doesNotReject(access(new URL(`out${src}`, root)), `referenced evidence binary is missing from the export: ${src}`);
+  }
+
+  const pages = (await walk(new URL("out/", root))).filter((f) => f.pathname.endsWith(".html"));
+  assert.ok(pages.length > 5, "export should contain several HTML pages");
+  for (const page of pages) {
+    const html = await readFile(page, "utf8");
+    for (const name of withheld.values()) {
+      assert.ok(!html.includes(name.replace(/\.jpg$/, "")), `withheld capture referenced in ${page.pathname}: ${name}`);
+    }
+  }
+});
+
+test("RSP captions claim only what the captures show", async () => {
+  const main = await readRspMain();
+
+  // No supplied capture proves QR scanning, autonomous purchase, autonomous publication,
+  // customers, or guaranteed return. None of those may appear as a claim.
+  for (const banned of [/\bQR\b/, /automatically (?:buys|purchases|lists|publishes)/i,
+    /guaranteed (?:profit|return)/i, /\bcustomers\b/i, /on your behalf/i]) {
+    assert.doesNotMatch(main, banned, `unsupported claim in RSP case study: ${banned}`);
+  }
+
+  // The stopping rule is the page's core claim and must stay stated.
+  assert.match(main, /does not publish or purchase anything/);
+});
+
+test("the RSP dek claims only what the page evidences, in the lede and in metadata", async () => {
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+  const main = await readRspMain();
+
+  // TSK-974 retired the outcome-loop section and the capture that carried it, so the
+  // "learning from outcomes" clause lost its evidence. It rendered in BOTH the hero lede and
+  // the meta/og description, which is the search snippet — scan the whole document, not main.
+  // Ban the claim FAMILY, document-wide. Pinning the exact 21-character string let every
+  // inflection back in — including through og/twitter descriptions and JSON-LD, which never
+  // appear in <main> at all.
+  assert.doesNotMatch(html, /learn(?:s|ed|ing)?\s+from\s+outcomes|smarter\s+from\s+outcomes|learns?\s+from\s+its\s+outcomes/i,
+    "the retired outcome-loop claim must not return, in any inflection or metadata field");
+
+  const dek = "A mobile decision system for evaluating resale finds, comparing market evidence, and preparing listings.";
+  assert.ok(main.includes(dek), "the approved dek must render as the case-study lede");
+  assert.match(html, new RegExp(`<meta name="description" content="${dek.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`),
+    "the approved dek must be the page description");
 });

@@ -566,7 +566,8 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .proof-hero { position:relative; overflow:hidden; padding:clamp(30px,5vw,58px) 0 clamp(52px,7vw,96px); }
 .proof-hero-grid { position:relative; z-index:1; }
 .proof-hero-copy { max-width:min(100%,660px); }
-.hero-role-family { margin:0 0 22px!important; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.72rem!important; font-weight:500; letter-spacing:.11em; text-transform:uppercase; }
+.hero-role-family { max-width:76ch; margin:0 0 22px!important; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.72rem!important; font-weight:500; line-height:1.55; letter-spacing:.11em; text-wrap:balance; text-transform:uppercase; }
+.hero-role-family span { white-space:nowrap; }
 .proof-hero h1 { max-width:15ch; margin-bottom:0; font-size:clamp(2.55rem,5.2vw,4.35rem); line-height:.99; letter-spacing:-.035em; }
 
 /* Decorative field. Crop is done here, not in the SVG, so the framing can differ
@@ -688,7 +689,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .verdict-mark { width:44px; height:44px; margin-inline:auto; }
 .verdict-row b { display:block; margin:14px 0 0; font-family:var(--font-geist-mono),monospace; font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
 .product-evidence-slot { width:min(100%,560px); margin:0; justify-self:end; overflow:hidden; border:1px solid var(--edge-strong); border-radius:var(--r-surface); background:var(--navy-deep); box-shadow:var(--lift-lg); }
-.product-evidence-slot img { width:100%; aspect-ratio:780/1180; object-fit:cover; object-position:top; }
+.product-evidence-slot img { width:100%; aspect-ratio:900/1215; object-fit:cover; object-position:top; }
+/* TSK-974: the HOME slot shows the TOP of the session capture, ending just below the
+   best-flip row. The ratio is tuned to that landmark so the frame never cuts a list row
+   in half. This is presentation framing only — the whole capture is published uncropped
+   on the case study, so nothing is hidden by the HOME crop. */
 
 /* Career bridge — one compact operating-reality note and the recruiter exits. */
 .home-bridge { display:grid; grid-template-columns:1.25fr .75fr; gap:clamp(24px,4vw,56px); align-items:start; margin-bottom:clamp(58px,7vw,90px); padding-top:clamp(44px,5vw,64px); border-top:1px solid var(--line); }
@@ -752,7 +757,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .verdict-row b { font-size:.7rem; letter-spacing:.08em; }
   .verdict-mark { width:36px; height:36px; }
   .product-evidence-slot { border-radius:var(--r-card); }
-  .product-evidence-slot img { aspect-ratio:780/1240; }
   .stage-cta { width:100%; }
   .stage-lede { font-size:.74rem; }
   /* The lattice is a desktop/tablet explanatory visual. On phones the locked Loft stage
@@ -1029,3 +1033,91 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
 .loft-plate,.dark-card,.experience-section,.workflow-section { --focus:#ffffff; }
 /* The cobalt primary sits on the light canvas, and its ring is offset outside the
    fill, so the ink ring is measured against the canvas (17:1), not the button. */
+
+/* ── TSK-974 RSP evidence spread ────────────────────────────────────────────
+   Editorial frames, not device mockups. The published binaries are whole,
+   uncropped captures (see rsp-evidence-provenance.md), and nothing here crops
+   them: an earlier draft framed each figure with object-fit:cover, which sliced
+   the "Add to Queue" control off the PASS capture while its caption still said
+   the controls stayed visible. Rhythm comes from frame WIDTH, vertical offset
+   and whitespace instead, so a caption can never outrun what the image shows.
+   --frame caps each figure near a real handset's own width, which keeps the
+   captured UI at roughly native scale and legible as evidence. */
+.rsp-editorial { margin-top:clamp(38px,6vw,76px); }
+.rsp-proof-frame {
+  width:min(100%,var(--frame,420px)); min-width:0; margin:0; overflow:hidden;
+  border:1px solid var(--edge); border-radius:var(--r-surface);
+  background:#000; box-shadow:var(--lift-lg);
+}
+.rsp-proof-frame img { width:100%; height:auto; aspect-ratio:900/1950; }
+.rsp-proof-frame figcaption { padding:16px 18px 18px; border-top:1px solid var(--edge); background:var(--surface); }
+.rsp-proof-frame figcaption span {
+  display:block; margin-bottom:6px; color:var(--copper);
+  font-family:var(--font-geist-mono),monospace; font-size:.66rem; font-weight:850;
+  letter-spacing:.09em; text-transform:uppercase;
+}
+.rsp-proof-frame figcaption p { margin:0; color:var(--muted); font-size:.82rem; line-height:1.5; }
+
+/* 01 — a dominant plate with the capture frame stepped down beside it. */
+.rsp-opening-spread {
+  display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.85fr);
+  gap:clamp(24px,5vw,72px); align-items:start;
+}
+.rsp-proof-dominant { --frame:460px; }
+.rsp-proof-offset { --frame:320px; margin-top:clamp(70px,9vw,132px); justify-self:end; }
+
+/* 02 / 03 — one large plate against a text note, alternating sides. */
+.rsp-analysis-feature,.rsp-decision-feature {
+  display:grid; gap:clamp(28px,5vw,72px); align-items:center;
+}
+.rsp-analysis-feature { grid-template-columns:minmax(0,.95fr) minmax(0,1fr); }
+.rsp-decision-feature { grid-template-columns:minmax(0,1fr) minmax(0,.95fr); }
+.rsp-proof-analysis { --frame:440px; }
+.rsp-proof-pass { --frame:410px; justify-self:end; }
+.rsp-feature-note { padding:clamp(20px,3vw,36px); border-left:3px solid var(--copper-on-dark); }
+.rsp-feature-note h3 {
+  margin:9px 0 14px; font-family:var(--font-playfair),Georgia,serif;
+  font-size:clamp(1.7rem,3vw,2.7rem); font-weight:500; line-height:1.04;
+}
+.rsp-feature-note>p:last-child { margin:0; color:var(--on-dark-muted); }
+.rsp-feature-note.is-ink { border-left-color:var(--copper); }
+.rsp-feature-note.is-ink>p:last-child { color:var(--muted); }
+
+/* 04 — one dominant plate with the two agent surfaces stacked and stepped down. */
+.rsp-operations-spread {
+  display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);
+  gap:clamp(26px,5vw,68px); align-items:start;
+}
+.rsp-proof-listing { --frame:460px; }
+.rsp-agent-stack {
+  display:grid; gap:clamp(26px,4vw,48px); justify-items:end;
+  margin-top:clamp(56px,8vw,116px);
+}
+.rsp-proof-scans,.rsp-proof-agent { --frame:330px; }
+
+.dark-section .rsp-proof-frame { border-color:var(--dark-line); }
+.dark-section .rsp-proof-frame figcaption { border-top-color:var(--dark-line); background:var(--navy-deep); }
+.dark-section .rsp-proof-frame figcaption span { color:var(--copper-on-dark); }
+.dark-section .rsp-proof-frame figcaption p { color:var(--on-dark-muted); }
+
+/* Below the two-column threshold the spread becomes one deliberate reading
+   column: offsets collapse, every frame aligns to the same edge, and the
+   figures grow rather than shrink so the UI keeps working as evidence. */
+@media (max-width:900px) {
+  .rsp-opening-spread,.rsp-analysis-feature,.rsp-decision-feature,.rsp-operations-spread {
+    grid-template-columns:minmax(0,1fr); gap:clamp(26px,5vw,44px);
+  }
+  .rsp-proof-frame { --frame:520px; }
+  .rsp-proof-offset,.rsp-agent-stack { margin-top:0; }
+  .rsp-proof-offset,.rsp-proof-pass,.rsp-agent-stack { justify-self:start; }
+  .rsp-agent-stack { justify-items:start; }
+  .rsp-feature-note { max-width:620px; padding:10px 0 10px 20px; }
+}
+
+@media (max-width:620px) {
+  .hero-role-family { max-width:46ch; line-height:1.5; text-wrap:pretty; }
+  .rsp-editorial { margin-top:32px; }
+  .rsp-proof-frame { --frame:100%; border-radius:var(--r-card); }
+  .rsp-proof-frame figcaption { padding:14px 16px 16px; }
+  .rsp-feature-note { padding:8px 0 8px 16px; }
+}
