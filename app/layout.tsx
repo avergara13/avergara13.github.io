@@ -26,7 +26,6 @@ const personSchema = {
   name: "Angel Vergara",
   url: "https://avergara13.github.io/",
   email: "mailto:avergara13@me.com",
-  jobTitle: "Applied AI Workflow and Business Systems Implementation",
   knowsLanguage: ["English", "Spanish"],
   sameAs: [
     "https://linkedin.com/in/angel-vergara-83861540",
