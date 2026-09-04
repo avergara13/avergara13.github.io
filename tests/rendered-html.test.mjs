@@ -46,141 +46,390 @@ test("top navigation preserves Work, About, Resume, and Contact", async () => {
   assert.match(html, /href="\/about\/"/);
 });
 
-test("homepage hero leads with identity, a subordinate role family, the value proposition, then CTAs", async () => {
+test("homepage opening is role family, then the full value proposition, then the architectural field — and no CTA row", async () => {
   const main = await readHomeMain();
 
-  // The identity anchor is the page h1 — not the nav wordmark.
-  assert.match(main, /<h1 id="hero-title">Angel Vergara<\/h1>/);
+  // TSK-970 lock: the VALUE PROPOSITION is the page h1. Identity moved to the header
+  // wordmark, which appears on every route. The full approved sentence is required —
+  // the shorter concept variant ("...clear, controlled systems.") is not approved copy.
+  assert.match(main, /<h1 id="hero-title">I turn messy operating problems into clear, controlled systems people can actually use\.<\/h1>/);
+  assert.doesNotMatch(main, /<h1[^>]*>Angel Vergara<\/h1>/);
 
-  // The role family is carried by a subordinate line, never promoted into a heading.
+  // The role family stays a subordinate mono line and is never promoted into a heading.
   assert.match(main, /<p class="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems<\/p>/);
   assert.doesNotMatch(main, /<h[12][^>]*>[^<]*AI Workflow Automation/);
+  // The retired proof cue must stay retired, and it must not creep back in prose form.
+  // The class pin alone was not enough: a support line reintroduced the same three
+  // concepts as a sentence, so the CONCEPTS are pinned too, in any order.
+  assert.doesNotMatch(main, /hero-proof-cue/);
+  assert.doesNotMatch(main, /Governed AI systems · Working products · Implementation discipline/);
+  assert.doesNotMatch(main, /class="hero-support"/);
+  const opening = main.slice(0, main.indexOf('class="arch-field"'));
+  assert.doesNotMatch(opening, /Governed AI systems/i, "the retired proof cue must not return as prose");
+  assert.doesNotMatch(opening, /implementation discipline/i);
 
-  // Value proposition. TSK-961 Phase 1 retired the proof cue as redundant with the
-  // role family above it, so its absence is pinned rather than left unguarded.
-  assert.match(main, /<p class="hero-value">I turn messy operating problems into clear, controlled systems people can actually use\.<\/p>/);
-  assert.doesNotMatch(main, /hero-proof-cue|Governed AI systems · Working products · Implementation discipline/);
-
-  // Recruiter CTAs resolve to the flagship case study and the resume, inside the hero.
-  const ctas = main.slice(main.indexOf('class="hero-ctas"'), main.indexOf('class="editorial-handoff"'));
-  assert.match(ctas, /href="\/work\/loft-os\/"[^>]*>View flagship work/);
-  assert.match(ctas, /href="\/resume\/">Resume</);
+  // Locked opening sequence: role -> value proposition -> architectural field. The first
+  // project CTA belongs inside the Loft stage, not the opening.
+  assert.doesNotMatch(opening, /class="hero-ctas"|class="button/, "the opening carries no CTA row");
+  assert.doesNotMatch(opening, /View flagship work/);
+  assert.doesNotMatch(opening, /href="\/resume\/"/, "the resume exit belongs lower on HOME, not in the opening");
 
   assertOrder(main, [
-    'id="hero-title"',
     'class="hero-role-family"',
-    'class="hero-value"',
-    'class="hero-ctas"',
+    'id="hero-title"',
+    'class="arch-field"',
+    'class="flagship-stage"',
   ]);
 });
 
-test("homepage recruiter scan order is hero -> CTAs -> selected work -> story bridge", async () => {
+test("homepage is three proof stages then one career bridge, with Loft OS first", async () => {
   const html = await readOutput("index.html");
   const main = await readHomeMain();
 
   assertOrder(main, [
     'id="hero-title"',
-    'class="hero-ctas"',
-    'class="proof-bridge-list"',
+    'class="arch-field"',
+    'class="flagship-stage"',
+    'id="flagship-title"',
+    'class="product-stage"',
+    'id="product-title"',
     'id="story-title"',
   ]);
 
-  // TSK-961 Phase 1 moved the interactive demo off HOME and into the Loft OS case
-  // study. HOME must not carry the relay surface again, or it re-competes with the
-  // recruiter story it was moved to protect.
+  // Audit repair C: the six-step governance strip is gone from HOME entirely. Governance
+  // stays contextual inside the Loft OS case study, where it is explained rather than
+  // merely displayed. Reintroducing it here must turn this red.
+  assert.doesNotMatch(main, /class="handoff|handoff-flow|Human-gated handoff/);
+  assert.doesNotMatch(main, /Request \+ Scope|Specialist work|Closeout follows the human decision/);
+
+  // The interactive demo stays on the case study, not HOME.
   assert.doesNotMatch(html, /id="relay-title"|class="relay-/);
 
-  // Locked HOME section title and copy.
-  assert.match(main, /<h2 id="proof-bridge-title">Selected work<\/h2>/);
-  assert.doesNotMatch(main, /Systems that were built, shipped, and used\./);
-  assert.match(main, /<p class="proof-bridge-kind">Flagship · Governed multi-agent workflow system<\/p>/);
-  assert.match(main, /<p class="proof-bridge-summary">Scoped work, human authority, independent review, and verified closeout\.<\/p>/);
-  assert.match(main, /<p class="proof-bridge-cue">Includes interactive agent workflow demo<span aria-hidden="true"> →<\/span><\/p>/);
-  assert.match(main, /<p class="proof-bridge-summary">A mobile workflow for evaluating resale finds with market evidence and human judgment\.<\/p>/);
+  // Loft OS is the flagship and leads; Resale Scanner Pro is the second stage.
+  const loft = main.indexOf('id="flagship-title"');
+  const rsp = main.indexOf('id="product-title"');
+  assert.ok(loft > -1 && rsp > -1 && loft < rsp, "Loft OS must lead Resale Scanner Pro");
+  assert.match(main.slice(loft, rsp), /Loft OS/);
+  assert.match(main.slice(rsp), /Resale Scanner Pro/);
+  assert.match(main, /<p class="eyebrow light-eyebrow">Flagship work<\/p>/);
+  // Only ONE surface may claim flagship. Scope the count to the rendered <main>: Next
+  // serialises the same copy into the RSC payload later in the file, so counting the
+  // whole document would measure the payload rather than the page.
+  const rendered = main.slice(0, main.indexOf("</main>"));
+  assert.equal((rendered.match(/Flagship work/g) ?? []).length, 1, "exactly one flagship claim on HOME");
 
-  // The HOME-only micro-signal list was retired; its concepts live in the case study.
-  assert.doesNotMatch(main, /class="proof-signals"/);
+  // Locked stage copy. The Proof Stage deliberately REDUCES copy: the explanatory
+  // paragraphs that briefly stood on each stage belong in the case studies, so their
+  // absence is pinned rather than left unguarded.
+  assert.match(main, /Governed multi-agent workflow system/);
+  assert.match(main, /Scoped work\. Independent review\. Verified closeout\./);
+  assert.match(main, /Working product\. In operating use\./);
+  assert.doesNotMatch(main, /class="stage-note"/);
+  assert.doesNotMatch(main, /Specialist agents do the work/);
+  assert.doesNotMatch(main, /A mobile workflow for evaluating resale finds/);
 
-  // Locked story bridge.
+  // The first project CTA lives inside the Loft stage.
+  const flagship = main.slice(main.indexOf('class="flagship-stage"'), main.indexOf('class="product-stage"'));
+  assert.match(flagship, /class="stage-cta"[^>]*href="\/work\/loft-os\/"|href="\/work\/loft-os\/"[^>]*class="stage-cta"/);
+
+  // BUY / MAYBE / PASS keeps its labels and marks. The per-verdict sentences were newly
+  // authored with no approved-copy authority behind them and must not be canonised here.
+  const verdictBlock = main.slice(main.indexOf('class="verdict-row"'), main.indexOf('class="product-evidence'));
+  for (const label of ["Buy", "Maybe", "Pass"]) assert.ok(verdictBlock.includes(`<b>${label}</b>`), `verdict label missing: ${label}`);
+  assert.equal((verdictBlock.match(/<svg/g) ?? []).length, 3, "each verdict keeps its mark");
+  assert.doesNotMatch(verdictBlock, /Clear value against the evidence|Needs more context before acting|Not worth the capital/);
+  assert.doesNotMatch(verdictBlock, /<p>/, "verdicts carry a label and a mark, not sentences");
+
+  // Locked career bridge and its exits.
   assert.match(main, /<h2 id="story-title">Operating reality → systems thinking<\/h2>/);
   assert.match(main, /I learned systems by running the operations they have to support—from kitchens and restaurant leadership to AI workflows and business systems\./);
-
-  // Loft OS is the flagship proof and leads; Resale Scanner Pro follows it.
-  const bridge = main.slice(main.indexOf('class="proof-bridge-list"'), main.indexOf('id="story-title"'));
-  const loftOs = bridge.indexOf('href="/work/loft-os/"');
-  const rsp = bridge.indexOf('href="/work/resale-scanner-pro/"');
-  assert.notEqual(loftOs, -1, "Loft OS must appear in the selected-proof bridge");
-  assert.notEqual(rsp, -1, "Resale Scanner Pro must appear in the selected-proof bridge");
-  assert.ok(loftOs < rsp, "Loft OS must lead the selected-proof bridge");
-
-  // The leading row must actually be labelled Loft OS: pinning link order alone
-  // would still pass if the rows kept their hrefs but swapped their identities.
-  assert.match(bridge.slice(loftOs, rsp), /<h3>Loft OS<\/h3>/);
-  assert.match(bridge.slice(rsp), /<h3>Resale Scanner Pro<\/h3>/);
-
-  // The retired card-heavy homepage layout must not return. "Selected work" is now
-  // the locked section title (TSK-961 Phase 1), so only the card markers are barred.
-  assert.doesNotMatch(html, /More proof|project-card/);
+  assert.match(main, /href="\/about\/"/);
+  assert.match(main, /href="\/work\/"/);
+  assert.match(main, /href="mailto:avergara13@me\.com"/);
 });
 
-test("Loft OS is marked as the flagship proof and Resale Scanner Pro is not", async () => {
-  const main = await readHomeMain();
-  const bridge = main.slice(main.indexOf('class="proof-bridge-list"'), main.indexOf('id="story-title"'));
+test("HOME ships no concept evidence and no unsupported identity metadata", async () => {
+  const html = await readOutput("index.html");
 
-  // The flagship distinction must be structural, not left to reading order alone:
-  // the two rows are otherwise identical markup, so CSS needs a hook it can rank on.
-  const rows = [...bridge.matchAll(/<a class="(proof-bridge-row[^"]*)" href="([^"]+)"/g)]
-    .map(([, cls, href]) => ({ cls, href }));
+  // The Canva concept carried invented RSP figures and a different contact identity.
+  // None of it is canonical, and none of it may ship.
+  for (const banned of ["Nike", "Air Max", "Market Size", "Confidence:", "Profit Potential", "Risk Level", "$110", "hello@angelvergara.com", "Austin"]) {
+    assert.ok(!html.includes(banned), `concept evidence must not ship: ${banned}`);
+  }
+  // The approved shorter concept headline is also not approved copy.
+  assert.doesNotMatch(html, /controlled systems\.<\/h1>/);
 
-  assert.equal(rows.length, 2, "the selected-proof bridge must render exactly two rows");
-  assert.equal(rows[0].href, "/work/loft-os/");
-  assert.equal(rows[1].href, "/work/resale-scanner-pro/");
-  assert.match(rows[0].cls, /\bis-flagship\b/, "Loft OS must carry the flagship marker");
-  assert.doesNotMatch(rows[1].cls, /\bis-flagship\b/, "only one row may be the flagship");
+  // Audit repair A: the Person schema claimed a jobTitle no held-title authority supports.
+  const layout = await readFile(new URL("app/layout.tsx", root), "utf8");
+  assert.doesNotMatch(layout, /jobTitle/);
+  assert.doesNotMatch(html, /jobTitle/);
+  // Positive control — the schema itself is still emitted and still names the person.
+  assert.match(html, /"@type":"Person"/);
+  assert.match(html, /"name":"Angel Vergara"/);
 
-  // Ordinals stay put.
-  assert.match(bridge, /<span class="proof-bridge-number">01<\/span>/);
-  assert.match(bridge, /<span class="proof-bridge-number">02<\/span>/);
+  // Audit repair D: a hard-coded lastModified asserted a precision the build cannot know.
+  const sitemapSource = await readFile(new URL("app/sitemap.ts", root), "utf8");
+  assert.doesNotMatch(sitemapSource, /lastModified/);
+  const sitemap = await readOutput("sitemap.xml");
+  assert.doesNotMatch(sitemap, /<lastmod>/i);
+  assert.match(sitemap, /https:\/\/avergara13\.github\.io\//);
+});
+
+test("the HOME architectural field is decorative, project-owned, and carries no meaning", async () => {
+  const html = await readOutput("index.html");
+  const source = await readFile(new URL("components/ArchitecturalField.tsx", root), "utf8");
+
+  // EA unlocked the asset only for an ORIGINAL vector composition. No external image
+  // dependency may back the hero, and the SVG must be authored in-repo.
+  const heroField = html.slice(html.indexOf('class="arch-field"'), html.indexOf("</section>", html.indexOf('class="arch-field"')));
+  assert.match(heroField, /<svg/, "the architectural field must be an inline SVG");
+  // url(#…) is an internal gradient reference; only EXTERNAL or raster sources are a
+  // licence dependency, so match those rather than every url( token.
+  assert.doesNotMatch(heroField, /<img|background-image|url\((?!#)/, "the hero must not depend on a raster or external image");
+  assert.match(heroField, /url\(#af-/, "control: the composition does use its own inline gradients");
+
+  // Decorative: hidden from assistive tech, and never given meaning-bearing alt text.
+  assert.match(heroField, /aria-hidden="true"/);
+  assert.doesNotMatch(heroField, /<title>|aria-label=/);
+
+  // Fixture sanity: the composition is substantial, not an empty placeholder.
+  assert.ok((source.match(/<polygon/g) ?? []).length >= 8, "the abstraction should be a real composition");
+  assert.match(source, /decorative/i);
+
+  // The Loft lattice is a desktop/tablet explanatory visual only. On phones the locked
+  // Loft stage stays compact — mark, title, lede, one CTA — so the lattice is hidden
+  // rather than shrunk. Pinned against the phone media block specifically.
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+  const phoneBlocks = mediaSegments(css).filter((seg) => seg.max <= 620).map((seg) => seg.body).join("\n");
+  assert.ok(phoneBlocks.length > 0, "media scan must find the phone block");
+  assert.match(phoneBlocks, /\.flagship-visual\s*\{[^}]*display:\s*none/, "the lattice must be hidden at phone widths");
+  // Control: it is still present for desktop/tablet.
+  assert.match(css, /\.flagship-visual\s*\{\s*position:relative/, "the lattice remains on wider viewports");
+
+  // And the compact mobile Loft stage keeps its four locked elements.
+  const loftHtml = html.slice(html.indexOf('class="flagship-stage"'), html.indexOf('class="product-stage"'));
+  assert.match(loftHtml, /class="stage-mark"/);
+  assert.match(loftHtml, /id="flagship-title"/);
+  assert.match(loftHtml, /Scoped work\. Independent review\. Verified closeout\./);
+  assert.match(loftHtml, /class="stage-cta"/);
+});
+
+test("the public demo is a curated chooser, never a freeform input", async () => {
+  const loft = await readOutput("work/loft-os/index.html");
+  const component = await readFile(new URL("components/DecisionRelay.tsx", root), "utf8");
+
+  // Audit repair B: an editable textarea promised that anything typed would be processed.
+  // It never was. The capability must be obvious BEFORE the run, not refused after it.
+  // Scope the negative assertions to the relay section. Run against the whole page they
+  // would fail on any unrelated future form field, which says nothing about whether the
+  // demo is still chooser-only — a brittle test that fails for the wrong reason.
+  const relayAt = loft.indexOf('id="relay-title"');
+  assert.notEqual(relayAt, -1, "fixture sanity: the relay section must be present to scope these checks");
+  const relay = loft.slice(relayAt, loft.indexOf("</section>", relayAt));
+  assert.doesNotMatch(relay, /<textarea/, "the public demo must not offer a freeform text field");
+  assert.doesNotMatch(component, /<textarea/);
+  assert.doesNotMatch(loft, /Dump everything here/);
+
+  // The chooser comes first, the loaded example is read-only, and Run is unavailable
+  // until an example is chosen.
+  assert.match(loft, /Choose a curated example/);
+  assert.match(loft, /class="relay-example"/);
+  assert.match(loft, /No example selected yet/);
+  assert.match(component, /disabled=\{running \|\| !fixtureId\}/);
+
+  // Refinements are presets only — no free-text field implying open-ended replanning.
+  // Ban FREEFORM TEXT entry, not every <input>: a hidden or checkbox input says nothing
+  // about whether the demo still invites typing, and banning all of them would fail for a
+  // reason unrelated to the property this test names.
+  const TEXTLIKE = new Set(["text", "search", "email", "url", "tel", "password", "number", "textarea"]);
+  const textInputs = [...relay.matchAll(/<input\b[^>]*>/g)].filter((m) => {
+    const type = m[0].match(/\btype="([^"]*)"/);
+    return !type || TEXTLIKE.has(type[1].toLowerCase()); // an omitted type defaults to text
+  });
+  assert.deepEqual(textInputs.map((m) => m[0]), [], "the demo must expose no freeform text entry");
+  assert.match(component, /These are the refinements this example supports/);
+
+  // Both button clusters must be grouped and named. The presets replaced a labelled text
+  // input, so without this they reach assistive tech as an unlabelled set of toggles.
+  // The chooser is server-rendered so it is checked in the OUTPUT; the refinements only
+  // mount after a run, so they are checked in the SOURCE — asserting them against the
+  // rendered HTML would fail for the wrong reason and teach nothing.
+  assert.match(loft, /role="group" aria-label="Curated examples"/);
+  assert.match(component, /role="group" aria-label="Available refinements"/);
+  assert.doesNotMatch(loft, /class="relay-refinement"/, "fixture sanity: the refinement block is not server-rendered, so the source check above is the right layer");
+  assert.match(loft, /Curated demonstration · deterministic fixture · not a live autonomous production run\./);
+});
+
+// Split a stylesheet into its top-level segment plus each `@media (max-width:N)` block.
+// A regex cannot do this reliably — the previous `(?:[^{}]*\\{[^{}]*\\})*` form matched
+// none of this file's media blocks, which silently made the prominence check read only
+// base rules. Scan braces instead, and assert the scan actually found blocks.
+const mediaSegments = (css) => {
+  const segments = [{ max: Infinity, body: "" }];
+  let i = 0, base = "";
+  while (i < css.length) {
+    const at = css.indexOf("@media", i);
+    if (at === -1) { base += css.slice(i); break; }
+    base += css.slice(i, at);
+    const open = css.indexOf("{", at);
+    let depth = 0, end = open;
+    for (; end < css.length; end++) {
+      if (css[end] === "{") depth++;
+      else if (css[end] === "}") { depth--; if (depth === 0) { end++; break; } }
+    }
+    const condition = css.slice(at, open);
+    const maxWidth = condition.match(/max-width:\s*(\d+)px/);
+    // Only a PLAIN `(max-width: N px)` block participates. The earlier form skipped just
+    // `min-width`, so `screen and (max-width: …)` would have been folded in despite the
+    // comment claiming compound conditions were excluded. Match the whole condition.
+    if (maxWidth && /^@media\s*\(\s*max-width:\s*\d+px\s*\)\s*$/.test(condition.trim())) {
+      segments.push({ max: Number.parseInt(maxWidth[1], 10), body: css.slice(open + 1, end - 1) });
+    }
+    i = end;
+  }
+  segments[0].body = base;
+  return segments;
+};
+
+test("no stylesheet rule has lost a selector separator", async () => {
+  // This pass broke a selector list twice by editing shared rules: once leaving a dangling
+  // continuation with no body, and once dropping the comma after `.resume-card`, which
+  // silently turned the list into a descendant selector and stripped the Loft OS demo
+  // panel of its surface styling. Nothing in the suite could see either — both were caught
+  // by human/agent review. CSS fails silently by design, so the structure is pinned here.
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+
+  // Strip comments so prose inside them cannot be mistaken for a selector.
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+  const offenders = [];
+  let cursor = 0;
+  while (true) {
+    const brace = clean.indexOf("{", cursor);
+    if (brace === -1) break;
+    // A selector starts after the previous rule's brace OR after a statement's semicolon
+    // (`@import "…";`), otherwise that statement is read as part of the next selector.
+    const prevEnd = Math.max(
+      clean.lastIndexOf("}", brace),
+      clean.lastIndexOf("{", brace - 1),
+      clean.lastIndexOf(";", brace),
+    );
+    const selector = clean.slice(prevEnd + 1, brace);
+    cursor = brace + 1;
+    // Skip at-rule preludes and keyframe steps. Keyframe selectors are percentages OR the
+    // keywords `from` / `to`; matching only digits would read a future `from {` as a
+    // selector and report a phantom missing comma.
+    if (/@media|@supports|@keyframes|@font-face/.test(selector)) continue;
+    if (/^\s*(?:-?\d|from\b|to\b)/.test(selector.trim())) continue;
+    const lines = selector.split("\n").map((l) => l.trim()).filter(Boolean);
+    // In this file's convention a multi-line selector list is comma-separated, so every
+    // line but the last must end with a comma. An interior line that does not is a lost
+    // separator, which silently becomes a descendant combinator.
+    for (let i = 0; i < lines.length - 1; i++) {
+      if (!lines[i].endsWith(",")) offenders.push(`${lines[i]} ⟶ ${lines[i + 1]}`);
+    }
+  }
+
+  assert.deepEqual(offenders, [], "a multi-line selector list is missing a separator (this silently becomes a descendant selector)");
+
+  // Fixture sanity: the scan must actually be looking at multi-line selector lists.
+  const multiLine = clean.split("\n").filter((l) => l.trim().endsWith(",") && !l.includes("{")).length;
+  assert.ok(multiLine >= 5, `expected several multi-line selector lists to scan, found ${multiLine}`);
+
+  // Controls: the scan must tolerate keyframe keywords AND still catch a real omission.
+  const withKeyframes = `${clean}\n@keyframes probe { from { opacity:0; } to { opacity:1; } }`;
+  const scanFor = (text) => {
+    const found = [];
+    let at = 0;
+    while (true) {
+      const brace = text.indexOf("{", at);
+      if (brace === -1) break;
+      const prev = Math.max(text.lastIndexOf("}", brace), text.lastIndexOf("{", brace - 1), text.lastIndexOf(";", brace));
+      const sel = text.slice(prev + 1, brace);
+      at = brace + 1;
+      if (/@media|@supports|@keyframes|@font-face/.test(sel)) continue;
+      if (/^\s*(?:-?\d|from\b|to\b)/.test(sel.trim())) continue;
+      const ls = sel.split("\n").map((l) => l.trim()).filter(Boolean);
+      for (let i = 0; i < ls.length - 1; i++) if (!ls[i].endsWith(",")) found.push(ls[i]);
+    }
+    return found;
+  };
+  assert.deepEqual(scanFor(withKeyframes), [], "a keyframes block with from/to must not be read as selectors");
+  assert.ok(scanFor(`${clean}\n.a,\n.b\n.c { color:red; }`).length > 0, "control: the scan must still catch a real missing separator");
+
+  // And braces must balance — the other way an edit to a shared rule fails silently.
+  assert.equal((clean.match(/\{/g) ?? []).length, (clean.match(/\}/g) ?? []).length, "unbalanced braces in the stylesheet");
 });
 
 test("homepage visual prominence follows the intended ranking at every width", async () => {
   const css = await readFile(new URL("app/globals.css", root), "utf8");
 
-  // Guards the regression that shipped: .proof-bridge-head h2 used clamp() and floored at
-  // 30.4px below ~950px wide, while .story-bridge h2 was a FIXED 2.35rem/2rem. So at
-  // 768/430/390 the trailing narrative card out-ranked the flagship proof section even
-  // though the DOM order was correct. Sizes that scale with vw must be compared AT THE SAME
-  // WIDTH — comparing one clamp's max against another's min mixes two different viewports.
-  const declared = (selector) => {
-    const rule = new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`, "g");
-    const decls = [...css.matchAll(rule)].map((m) => m[1]).filter((b) => /font-size\s*:/.test(b));
-    assert.equal(decls.length, 1, `${selector} must declare font-size exactly once — a second override can silently re-invert the hierarchy`);
-    const value = decls[0].match(/font-size\s*:\s*([^;]+)/)[1].trim();
+  // Sizes that scale with vw must be compared AT THE SAME WIDTH, and the comparison has
+  // to respect breakpoint overrides: the lock floors the stage headings on phones
+  // precisely because a fluid h1 and a fixed-floor h2 converged at 390 and inverted the
+  // page. Parsing only the base rule would have declared that inversion safe.
+  const segments = mediaSegments(css);
+  // Harness control: if the scan finds no phone block the comparison below silently
+  // degrades to base-rule-only, which is exactly how the 390px inversion slipped through.
+  assert.ok(segments.some((seg) => seg.max <= 620), "media scan must find the phone block");
+
+  const sizeAt = (selector, width) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let value = null;
+    for (const seg of segments) {
+      if (width > seg.max) continue;
+      for (const rule of seg.body.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, "g"))) {
+        const found = rule[1].match(/font-size\s*:\s*([^;]+)/);
+        if (found) value = found[1].trim();
+      }
+    }
+    assert.ok(value, `${selector} declares no font-size applicable at ${width}px`);
     const clamped = value.match(/^clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)rem\s*\)$/);
     if (clamped) {
       const [, lo, vw, hi] = clamped.map(Number.parseFloat);
-      return (width) => Math.min(Math.max(lo * 16, (vw / 100) * width), hi * 16);
+      return Math.min(Math.max(lo * 16, (vw / 100) * width), hi * 16);
     }
     const rem = value.match(/^([\d.]+)rem$/);
     assert.ok(rem, `${selector}: unsupported font-size form ${value}`);
-    return () => parseFloat(rem[1]) * 16;
+    return Number.parseFloat(rem[1]) * 16;
   };
 
-  const proofHead = declared(".proof-bridge-head h2");
-  const flagship = declared(".proof-bridge-row.is-flagship h3");
-  const row = declared(".proof-bridge-row h3");
-  const story = declared(".story-bridge h2");
-
-  // A rank gap has to be SEEN, not just satisfied numerically: 30.4px over 28px is a
-  // 1.09x difference that reads as "same size" and leaves the hierarchy ambiguous.
+  // A rank gap has to be SEEN, not merely satisfied numerically.
   const STEP = 1.12;
-  const outranks = (bigger, smaller) => bigger >= smaller * STEP;
+  // Sampling only the five acceptance widths left the 621-767 band unchecked, and that is
+  // exactly where a breakpoint boundary put the h1 within 2% of the flagship title. Sample
+  // just inside every boundary and across the gaps between the acceptance widths.
+  for (const width of [1440, 1200, 1024, 961, 960, 900, 800, 768, 720, 700, 680, 640, 621, 620, 600, 520, 470, 430, 414, 390, 360]) {
+    const h1 = sizeAt(".proof-hero h1", width);
+    const flagship = sizeAt(".flagship-copy h2", width);
+    const product = sizeAt(".stage-head h2", width);
+    const bridge = sizeAt(".home-bridge h2", width);
 
-  for (const width of [1440, 768, 430, 390]) {
-    const [ph, fl, rw, st] = [proofHead(width), flagship(width), row(width), story(width)];
-    assert.ok(outranks(ph, st), `at ${width}px the selected-proof heading (${ph}px) must visibly out-rank the trailing story section (${st}px)`);
-    assert.ok(outranks(ph, fl), `at ${width}px the section heading (${ph}px) must visibly out-rank the flagship row title (${fl}px)`);
-    assert.ok(outranks(fl, rw), `at ${width}px the flagship Loft OS row (${fl}px) must visibly out-rank Resale Scanner Pro (${rw}px)`);
+    assert.ok(h1 >= flagship * STEP, `at ${width}px the value proposition (${h1}px) must visibly out-rank the flagship stage (${flagship}px)`);
+    assert.ok(flagship >= product, `at ${width}px the flagship stage (${flagship}px) must not be out-ranked by the product stage (${product}px)`);
+    assert.ok(product >= bridge * STEP, `at ${width}px the product stage (${product}px) must visibly out-rank the career bridge (${bridge}px)`);
+  }
+
+  // Control: the phone override must actually be the value used at 390. Reading the base
+  // rule there would report 33.6px for the flagship heading instead of the 27.2px the
+  // override sets — the precise blindness that let the inversion look safe.
+  assert.ok(sizeAt(".flagship-copy h2", 390) < 30, "the 390px flagship size must come from the phone override, not the base rule");
+  assert.ok(sizeAt(".flagship-copy h2", 1440) > 40, "the desktop flagship size must come from the base rule");
+
+  // Continuity across every breakpoint boundary. A band can satisfy the ranking on both
+  // sides and still drop the heading off a cliff at the boundary itself: at 621 the h1
+  // fell 41.6 -> 34.4px in a single pixel because the wider band floored LOWER than the
+  // narrower one. Ranking checks alone cannot see that.
+  // Guarding only the h1 left the same collision live on two other headings: the product
+  // stage and the career bridge each got SMALLER as the viewport grew past 620, because
+  // their phone caps exceeded the wider band's floor. Every heading is checked.
+  for (const [below, above] of [[620, 621], [960, 961]]) {
+    for (const selector of [".proof-hero h1", ".flagship-copy h2", ".stage-head h2", ".home-bridge h2"]) {
+      const before = sizeAt(selector, below);
+      const after = sizeAt(selector, above);
+      const drop = (before - after) / before;
+      assert.ok(drop <= 0.05, `${selector} drops ${(drop * 100).toFixed(1)}% across ${below}->${above}px; no heading may step DOWN as the viewport grows`);
+    }
   }
 });
 
@@ -204,7 +453,11 @@ test("Agent Workflow Demo is a bounded curated demo with visible three-agent and
   assert.match(contract, /Planning Agent/);
   assert.match(contract, /Personal Assistant Agent/);
   assert.match(contract, /Refine the plan/);
-  assert.match(contract, /Custom input is not processed in this public demo/);
+  // The demo used to warn that custom input is not processed. With the chooser-only
+  // surface there is nothing to type, so that warning now contradicts the panel's own
+  // copy and its branch is unreachable. Pin the INVARIANT instead of the dead message.
+  assert.doesNotMatch(contract, /Custom input is not processed/);
+  assert.match(component, /if \(!fixtureId\) return;/, "runDemo must still refuse without a chosen fixture");
   assert.match(contract, /arbitrary input is never presented as processed/i);
   assert.doesNotMatch(contract, /Mess → Mission|Mess to Mission/i);
 });
@@ -542,8 +795,12 @@ test("metadata and footer language align with applied AI workflows positioning",
   assert.match(resume, /og-resume\.png/);
 
   const layoutSource = await readFile(new URL("app/layout.tsx", root), "utf8");
-  assert.match(layoutSource, /Applied AI Workflow and Business Systems Implementation/);
+  // TSK-970 audit repair A retired the Person schema's jobTitle: no held-title authority
+  // supported it. The positioning it used to carry lives in the page metadata instead,
+  // which is asserted above, so this now pins the ABSENCE.
+  assert.doesNotMatch(layoutSource, /jobTitle/);
   assert.doesNotMatch(layoutSource, /Hospitality Operations Leader & Systems Builder/);
+  assert.match(layoutSource, /"@type": "Person"/);
 });
 
 test("claim-boundary and privacy scan passes across recruiter-facing routes", async () => {

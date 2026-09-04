@@ -75,6 +75,10 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
 .wordmark { font-family:var(--font-playfair),Georgia,serif; font-size:1.05rem; text-decoration:none; }
 .navlinks { display:flex; align-items:center; gap:22px; font-size:.84rem; font-weight:780; }
 .navlinks>a:not(.button) { text-decoration:none; }
+/* TSK-970: shared target sizing. These links were 19-27px tall, under the 44px the
+   acceptance widths require. Height only — the markup and link set are unchanged. */
+.navlinks>a,.wordmark { display:inline-flex; align-items:center; min-height:44px; }
+.footer-links a { display:inline-flex; align-items:center; min-height:44px; }
 .navlinks>a:hover,.navlinks>a:focus-visible { color:var(--cobalt-ink); }
 .navlinks>a[aria-current="page"] { color:var(--cobalt-ink); text-decoration:underline; text-underline-offset:6px; text-decoration-thickness:2px; }
 .menu-button { display:none; width:44px; height:44px; place-items:center; border:1px solid var(--ink); background:var(--white); color:var(--ink); cursor:pointer; }
@@ -551,20 +555,29 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .footer-links { display:flex; gap:26px; text-transform:uppercase; letter-spacing:.08em; }
 .footer-links a { color:var(--ink); text-underline-offset:4px; }
 
-.editorial-hero { padding:12px 0 0; }
-.hero-statement { max-width:960px; padding:0 0 52px; }
-.hero-statement h1 { max-width:17ch; font-size:clamp(2.3rem,3.9vw,3.05rem); line-height:1.02; letter-spacing:-.035em; margin-bottom:0; }
-.hero-statement>p { max-width:710px; margin:32px 0 0; color:var(--muted); font-size:1.15rem; }
-.hero-role-family { margin:14px 0 0!important; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.72rem!important; font-weight:500; letter-spacing:.11em; text-transform:uppercase; }
-.hero-value { max-width:640px!important; margin:30px 0 0!important; color:var(--ink); font-family:var(--font-playfair),Georgia,"Times New Roman",serif; font-size:clamp(1.45rem,2.5vw,2.05rem)!important; font-weight:500; line-height:1.24; letter-spacing:-.018em; }
-.hero-ctas { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
-.hero-statement>a,.story-bridge>a,.lab-link { display:inline-flex; min-height:44px; align-items:center; gap:8px; margin-top:34px; font-size:1.08rem; font-weight:700; text-underline-offset:5px; }
-.editorial-handoff { padding:21px 0 19px; border-top:1px solid var(--line); }
-.editorial-handoff .handoff-flow { display:grid; grid-template-columns:repeat(6,max-content); justify-content:space-between; gap:20px; border:0; background:transparent; margin:0; }
-.editorial-handoff .handoff-node { min-height:0; padding:0; display:flex; gap:7px; align-items:baseline; background:transparent; color:var(--muted); outline:0; }
-.editorial-handoff .handoff-node span,.editorial-handoff .handoff-node b { display:inline; margin:0; color:inherit; font-family:var(--font-geist-mono),monospace; font-size:.68rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; }
-.editorial-handoff .handoff-decision,.editorial-handoff .handoff-decision span { color:var(--copper); }
-.editorial-handoff .handoff-recovery,.editorial-handoff .handoff-note,.editorial-handoff .handoff-public-label { display:none; }
+/* ── TSK-970 HOME Proof Stage ────────────────────────────────────────────────
+   Three deliberate stages (opening / flagship / product) plus one career bridge.
+   The opening is asymmetric on purpose: copy holds the left reading column while
+   the decorative architectural field takes the right, cropped by its container so
+   each breakpoint can frame it independently. */
+
+.lab-link { display:inline-flex; min-height:44px; align-items:center; gap:8px; margin-top:34px; font-size:1.08rem; font-weight:700; text-underline-offset:5px; }
+
+.proof-hero { position:relative; overflow:hidden; padding:clamp(30px,5vw,58px) 0 clamp(52px,7vw,96px); }
+.proof-hero-grid { position:relative; z-index:1; }
+.proof-hero-copy { max-width:min(100%,660px); }
+.hero-role-family { margin:0 0 22px!important; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.72rem!important; font-weight:500; letter-spacing:.11em; text-transform:uppercase; }
+.proof-hero h1 { max-width:15ch; margin-bottom:0; font-size:clamp(2.55rem,5.2vw,4.35rem); line-height:.99; letter-spacing:-.035em; }
+
+/* Decorative field. Crop is done here, not in the SVG, so the framing can differ
+   per breakpoint: mass upper-right on desktop, cropped lower-right field on phones. */
+.arch-field { position:absolute; z-index:0; inset-block:0; right:0; width:54%; overflow:hidden; pointer-events:none;
+  /* Feathered inner edge: without it the art's deep base meets the warm canvas as a
+     hard vertical seam mid-hero. Fading it in lets the field read as one surface and
+     lets the geometry extend toward the Loft OS transition rather than butting into it. */
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 22%);
+  mask-image:linear-gradient(to right,transparent 0,#000 22%); }
+.arch-field .arch-art { position:absolute; top:-16%; right:-8%; width:auto; height:142%; }
 
 .relay-section { padding:20px 0 76px; }
 .relay-header { max-width:680px; margin-bottom:26px; }
@@ -575,14 +588,27 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-header>p { margin:6px 0 0; color:var(--muted); font-size:1.04rem; }
 .relay-layout { display:grid; grid-template-columns:320px minmax(0,1fr); gap:26px; align-items:start; }
 .relay-input-panel { padding:24px; border:1px solid var(--line); background:var(--white); }
-.relay-input-panel textarea { width:100%; min-height:150px; resize:vertical; margin:17px 0 14px; padding:14px; border:1px solid var(--line); border-radius:var(--r-control); background:white; color:var(--ink); font:inherit; font-size:.95rem; line-height:1.35; }
-.relay-input-panel textarea:focus-visible,.relay-refinement input:focus-visible { outline:3px solid var(--focus); outline-offset:2px; border-color:var(--ink); }
+/* TSK-970: the read-only curated example replaces the editable textarea. It is
+   deliberately styled as a quoted panel, not a field, so nothing invites typing. */
+.relay-example { margin:14px 0; padding:14px; border:1px solid var(--line); border-left:3px solid var(--copper); border-radius:var(--r-control); background:var(--paper); font-size:.92rem; line-height:1.4; }
+.relay-example p { margin:0; color:var(--ink); }
+.relay-example .relay-example-empty { color:var(--muted); }
+.relay-example:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+.relay-samples button[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:#fff; }
 .relay-run { width:100%; min-height:46px; border:1px solid var(--cobalt); border-radius:var(--r-control); background:var(--cobalt); color:#fff; font:inherit; font-weight:800; cursor:pointer; box-shadow:0 1px 2px rgba(36,102,253,.18); }
 .relay-run:hover:not(:disabled) { background:var(--cobalt-ink); border-color:var(--cobalt-ink); box-shadow:0 4px 16px rgba(36,102,253,.28); }
-.relay-run:disabled,.relay-samples button:disabled,.relay-refinement button:disabled { opacity:.58; cursor:wait; }
+/* Run is disabled in two different situations and they must not look alike: BLOCKED
+   (no example chosen yet) reads as not-allowed, BUSY (a run in flight) as wait. Before
+   this, the idle button showed a wait cursor before anything had started. */
+.relay-run:disabled,.relay-samples button:disabled,.relay-refinement button:disabled { opacity:.58; cursor:not-allowed; }
+.relay-run[aria-busy="true"]:disabled { cursor:wait; }
 .relay-samples { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .relay-samples button { min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--r-control); background:transparent; color:var(--ink); font-family:var(--font-geist-mono),monospace; font-size:.67rem; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
 .relay-samples button:hover:not(:disabled) { border-color:var(--ink); background:var(--paper); }
+/* The pressed chip must survive hover: the rule above is more specific, so without this it
+   swaps the dark fill for --paper while the white label stays, making the SELECTED item
+   the one you cannot read. */
+.relay-samples button[aria-pressed="true"]:hover:not(:disabled) { background:var(--ink); color:#fff; }
 .relay-privacy { margin:16px 0 0; color:var(--muted); font-size:.72rem; }
 .relay-warning { margin:0 0 12px; padding:10px; border-left:3px solid var(--copper); background:rgba(180,83,9,.07); color:var(--copper); font-size:.76rem; }
 .relay-output { min-width:0; }
@@ -623,36 +649,116 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-human b { color:var(--copper); font-family:var(--font-geist-mono),monospace; font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; }
 .relay-human span { font-size:.82rem; }
 .relay-refinement { padding-top:26px; }
-.relay-refinement>label { font-family:var(--font-geist-mono),monospace; font-size:.7rem; font-weight:800; text-transform:uppercase; }
 .relay-refinement>p { margin:4px 0 12px; color:var(--muted); font-size:.78rem; }
-.relay-refinement>div:first-of-type { display:grid; grid-template-columns:1fr auto; gap:8px; }
-.relay-refinement input { min-height:44px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--r-control); background:white; color:var(--ink); font:inherit; }
-.relay-refinement>div:first-of-type button { min-height:44px; padding:9px 14px; border:1px solid var(--ink); border-radius:var(--r-control); background:var(--ink); color:white; font:inherit; font-weight:800; cursor:pointer; }
 .relay-reset { min-height:44px; margin-top:20px; padding:9px 0; border:0; border-bottom:1px solid currentColor; background:transparent; color:var(--muted); font:inherit; font-size:.75rem; cursor:pointer; }
 .relay-governance { margin:22px 0 0; padding-top:12px; border-top:1px dashed var(--line); color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.65rem; letter-spacing:.04em; text-transform:uppercase; }
 .relay-section button:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
 
-.proof-bridge { padding:8px 0 84px; }
-.proof-bridge-head { max-width:760px; margin-bottom:34px; }
-.proof-bridge-head h2 { margin:10px 0 0; font-size:clamp(2rem,3.2vw,2.6rem); }
-.proof-bridge-list { border-top:1px solid var(--line); }
-.proof-bridge-row { display:grid; grid-template-columns:52px 1fr 32px; gap:28px; align-items:center; padding:30px 0; border-bottom:1px solid var(--line); text-decoration:none; }
-.proof-bridge-number { align-self:start; color:var(--copper); font-family:var(--font-geist-mono),monospace; font-size:.73rem; }
-.proof-bridge-row h3 { margin:0; font-family:var(--font-playfair),Georgia,"Times New Roman",serif; font-size:clamp(1.45rem,2.05vw,1.85rem); font-weight:500; }
-.proof-bridge-row.is-flagship { padding:36px 0 32px; }
-.proof-bridge-row.is-flagship h3 { font-size:clamp(1.75rem,2.5vw,2.25rem); }
-.proof-bridge-row.is-flagship .proof-bridge-kind { color:var(--copper); }
-.proof-bridge-kind { margin:10px 0 0; color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.68rem; letter-spacing:.05em; text-transform:uppercase; }
-.proof-bridge-summary { margin:12px 0 0; max-width:640px; color:var(--muted); font-size:.95rem; }
-.proof-bridge-cue { margin:14px 0 0; color:var(--cobalt-ink); font-family:var(--font-geist-mono),monospace; font-size:.68rem; letter-spacing:.05em; text-transform:uppercase; }
-.proof-bridge-row.is-flagship .proof-bridge-cue { color:var(--cobalt-on-dark); }
-.proof-bridge-arrow { color:var(--muted); font-size:1.3rem; transition:transform .18s ease,color .18s ease; }
-.proof-bridge-row:hover .proof-bridge-arrow,.proof-bridge-row:focus-visible .proof-bridge-arrow { color:var(--cobalt-ink); transform:translateX(4px); }
-.proof-bridge>.lab-link { margin-top:30px; }
+/* Shared stage primitives — one vocabulary across the flagship and product stages. */
+.stage-sub { display:block; margin-top:8px; font-size:.52em; line-height:1.16; letter-spacing:-.01em; }
+.stage-lede { margin:18px 0 0; font-family:var(--font-geist-mono),monospace; font-size:.79rem; letter-spacing:.055em; text-transform:uppercase; }
+.stage-cta { display:inline-flex; min-height:46px; align-items:center; justify-content:center; gap:12px; margin-top:30px; padding:11px 22px; border:1px solid var(--copper-on-dark); border-radius:var(--r-control); color:var(--copper-on-dark); font-family:var(--font-geist-mono),monospace; font-size:.75rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; transition:background .18s ease,color .18s ease,transform .18s ease; }
+.stage-cta:hover { background:var(--copper-on-dark); color:var(--navy-deep); transform:translateY(-2px); }
+.stage-cta.is-ink { border-color:var(--copper); color:var(--copper); }
+.stage-cta.is-ink:hover { background:var(--copper); color:#fff; }
 
-.story-bridge { margin-bottom:90px; padding:62px; border:1px solid var(--line); background:var(--white); }
-.story-bridge h2 { margin-bottom:18px; font-size:clamp(1.5rem,2.4vw,1.9rem); }
-.story-bridge p { max-width:780px; color:var(--muted); font-size:1rem; }
+/* Flagship stage — the first full-width dark proof interruption. */
+.flagship-stage { padding:clamp(54px,7vw,94px) 0; background:var(--navy-deep); color:var(--on-dark); --focus:#ffffff; }
+.flagship-grid { display:grid; grid-template-columns:1.06fr .94fr; gap:clamp(34px,5vw,68px); align-items:center; }
+.flagship-copy h2 { margin:14px 0 0; font-size:clamp(2.1rem,3.9vw,3.3rem); line-height:1.03; letter-spacing:-.028em; }
+.flagship-copy .stage-sub { color:var(--on-dark-muted); }
+.flagship-copy .stage-lede { color:var(--copper-on-dark); }
+.flagship-visual { position:relative; min-width:0; }
+.flagship-visual .lattice-art { display:block; width:100%; height:auto; }
+.stage-mark { display:block; width:56px; height:auto; margin-bottom:20px; border-radius:var(--r-card); }
+
+/* Product stage — lighter, product-led, and evidence-backed. */
+.product-stage { padding:clamp(54px,7vw,90px) 0; background:var(--surface); }
+.stage-head { max-width:56ch; }
+.stage-head h2 { margin:14px 0 0; font-size:clamp(1.9rem,3.4vw,2.9rem); line-height:1.05; letter-spacing:-.025em; }
+.stage-head .stage-lede { color:var(--copper); }
+.verdict-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:clamp(30px,4vw,44px) 0 0; padding:0; list-style:none; border-block:1px solid var(--line); }
+.verdict-row li { padding:26px 24px; text-align:center; border-left:1px solid var(--line); }
+.verdict-row li:first-child { border-left:0; padding-left:0; }
+.verdict-row li:last-child { padding-right:0; }
+.verdict-icon { display:block; color:var(--copper); }
+.verdict-mark { width:44px; height:44px; margin-inline:auto; }
+.verdict-row b { display:block; margin:14px 0 0; font-family:var(--font-geist-mono),monospace; font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+.product-evidence { margin-top:clamp(30px,4vw,42px); }
+
+/* Career bridge — one compact operating-reality note and the recruiter exits. */
+.home-bridge { display:grid; grid-template-columns:1.25fr .75fr; gap:clamp(24px,4vw,56px); align-items:start; margin-bottom:clamp(58px,7vw,90px); padding-top:clamp(44px,5vw,64px); border-top:1px solid var(--line); }
+.home-bridge h2 { margin-bottom:16px; font-size:clamp(1.5rem,2.4vw,1.95rem); }
+.home-bridge p { max-width:62ch; color:var(--muted); font-size:1rem; }
+.home-exits { display:grid; gap:2px; }
+.home-exits a { display:flex; min-height:52px; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid var(--line); font-size:1rem; font-weight:700; text-decoration:none; }
+.home-exits a:first-child { border-top:1px solid var(--line); }
+.home-exits a:hover { color:var(--cobalt-ink); }
+
+/* ── HOME Proof Stage — responsive framing ──────────────────────────────────
+   These MUST sit after the HOME base rules above: at equal specificity the later
+   rule wins, and when they were folded into the earlier shared media blocks the
+   base .arch-field rule overrode them and the art covered the headline at 390. */
+@media (max-width:960px) {
+  /* Crop harder rather than shrink proportionally, so the counterweight stays
+     legible without squeezing the reading column. */
+  .proof-hero h1 { max-width:13ch; font-size:clamp(2.6rem,5.2vw,4.35rem); }
+  .proof-hero-copy { max-width:min(100%,52%); }
+  .arch-field { width:48%; }
+  .arch-field .arch-art { top:-8%; right:-22%; height:128%; }
+  .flagship-grid,.home-bridge { grid-template-columns:1fr; }
+  .flagship-visual { max-width:520px; }
+  .stage-mark { width:64px; }
+}
+
+@media (max-width:620px) {
+  /* Deliberate recomposition, not a shrunk desktop: the art stops being a side
+     panel and becomes a cropped field BELOW the headline, handing off into the
+     Loft OS dark stage exactly as the approved mobile reference does. */
+  .proof-hero { padding-bottom:0; }
+  .proof-hero-copy { max-width:none; }
+  /* A fluid h1 and a fixed-floor h2 converge: at 390 the flagship heading (33.6px)
+     had overtaken the page h1 (32.8px), inverting the whole page's hierarchy. Both are
+     pinned here so the step stays perceptible at every phone width. */
+  /* The vw term grew the headline in lockstep with the column, so the line-fill stayed
+     pinned near 100% instead of relaxing: at 430 the longest line left only 3px of right
+     slack and read edge-to-edge. 390 was fine only because the rem floor took over there.
+     A slower vw coefficient lets the column outpace the type, restoring 390's breathing
+     room across the rest of the phone band. 390 itself is unchanged — still on the floor. */
+  .proof-hero h1 { max-width:none; font-size:clamp(2.15rem,7.6vw,2.6rem); line-height:1.03; }
+  .flagship-copy h2 { font-size:clamp(1.7rem,6.6vw,2.1rem); }
+  .stage-head h2 { font-size:clamp(1.6rem,6.2vw,1.9rem); }
+  .home-bridge h2 { font-size:clamp(1.25rem,5vw,1.5rem); }
+  .hero-role-family { margin-bottom:16px!important; }
+  /* Right-biased cropped field. The offset is a transform, not `top`/`bottom`: a
+     percentage transform resolves against the ART's own height, so the window lands
+     on the cantilever, its copper soffit and the recess regardless of viewport width.
+     Anchoring by `bottom` framed the navy base instead and lost the architecture. */
+  .arch-field { position:relative; inset:auto; right:auto; width:82%; margin-left:auto; height:clamp(178px,50vw,232px); margin-top:26px;
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 14%);
+    mask-image:linear-gradient(to right,transparent 0,#000 14%); }
+  .arch-field .arch-art { top:0; right:-16%; width:150%; height:auto; transform:translateY(-19%); }
+  .verdict-row li { padding:20px 8px; }
+  .verdict-row b { font-size:.7rem; letter-spacing:.08em; }
+  .verdict-mark { width:36px; height:36px; }
+  /* Keep the evidence as a three-up strip rather than stacking it. Stacked full-height
+     phones pushed the product stage to ~2950px on a 390 viewport — the evidence stopped
+     being a glance and became the page. Cropped shorter, it still reads as real product
+     texture at a fraction of the scroll. */
+  .product-evidence { grid-template-columns:repeat(3,1fr); gap:8px; }
+  /* Must out-rank .case-screens .phone:nth-child(2|3), which this element also matches:
+     at (0,2,0) this rule was inert and the desktop stagger survived on phones, leaving
+     ragged tops and 36px of the height the crop above exists to remove. */
+  .product-evidence.case-screens .phone { margin-top:0; }
+  .product-evidence .phone img { aspect-ratio:780/1150; }
+  .product-evidence .phone figcaption { padding:9px 8px; font-size:.6rem; }
+  .stage-cta { width:100%; }
+  .stage-lede { font-size:.74rem; }
+  /* The lattice is a desktop/tablet explanatory visual. On phones the locked Loft stage
+     is compact — mark, title, the three-part lede and one case-study CTA before RSP — so
+     the diagram is hidden rather than shrunk into illegibility. */
+  .flagship-visual { display:none; }
+}
 
 .work-index,.about-page,.lab-page { padding:84px 0 110px; }
 .work-index>header,.about-page>header,.lab-page>header { max-width:880px; margin-bottom:56px; }
@@ -709,9 +815,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .lab-list strong { color:var(--copper); font-family:var(--font-geist-mono),monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; }
 
 @media (max-width:960px) {
-  .hero-statement h1 { font-size:clamp(2.3rem,5.2vw,3.05rem); }
-  .editorial-handoff .handoff-flow { grid-template-columns:repeat(3,1fr); row-gap:14px; }
-  .proof-bridge-row { grid-template-columns:44px 1fr 28px; gap:20px; }
   .relay-layout { grid-template-columns:1fr; }
   .relay-input-panel { max-width:none; }
   .work-index-row { grid-template-columns:44px 1fr; }
@@ -720,15 +823,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 }
 
 @media (max-width:620px) {
-  .editorial-hero { padding-top:26px; }
-  .hero-statement { padding-bottom:38px; }
-  .hero-statement h1 { max-width:18ch; font-size:clamp(2rem,8.4vw,2.6rem); line-height:1.04; }
-  .hero-statement>p { margin-top:22px; font-size:1rem; }
-  .hero-role-family { margin-top:12px!important; font-size:.66rem!important; letter-spacing:.09em; }
-  .hero-value { margin-top:22px!important; font-size:clamp(1.3rem,5.6vw,1.6rem)!important; }
-  .hero-ctas { margin-top:26px; }
-  .hero-ctas .button { flex:1 1 100%; }
-  .editorial-handoff .handoff-flow { grid-template-columns:1fr 1fr; }
+  .hero-role-family { font-size:.66rem!important; letter-spacing:.09em; }
   .relay-section { padding-top:18px; }
   .relay-title-row { display:block; }
   .relay-title-row>span { display:block; margin-top:7px; }
@@ -742,16 +837,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .relay-plan-body section { grid-column:1!important; }
   .relay-skeleton span { grid-column:1; }
   .relay-plan-heading { align-items:flex-start; flex-direction:column; gap:0; }
-  .relay-refinement>div:first-of-type { grid-template-columns:1fr; }
   .control-grid,.control-stack { grid-template-columns:1fr; }
   .case-hero-marked { grid-template-columns:1fr; gap:20px; }
   .case-mark { width:88px; height:88px; }
   .relay-chain { padding:26px 20px 20px; }
-  .proof-bridge { padding-bottom:60px; }
-  .proof-bridge-row { grid-template-columns:1fr; gap:12px; padding:24px 0; }
   /* Keep the link affordance on mobile: hiding it left the flagship row reading as body copy. */
-  .proof-bridge-arrow { font-size:1.05rem; }
-  .story-bridge { margin-bottom:60px; padding:30px 24px; }
   .work-index,.about-page,.lab-page { padding-top:60px; }
   .work-index-row { grid-template-columns:1fr; gap:14px; }
   .work-additional-row { grid-template-columns:1fr; gap:10px; }
@@ -762,7 +852,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .about-points { grid-template-columns:1fr; }
   .footer-links { flex-wrap:wrap; gap:16px; }
 }
-
 
 /* ── Evidence Stage surface treatment ───────────────────────────────────────
    The board's material language: thin alpha borders, soft elevation, 14-16px
@@ -777,7 +866,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .menu-button { border-radius:var(--r-control); border-color:var(--edge-strong); }
 
 /* Luminous surfaces */
-.story-bridge,.about-story article,.operations-translation article,.resume-card,
+.about-story article,.operations-translation article,.resume-card,
 .relay-input-panel,.case-note,.dark-card,.hero-product,.translation-grid article,
 .three-cards article,.office-card,.loft-plate {
   border-radius:var(--r-card); border-color:var(--edge); box-shadow:var(--lift);
@@ -798,12 +887,13 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .status-dot { border-radius:var(--r-chip); }
 .relay-title-row span { border-radius:var(--r-chip); }
 
-/* Inputs */
-.relay-input-panel textarea,.relay-refinement input { border-radius:var(--r-control); border-color:var(--edge-strong); }
-.relay-input-panel textarea:focus-visible,.relay-refinement input:focus-visible { border-color:var(--cobalt); }
+/* Inputs — the public demo has none. The chooser loads a read-only example, so the
+   only focusable surface is .relay-example, styled with the rest of the panel above.
+   Rules for a textarea and a text input lingered here after the chooser repair and
+   implied freeform entry was still supported. */
 
 /* Thin rule system: hairlines rather than heavy boxes */
-.proofbar,.case-proofbar,.hero-proof-strip,.proof-bridge-list,.work-index-row,.editorial-handoff {
+.proofbar,.case-proofbar,.hero-proof-strip,.work-index-row{
   border-color:var(--line);
 }
 
@@ -814,32 +904,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .dark-section .card-link,.blue-section .card-link { color:var(--cobalt-on-dark); }
 .loft-plate .card-link,.dark-card .card-link { color:var(--on-dark); }
 
-/* ── Flagship proof surface ─────────────────────────────────────────────────
-   The board gives the flagship a deep navy proof surface while the second row
-   stays a light editorial rule. That IS the hierarchy — it does not depend on
-   type size alone. Content is unchanged; only the surface is promoted. */
-.proof-bridge-list { border-top:0; display:grid; gap:18px; }
-.proof-bridge-row { border-bottom:0; padding:26px 0; }
-
-.proof-bridge-row.is-flagship {
-  position:relative; padding:32px 30px; gap:22px;
-  grid-template-columns:52px 1fr 32px;
-  background:var(--navy); border:1px solid var(--dark-line); border-radius:var(--r-surface);
-  box-shadow:var(--lift-lg); color:var(--on-dark);
-}
-.proof-bridge-row.is-flagship .proof-bridge-number { color:var(--copper-on-dark); }
-.proof-bridge-row.is-flagship h3 { color:var(--on-dark); }
-.proof-bridge-row.is-flagship .proof-bridge-kind { color:var(--copper-on-dark); }
-.proof-bridge-row.is-flagship .proof-bridge-summary { color:var(--on-dark-muted); }
-.proof-bridge-row.is-flagship .proof-bridge-arrow { color:var(--on-dark-faint); }
-.proof-bridge-row.is-flagship:hover .proof-bridge-arrow,
-.proof-bridge-row.is-flagship:focus-visible .proof-bridge-arrow { color:var(--cobalt-on-dark); }
-
-/* The four governed-run signals, as restrained chips rather than another card grid. */
-
-/* The second row stays light and quieter — a rule, not a surface. */
-.proof-bridge-row:not(.is-flagship) { border-bottom:1px solid var(--line); }
-.proof-bridge-list>.proof-bridge-row:not(.is-flagship):first-child { border-top:1px solid var(--line); }
+/* ── Proof stage surfaces ───────────────────────────────────────────────────
+   HOME carries the hierarchy in its SURFACES, not in type size alone: Loft OS
+   takes a full-bleed deep navy stage (.flagship-stage) and Resale Scanner Pro a
+   lighter product stage (.product-stage). The two-row proof bridge these notes
+   used to describe was retired with TSK-970; its rules are gone. */
 
 /* Decision Relay: compact signature proof. The truth model is untouched — only the
    surface, scale and density change. */
@@ -903,18 +972,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .proof-surface .proof-chain>li::after { top:4px; }
 }
 
-/* ── Deliberate mobile recomposition ────────────────────────────────────────
-   Not a squeezed desktop: the flagship surface keeps its own padding scale,
-   the signals wrap as chips, and the arrow column is dropped in favour of the
-   row's own affordance rather than shrinking everything proportionally. */
+/* The HOME mobile recomposition now lives with the rest of the 620px band above
+   (see "TSK-970 mobile recomposition"), so the art, stages and exits are reframed
+   together rather than in two places. */
 @media (max-width:620px) {
   .relay-title-row>span { display:inline-block; width:max-content; margin-top:8px; }
-  .proof-bridge-row.is-flagship { grid-template-columns:1fr; padding:26px 20px; gap:14px; border-radius:var(--r-card); }
-  .proof-bridge-row.is-flagship .proof-bridge-arrow { display:block; color:var(--cobalt-on-dark); }
-  .proof-bridge-list { gap:14px; }
-}
-@media (max-width:960px) and (min-width:621px) {
-  .proof-bridge-row.is-flagship { padding:28px 24px; grid-template-columns:44px 1fr 28px; }
 }
 
 /* ── Contrast corrections found by the rendered-page audit ──────────────────
@@ -963,7 +1025,6 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
 /* Anything sitting on a deep proof surface flips the ring to white so it always
    clears its own backdrop. */
 .dark-section,.blue-section,.proof-surface,.handoff-dark,.app-hero,.hero-product,
-.loft-plate,.dark-card,.experience-section,.workflow-section,
-.proof-bridge-row.is-flagship { --focus:#ffffff; }
+.loft-plate,.dark-card,.experience-section,.workflow-section { --focus:#ffffff; }
 /* The cobalt primary sits on the light canvas, and its ring is offset outside the
    fill, so the ink ring is measured against the canvas (17:1), not the button. */

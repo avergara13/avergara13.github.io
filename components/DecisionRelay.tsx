@@ -244,11 +244,11 @@ export function DecisionRelay() {
   };
 
   const runDemo = async () => {
-    if (!fixtureId || input !== fixtures[fixtureId].input) {
-      setWarning("Custom input is not processed in this public demo. Choose a curated example to run the demo.");
-      setAnnouncement("Custom input is not processed. Choose a curated example.");
-      return;
-    }
+    // Invariant check, not a user-facing path: the chooser is the only way to load an
+    // example and Run is disabled until one is chosen. The old branch warned that custom
+    // input is not processed, which now contradicts the panel's own copy ("there is
+    // nothing to type") and could only fire if this were called out of band.
+    if (!fixtureId) return;
     setWarning("");
     setRunning(true);
     setMission(null);
@@ -264,9 +264,9 @@ export function DecisionRelay() {
     window.requestAnimationFrame(() => headingRef.current?.focus());
   };
 
-  const applyRefinement = async () => {
+  const applyRefinement = async (value: string = refinement) => {
     if (!fixtureId || !mission) return;
-    const normalized = normalize(refinement);
+    const normalized = normalize(value);
     if (/^(add |also add|new task|also need to)/.test(normalized)) {
       setWarning("This adds new work and requires a new run. The curated demo will not pretend it was replanned.");
       setAnnouncement("New work requires a new run.");
@@ -314,13 +314,19 @@ export function DecisionRelay() {
     </div>
     <div className="relay-layout">
       <div className="relay-input-panel">
-        <span className="relay-label">Your input</span>
-        <label className="sr-only" htmlFor="relay-input">Messy input</label>
-        <textarea id="relay-input" value={input} disabled={running} onChange={(event) => { const value = event.target.value; setInput(value); setFixtureId((current) => current && value === fixtures[current].input ? current : null); setWarning(""); }} placeholder="Dump everything here — tasks, deadlines, worries, ideas, reminders, things you’re waiting on…" />
+        {/* TSK-970 audit repair B: this used to be an editable textarea, which promised
+            that whatever you typed would be processed. It never was — the demo runs
+            deterministic fixtures. The chooser now comes first and the example is
+            read-only, so the capability is obvious BEFORE the run rather than being
+            refused after it. */}
+        <span className="relay-label">Choose a curated example</span>
+        <div className="relay-samples" role="group" aria-label="Curated examples">{Object.entries(fixtures).map(([id, fixture]) => <button type="button" key={id} aria-pressed={fixtureId === id} onClick={() => chooseFixture(id)} disabled={running}>{fixture.label}</button>)}</div>
+        <div className="relay-example" id="relay-input" tabIndex={-1} role="group" aria-label="Selected example input">
+          {input ? <p>{input}</p> : <p className="relay-example-empty">No example selected yet. Pick one above to load its input.</p>}
+        </div>
         {warning && <p className="relay-warning" aria-live="polite">{warning}</p>}
-        <button className="relay-run" type="button" onClick={runDemo} disabled={running}>{running ? "Relay running…" : "Run demo"}</button>
-        <div className="relay-samples" role="group" aria-label="Curated examples">{Object.entries(fixtures).map(([id, fixture]) => <button type="button" key={id} onClick={() => chooseFixture(id)} disabled={running}>{fixture.label}</button>)}</div>
-        <p className="relay-privacy">Do not paste confidential or sensitive information.</p>
+        <button className="relay-run" type="button" onClick={runDemo} aria-busy={running} disabled={running || !fixtureId}>{running ? "Relay running…" : "Run demo"}</button>
+        <p className="relay-privacy">This demo runs fixed examples only — there is nothing to type, so no personal or confidential text can be entered.</p>
       </div>
       <div className="relay-output">
         <div className="relay-pipeline" role="group" aria-label="Agent Workflow Demo agents">
@@ -335,9 +341,10 @@ export function DecisionRelay() {
             {constraint && <div className="relay-human"><b>Human constraint</b><span>{constraint}</span></div>}
             <MissionView mission={mission} />
             <div className="relay-refinement">
-              <label htmlFor="relay-refinement">Refine the plan</label><p>Adjust a constraint without pretending to process new work.</p>
-              <div><input id="relay-refinement" value={refinement} onChange={(event) => { setRefinement(event.target.value); setWarning(""); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void applyRefinement(); } }} disabled={running} /><button type="button" onClick={applyRefinement} disabled={running}>Apply refinement</button></div>
-              <div className="relay-samples">{fixtureId && fixtures[fixtureId].refinementLabels.map((label) => <button type="button" key={label} onClick={() => setRefinement(label)} disabled={running}>{label}</button>)}</div>
+              <span className="relay-label">Refine the plan</span><p>Adjust a constraint without pretending to process new work. These are the refinements this example supports.</p>
+              {/* Grouped and labelled like the chooser above it: without this the presets
+                  are an unlabelled cluster of toggle buttons to a screen reader. */}
+              <div className="relay-samples" role="group" aria-label="Available refinements">{fixtureId && fixtures[fixtureId].refinementLabels.map((label) => <button type="button" key={label} aria-pressed={normalize(refinement) === normalize(label)} onClick={() => { setRefinement(label); void applyRefinement(label); }} disabled={running}>{label}</button>)}</div>
               <button className="relay-reset" type="button" onClick={reset}>Reset demo</button>
             </div>
           </div>}
