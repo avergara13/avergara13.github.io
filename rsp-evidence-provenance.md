@@ -37,19 +37,61 @@ One further capture was reviewed and not published for editorial reasons only:
 `IMG_0546.jpg` shows the same AI Lens capture state already proven by `IMG_0540.jpg` with a
 different item, so it would repeat a capability rather than add one.
 
-## What actually enforces this
+## Non-evidence images in the same directory
 
-Both guards are CONTENT-based, because a filename check is trivially defeated: `img_0550.jpg`,
-`IMG_0550.JPG` and `./IMG_0550.jpg` all open the same withheld bytes.
+`public/images/rsp/` also holds the project marks and four retired placeholder screenshots
+that no longer have a referrer. They are recorded here so the allowlist below can tell
+"known non-evidence asset" from "a binary nobody vouched for" — anything in that directory
+matching neither table fails.
 
-- `scripts/generate_rsp_evidence.sh` hashes every source before reading it and refuses to
-  publish any file whose md5 is withheld above, whatever it is called or wherever it is read
-  from. It also refuses a source whose md5 is not the one this table records.
-- `tests/rendered-html.test.mjs` walks `public/` and `out/` recursively and requires every
-  published `.jpg` under `images/rsp` to carry an md5 from the table above — an allowlist, so
-  a renamed or re-encoded withheld capture fails even though its name looks innocent.
+| File | md5 |
+|---|---|
+| `agent.png` | `c4eaa3e93e55cbbb7eed9f97b7affd4d` |
+| `listings.png` | `3feec575ccb028ebaf5cdb935147d1c2` |
+| `logo.png` | `2cdf380932a0fdc6d0ccf380310ef50f` |
+| `mark-336.png` | `e9e1112508e26e5bb72884decbc2d887` |
+| `mark.png` | `863667f2468f458ca77d8d904065a1b9` |
+| `session.png` | `7713298fc0bd85e463ec8d5248b42a15` |
+| `sold.png` | `8d6311fa55c060dcd6c5b5f7ebf33ea0` |
 
-Both run locally. **Neither runs on the deploy path**: `main` carries only the generated
-export and no workflow, so `.github/workflows/deploy-pages.yml` (which triggers on push to
-`main`) never fires, and GitHub's built-in Pages deployment runs no npm gate at all. Treat
-`npm test` as a release precondition a human must run, not as CI.
+`session.png`, `listings.png`, `sold.png` and `agent.png` are unreferenced but still
+published; deleting them is tracked as separate follow-up work.
+
+## What actually enforces this — and what does not
+
+Two independent reviews found earlier versions of this section overstating its own guards.
+This version states the limits.
+
+**Enforced soundly** (a property of the published artifact, not of a text scan):
+
+- Every raster in `public/images/rsp/` and `out/images/rsp/` must hash to an md5 recorded in
+  one of the tables above, for any image format — so a withheld capture renamed, moved into a
+  subdirectory, or re-encoded to PNG fails.
+- No withheld md5 may appear anywhere under `public/` or `out/`.
+- The RSP page ships no `<style>` element, no `data:` image URI, and no geometric inline
+  style on an evidence image — the three routes by which a page can crop or smuggle content
+  past any stylesheet scan.
+- Every screenshot on the page renders inside an evidence figure that has a label and
+  describing caption text; the project mark is the only permitted exception.
+- The approved dek is pinned in the lede and in `<meta name="description">`, and the retired
+  outcome-loop claim is banned document-wide in any inflection.
+
+**A tripwire, not a proof.** The stylesheet scan for cropping rules reads `app/globals.css`
+as text. It catches the defect that actually happened and the obvious variants — media
+blocks (including non-plain conditions), later duplicates, more specific selectors, logical
+properties, `clip-path`, decimal `aspect-ratio` — but a CSS text scan cannot enumerate every
+selector that could reach these images. `@layer`, `@container`, `:is()` forms that avoid the
+class names, and rules in a stylesheet this scan does not read remain outside it. Treat a
+green here as "no known crop pattern", never as "no crop".
+
+**Nothing runs on the deploy path.** `main` carries only the generated export and no
+workflow, so `.github/workflows/deploy-pages.yml` (which triggers on push to `main`) never
+fires, and GitHub's built-in Pages deployment runs no npm gate. Every guard above is a
+release precondition a human must run locally with `npm test`. It is not CI.
+
+**The allowlist is scoped and self-certifying.** It covers `images/rsp/` only; content placed
+in another directory is checked against the withheld hashes alone. And the tables are
+maintained by hand from this script's own output, so they record "the bytes last published",
+not "these bytes are not a withheld capture". Re-running
+`scripts/generate_rsp_evidence.sh` against the originals and confirming a clean tree is what
+actually proves the derivatives are what they claim to be.
