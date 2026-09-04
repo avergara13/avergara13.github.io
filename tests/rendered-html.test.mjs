@@ -370,11 +370,16 @@ test("homepage visual prominence follows the intended ranking at every width", a
   // sides and still drop the heading off a cliff at the boundary itself: at 621 the h1
   // fell 41.6 -> 34.4px in a single pixel because the wider band floored LOWER than the
   // narrower one. Ranking checks alone cannot see that.
+  // Guarding only the h1 left the same collision live on two other headings: the product
+  // stage and the career bridge each got SMALLER as the viewport grew past 620, because
+  // their phone caps exceeded the wider band's floor. Every heading is checked.
   for (const [below, above] of [[620, 621], [960, 961]]) {
-    const before = sizeAt(".proof-hero h1", below);
-    const after = sizeAt(".proof-hero h1", above);
-    const drop = (before - after) / before;
-    assert.ok(drop <= 0.05, `the hero drops ${(drop * 100).toFixed(1)}% across ${below}->${above}px; a breakpoint must not step the heading down`);
+    for (const selector of [".proof-hero h1", ".flagship-copy h2", ".stage-head h2", ".home-bridge h2"]) {
+      const before = sizeAt(selector, below);
+      const after = sizeAt(selector, above);
+      const drop = (before - after) / before;
+      assert.ok(drop <= 0.05, `${selector} drops ${(drop * 100).toFixed(1)}% across ${below}->${above}px; no heading may step DOWN as the viewport grows`);
+    }
   }
 });
 

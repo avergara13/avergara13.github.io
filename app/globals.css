@@ -723,8 +723,8 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
      room across the rest of the phone band. 390 itself is unchanged — still on the floor. */
   .proof-hero h1 { max-width:none; font-size:clamp(2.15rem,7.6vw,2.6rem); line-height:1.03; }
   .flagship-copy h2 { font-size:clamp(1.7rem,6.6vw,2.1rem); }
-  .stage-head h2 { font-size:clamp(1.6rem,6.2vw,2rem); }
-  .home-bridge h2 { font-size:clamp(1.25rem,5vw,1.6rem); }
+  .stage-head h2 { font-size:clamp(1.6rem,6.2vw,1.9rem); }
+  .home-bridge h2 { font-size:clamp(1.25rem,5vw,1.5rem); }
   .hero-role-family { margin-bottom:16px!important; }
   /* Right-biased cropped field. The offset is a transform, not `top`/`bottom`: a
      percentage transform resolves against the ART's own height, so the window lands
@@ -742,7 +742,10 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
      being a glance and became the page. Cropped shorter, it still reads as real product
      texture at a fraction of the scroll. */
   .product-evidence { grid-template-columns:repeat(3,1fr); gap:8px; }
-  .product-evidence .phone { margin-top:0; }
+  /* Must out-rank .case-screens .phone:nth-child(2|3), which this element also matches:
+     at (0,2,0) this rule was inert and the desktop stagger survived on phones, leaving
+     ragged tops and 36px of the height the crop above exists to remove. */
+  .product-evidence.case-screens .phone { margin-top:0; }
   .product-evidence .phone img { aspect-ratio:780/1150; }
   .product-evidence .phone figcaption { padding:9px 8px; font-size:.6rem; }
   .stage-cta { width:100%; }
@@ -816,7 +819,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 }
 
 @media (max-width:620px) {
-  .hero-role-family { margin-top:12px!important; font-size:.66rem!important; letter-spacing:.09em; }
+  .hero-role-family { font-size:.66rem!important; letter-spacing:.09em; }
   .relay-section { padding-top:18px; }
   .relay-title-row { display:block; }
   .relay-title-row>span { display:block; margin-top:7px; }

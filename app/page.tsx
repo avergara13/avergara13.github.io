@@ -28,10 +28,12 @@ const verdicts = [
   { key: "pass", label: "Pass" },
 ];
 
-const evidence = [
+const evidence: { src: string; title: string; note: string; alt?: string }[] = [
   { src: "/images/rsp/session.png", title: "Capture", note: "An item enters the workflow." },
   { src: "/images/rsp/listings.png", title: "Market evidence", note: "Comparable listings are gathered." },
-  { src: "/images/rsp/sold.png", title: "Sold history", note: "What items like it actually sold for." },
+  // The Sold tab ships as an empty state. It shows where completed sales land, not what
+  // anything sold for — the caption must not assert data the screenshot contradicts.
+  { src: "/images/rsp/sold.png", title: "Sold", note: "Where completed sales are recorded.", alt: "Resale Scanner Pro — the sold tab, with no sales recorded yet" },
 ];
 
 function VerdictMark({ kind }: { kind: string }) {
@@ -104,7 +106,7 @@ export default function Home() {
 
         <div className="product-evidence case-screens">
           {evidence.map((shot) => <figure className="phone" key={shot.src}>
-            <Image src={shot.src} alt={`Resale Scanner Pro — ${shot.title.toLowerCase()} screen`} width={780} height={1688} sizes="(max-width:620px) 92vw, (max-width:960px) 30vw, 320px" />
+            <Image src={shot.src} alt={shot.alt ?? `Resale Scanner Pro — ${shot.title.toLowerCase()} screen`} width={780} height={1688} sizes="(max-width:620px) 31vw, (max-width:960px) 30vw, 320px" />
             <figcaption><b>{shot.title}</b><span>{shot.note}</span></figcaption>
           </figure>)}
         </div>
