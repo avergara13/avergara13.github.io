@@ -897,14 +897,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .dark-section .card-link,.blue-section .card-link { color:var(--cobalt-on-dark); }
 .loft-plate .card-link,.dark-card .card-link { color:var(--on-dark); }
 
-/* ── Flagship proof surface ─────────────────────────────────────────────────
-   The board gives the flagship a deep navy proof surface while the second row
-   stays a light editorial rule. That IS the hierarchy — it does not depend on
-   type size alone. Content is unchanged; only the surface is promoted. */
-
-/* The four governed-run signals, as restrained chips rather than another card grid. */
-
-/* The second row stays light and quieter — a rule, not a surface. */
+/* ── Proof stage surfaces ───────────────────────────────────────────────────
+   HOME carries the hierarchy in its SURFACES, not in type size alone: Loft OS
+   takes a full-bleed deep navy stage (.flagship-stage) and Resale Scanner Pro a
+   lighter product stage (.product-stage). The two-row proof bridge these notes
+   used to describe was retired with TSK-970; its rules are gone. */
 
 /* Decision Relay: compact signature proof. The truth model is untouched — only the
    surface, scale and density change. */
