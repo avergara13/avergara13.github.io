@@ -19,12 +19,13 @@ export const metadata: Metadata = {
 // explained rather than merely displayed.
 
 // RSP's own decision vocabulary, already carried by the case study ("BUY / MAYBE / PASS
-// judgment"). These describe what each verdict MEANS in the workflow — they are not
-// metrics, and no market, price, confidence or profit figure belongs on this surface.
+// judgment"). Labels and mark only: the per-verdict explanatory sentences that briefly
+// stood here were newly authored, and no approved-copy authority covers them, so they are
+// not canonised on a public surface. Meaning belongs in the case study.
 const verdicts = [
-  { key: "buy", label: "Buy", meaning: "Clear value against the evidence." },
-  { key: "maybe", label: "Maybe", meaning: "Needs more context before acting." },
-  { key: "pass", label: "Pass", meaning: "Not worth the capital or the time." },
+  { key: "buy", label: "Buy" },
+  { key: "maybe", label: "Maybe" },
+  { key: "pass", label: "Pass" },
 ];
 
 const evidence = [
@@ -65,11 +66,6 @@ export default function Home() {
         <div className="proof-hero-copy">
           <p className="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems</p>
           <h1 id="hero-title">I turn messy operating problems into clear, controlled systems people can actually use.</h1>
-          <p className="hero-support">Governed AI systems, working products, and implementation discipline.</p>
-          <div className="hero-ctas">
-            <Link className="button primary" href="/work/loft-os/">View flagship work <span aria-hidden="true">→</span></Link>
-            <Link className="button" href="/resume/">Resume</Link>
-          </div>
         </div>
       </div>
       {/* Decorative only — the copy above carries the meaning. See ArchitecturalField. */}
@@ -83,7 +79,6 @@ export default function Home() {
           <p className="eyebrow light-eyebrow">Flagship work</p>
           <h2 id="flagship-title">Loft OS<span className="stage-sub">Governed multi-agent workflow system</span></h2>
           <p className="stage-lede">Scoped work. Independent review. Verified closeout.</p>
-          <p className="stage-note">Specialist agents do the work; a human holds the decision. Every run leaves evidence behind, and a lane that cannot prove its outcome does not close.</p>
           <Link className="stage-cta" href="/work/loft-os/">View case study <span aria-hidden="true">→</span></Link>
         </div>
         <div className="flagship-visual">
@@ -95,19 +90,15 @@ export default function Home() {
     <section className="product-stage" aria-labelledby="product-title">
       <div className="shell">
         <div className="stage-head">
-          <div>
-            <p className="eyebrow">Product</p>
-            <h2 id="product-title">Resale Scanner Pro</h2>
-            <p className="stage-lede">Working product. In operating use.</p>
-          </div>
-          <p className="stage-note">A mobile workflow for evaluating resale finds with market evidence and human judgment.</p>
+          <p className="eyebrow">Product</p>
+          <h2 id="product-title">Resale Scanner Pro</h2>
+          <p className="stage-lede">Working product. In operating use.</p>
         </div>
 
         <ul className="verdict-row">
           {verdicts.map((verdict) => <li key={verdict.key}>
             <span className="verdict-icon"><VerdictMark kind={verdict.key} /></span>
             <b>{verdict.label}</b>
-            <span>{verdict.meaning}</span>
           </li>)}
         </ul>
 

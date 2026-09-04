@@ -58,17 +58,27 @@ test("homepage opening leads with the role family, the full value proposition, t
   // The role family stays a subordinate mono line and is never promoted into a heading.
   assert.match(main, /<p class="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems<\/p>/);
   assert.doesNotMatch(main, /<h[12][^>]*>[^<]*AI Workflow Automation/);
-  assert.doesNotMatch(main, /hero-proof-cue|Governed AI systems · Working products · Implementation discipline/);
+  // The retired proof cue must stay retired, and it must not creep back in prose form.
+  // The class pin alone was not enough: a support line reintroduced the same three
+  // concepts as a sentence, so the CONCEPTS are pinned too, in any order.
+  assert.doesNotMatch(main, /hero-proof-cue/);
+  assert.doesNotMatch(main, /Governed AI systems · Working products · Implementation discipline/);
+  assert.doesNotMatch(main, /class="hero-support"/);
+  const opening = main.slice(0, main.indexOf('class="arch-field"'));
+  assert.doesNotMatch(opening, /Governed AI systems/i, "the retired proof cue must not return as prose");
+  assert.doesNotMatch(opening, /implementation discipline/i);
 
-  const ctas = main.slice(main.indexOf('class="hero-ctas"'), main.indexOf('class="arch-field"'));
-  assert.match(ctas, /href="\/work\/loft-os\/"[^>]*>View flagship work/);
-  assert.match(ctas, /href="\/resume\/">Resume</);
+  // Locked opening sequence: role -> value proposition -> architectural field. The first
+  // project CTA belongs inside the Loft stage, not the opening.
+  assert.doesNotMatch(opening, /class="hero-ctas"|class="button/, "the opening carries no CTA row");
+  assert.doesNotMatch(opening, /View flagship work/);
+  assert.doesNotMatch(opening, /href="\/resume\/"/, "the resume exit belongs lower on HOME, not in the opening");
 
   assertOrder(main, [
     'class="hero-role-family"',
     'id="hero-title"',
-    'class="hero-support"',
-    'class="hero-ctas"',
+    'class="arch-field"',
+    'class="flagship-stage"',
   ]);
 });
 
@@ -78,7 +88,7 @@ test("homepage is three proof stages then one career bridge, with Loft OS first"
 
   assertOrder(main, [
     'id="hero-title"',
-    'class="hero-ctas"',
+    'class="arch-field"',
     'class="flagship-stage"',
     'id="flagship-title"',
     'class="product-stage"',
@@ -108,11 +118,27 @@ test("homepage is three proof stages then one career bridge, with Loft OS first"
   const rendered = main.slice(0, main.indexOf("</main>"));
   assert.equal((rendered.match(/Flagship work/g) ?? []).length, 1, "exactly one flagship claim on HOME");
 
-  // Locked stage copy.
+  // Locked stage copy. The Proof Stage deliberately REDUCES copy: the explanatory
+  // paragraphs that briefly stood on each stage belong in the case studies, so their
+  // absence is pinned rather than left unguarded.
   assert.match(main, /Governed multi-agent workflow system/);
   assert.match(main, /Scoped work\. Independent review\. Verified closeout\./);
   assert.match(main, /Working product\. In operating use\./);
-  assert.match(main, /A mobile workflow for evaluating resale finds with market evidence and human judgment\./);
+  assert.doesNotMatch(main, /class="stage-note"/);
+  assert.doesNotMatch(main, /Specialist agents do the work/);
+  assert.doesNotMatch(main, /A mobile workflow for evaluating resale finds/);
+
+  // The first project CTA lives inside the Loft stage.
+  const flagship = main.slice(main.indexOf('class="flagship-stage"'), main.indexOf('class="product-stage"'));
+  assert.match(flagship, /class="stage-cta"[^>]*href="\/work\/loft-os\/"|href="\/work\/loft-os\/"[^>]*class="stage-cta"/);
+
+  // BUY / MAYBE / PASS keeps its labels and marks. The per-verdict sentences were newly
+  // authored with no approved-copy authority behind them and must not be canonised here.
+  const verdictBlock = main.slice(main.indexOf('class="verdict-row"'), main.indexOf('class="product-evidence'));
+  for (const label of ["Buy", "Maybe", "Pass"]) assert.ok(verdictBlock.includes(`<b>${label}</b>`), `verdict label missing: ${label}`);
+  assert.equal((verdictBlock.match(/<svg/g) ?? []).length, 3, "each verdict keeps its mark");
+  assert.doesNotMatch(verdictBlock, /Clear value against the evidence|Needs more context before acting|Not worth the capital/);
+  assert.doesNotMatch(verdictBlock, /<p>/, "verdicts carry a label and a mark, not sentences");
 
   // Locked career bridge and its exits.
   assert.match(main, /<h2 id="story-title">Operating reality → systems thinking<\/h2>/);
@@ -169,6 +195,23 @@ test("the HOME architectural field is decorative, project-owned, and carries no 
   // Fixture sanity: the composition is substantial, not an empty placeholder.
   assert.ok((source.match(/<polygon/g) ?? []).length >= 8, "the abstraction should be a real composition");
   assert.match(source, /decorative/i);
+
+  // The Loft lattice is a desktop/tablet explanatory visual only. On phones the locked
+  // Loft stage stays compact — mark, title, lede, one CTA — so the lattice is hidden
+  // rather than shrunk. Pinned against the phone media block specifically.
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+  const phoneBlocks = mediaSegments(css).filter((seg) => seg.max <= 620).map((seg) => seg.body).join("\n");
+  assert.ok(phoneBlocks.length > 0, "media scan must find the phone block");
+  assert.match(phoneBlocks, /\.flagship-visual\s*\{[^}]*display:\s*none/, "the lattice must be hidden at phone widths");
+  // Control: it is still present for desktop/tablet.
+  assert.match(css, /\.flagship-visual\s*\{\s*position:relative/, "the lattice remains on wider viewports");
+
+  // And the compact mobile Loft stage keeps its four locked elements.
+  const loftHtml = html.slice(html.indexOf('class="flagship-stage"'), html.indexOf('class="product-stage"'));
+  assert.match(loftHtml, /class="stage-mark"/);
+  assert.match(loftHtml, /id="flagship-title"/);
+  assert.match(loftHtml, /Scoped work\. Independent review\. Verified closeout\./);
+  assert.match(loftHtml, /class="stage-cta"/);
 });
 
 test("the public demo is a curated chooser, never a freeform input", async () => {
@@ -194,6 +237,35 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
   assert.match(loft, /Curated demonstration · deterministic fixture · not a live autonomous production run\./);
 });
 
+// Split a stylesheet into its top-level segment plus each `@media (max-width:N)` block.
+// A regex cannot do this reliably — the previous `(?:[^{}]*\\{[^{}]*\\})*` form matched
+// none of this file's media blocks, which silently made the prominence check read only
+// base rules. Scan braces instead, and assert the scan actually found blocks.
+const mediaSegments = (css) => {
+  const segments = [{ max: Infinity, body: "" }];
+  let i = 0, base = "";
+  while (i < css.length) {
+    const at = css.indexOf("@media", i);
+    if (at === -1) { base += css.slice(i); break; }
+    base += css.slice(i, at);
+    const open = css.indexOf("{", at);
+    let depth = 0, end = open;
+    for (; end < css.length; end++) {
+      if (css[end] === "{") depth++;
+      else if (css[end] === "}") { depth--; if (depth === 0) { end++; break; } }
+    }
+    const condition = css.slice(at, open);
+    const maxWidth = condition.match(/max-width:\s*(\d+)px/);
+    // Only plain max-width blocks participate; compound conditions are skipped.
+    if (maxWidth && !/min-width/.test(condition)) {
+      segments.push({ max: Number.parseInt(maxWidth[1], 10), body: css.slice(open + 1, end - 1) });
+    }
+    i = end;
+  }
+  segments[0].body = base;
+  return segments;
+};
+
 test("homepage visual prominence follows the intended ranking at every width", async () => {
   const css = await readFile(new URL("app/globals.css", root), "utf8");
 
@@ -201,10 +273,10 @@ test("homepage visual prominence follows the intended ranking at every width", a
   // to respect breakpoint overrides: the lock floors the stage headings on phones
   // precisely because a fluid h1 and a fixed-floor h2 converged at 390 and inverted the
   // page. Parsing only the base rule would have declared that inversion safe.
-  const segments = [{ max: Infinity, body: css.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, "") }];
-  for (const m of css.matchAll(/@media\s*\(max-width:\s*(\d+)px\)\s*\{((?:[^{}]*\{[^{}]*\})*)\}/g)) {
-    segments.push({ max: Number.parseInt(m[1], 10), body: m[2] });
-  }
+  const segments = mediaSegments(css);
+  // Harness control: if the scan finds no phone block the comparison below silently
+  // degrades to base-rule-only, which is exactly how the 390px inversion slipped through.
+  assert.ok(segments.some((seg) => seg.max <= 620), "media scan must find the phone block");
 
   const sizeAt = (selector, width) => {
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -239,6 +311,12 @@ test("homepage visual prominence follows the intended ranking at every width", a
     assert.ok(flagship >= product, `at ${width}px the flagship stage (${flagship}px) must not be out-ranked by the product stage (${product}px)`);
     assert.ok(product >= bridge * STEP, `at ${width}px the product stage (${product}px) must visibly out-rank the career bridge (${bridge}px)`);
   }
+
+  // Control: the phone override must actually be the value used at 390. Reading the base
+  // rule there would report 33.6px for the flagship heading instead of the 27.2px the
+  // override sets — the precise blindness that let the inversion look safe.
+  assert.ok(sizeAt(".flagship-copy h2", 390) < 30, "the 390px flagship size must come from the phone override, not the base rule");
+  assert.ok(sizeAt(".flagship-copy h2", 1440) > 40, "the desktop flagship size must come from the base rule");
 });
 
 test("Agent Workflow Demo is a bounded curated demo with visible three-agent and human-refinement structure", async () => {
