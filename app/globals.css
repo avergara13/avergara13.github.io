@@ -595,7 +595,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-example .relay-example-empty { color:var(--muted); }
 .relay-example:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
 .relay-samples button[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:#fff; }
-.relay-input-panel textarea:focus-visible,.relay-refinement input:focus-visible { outline:3px solid var(--focus); outline-offset:2px; border-color:var(--ink); }
 .relay-run { width:100%; min-height:46px; border:1px solid var(--cobalt); border-radius:var(--r-control); background:var(--cobalt); color:#fff; font:inherit; font-weight:800; cursor:pointer; box-shadow:0 1px 2px rgba(36,102,253,.18); }
 .relay-run:hover:not(:disabled) { background:var(--cobalt-ink); border-color:var(--cobalt-ink); box-shadow:0 4px 16px rgba(36,102,253,.28); }
 .relay-run:disabled,.relay-samples button:disabled,.relay-refinement button:disabled { opacity:.58; cursor:wait; }
@@ -646,9 +645,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-human b { color:var(--copper); font-family:var(--font-geist-mono),monospace; font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; }
 .relay-human span { font-size:.82rem; }
 .relay-refinement { padding-top:26px; }
-.relay-refinement>label { font-family:var(--font-geist-mono),monospace; font-size:.7rem; font-weight:800; text-transform:uppercase; }
 .relay-refinement>p { margin:4px 0 12px; color:var(--muted); font-size:.78rem; }
-.relay-refinement input { min-height:44px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--r-control); background:white; color:var(--ink); font:inherit; }
 .relay-reset { min-height:44px; margin-top:20px; padding:9px 0; border:0; border-bottom:1px solid currentColor; background:transparent; color:var(--muted); font:inherit; font-size:.75rem; cursor:pointer; }
 .relay-governance { margin:22px 0 0; padding-top:12px; border-top:1px dashed var(--line); color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.65rem; letter-spacing:.04em; text-transform:uppercase; }
 .relay-section button:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
@@ -883,9 +880,10 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .status-dot { border-radius:var(--r-chip); }
 .relay-title-row span { border-radius:var(--r-chip); }
 
-/* Inputs */
-.relay-input-panel textarea,.relay-refinement input { border-radius:var(--r-control); border-color:var(--edge-strong); }
-.relay-input-panel textarea:focus-visible,.relay-refinement input:focus-visible { border-color:var(--cobalt); }
+/* Inputs — the public demo has none. The chooser loads a read-only example, so the
+   only focusable surface is .relay-example, styled with the rest of the panel above.
+   Rules for a textarea and a text input lingered here after the chooser repair and
+   implied freeform entry was still supported. */
 
 /* Thin rule system: hairlines rather than heavy boxes */
 .proofbar,.case-proofbar,.hero-proof-strip,.work-index-row{

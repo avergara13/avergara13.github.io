@@ -398,7 +398,11 @@ test("Agent Workflow Demo is a bounded curated demo with visible three-agent and
   assert.match(contract, /Planning Agent/);
   assert.match(contract, /Personal Assistant Agent/);
   assert.match(contract, /Refine the plan/);
-  assert.match(contract, /Custom input is not processed in this public demo/);
+  // The demo used to warn that custom input is not processed. With the chooser-only
+  // surface there is nothing to type, so that warning now contradicts the panel's own
+  // copy and its branch is unreachable. Pin the INVARIANT instead of the dead message.
+  assert.doesNotMatch(contract, /Custom input is not processed/);
+  assert.match(component, /if \(!fixtureId\) return;/, "runDemo must still refuse without a chosen fixture");
   assert.match(contract, /arbitrary input is never presented as processed/i);
   assert.doesNotMatch(contract, /Mess → Mission|Mess to Mission/i);
 });

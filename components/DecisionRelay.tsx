@@ -244,11 +244,11 @@ export function DecisionRelay() {
   };
 
   const runDemo = async () => {
-    if (!fixtureId || input !== fixtures[fixtureId].input) {
-      setWarning("Custom input is not processed in this public demo. Choose a curated example to run the demo.");
-      setAnnouncement("Custom input is not processed. Choose a curated example.");
-      return;
-    }
+    // Invariant check, not a user-facing path: the chooser is the only way to load an
+    // example and Run is disabled until one is chosen. The old branch warned that custom
+    // input is not processed, which now contradicts the panel's own copy ("there is
+    // nothing to type") and could only fire if this were called out of band.
+    if (!fixtureId) return;
     setWarning("");
     setRunning(true);
     setMission(null);
@@ -341,7 +341,7 @@ export function DecisionRelay() {
             {constraint && <div className="relay-human"><b>Human constraint</b><span>{constraint}</span></div>}
             <MissionView mission={mission} />
             <div className="relay-refinement">
-              <p className="relay-label">Refine the plan</p><p>Adjust a constraint without pretending to process new work. These are the refinements this example supports.</p>
+              <span className="relay-label">Refine the plan</span><p>Adjust a constraint without pretending to process new work. These are the refinements this example supports.</p>
               <div className="relay-samples">{fixtureId && fixtures[fixtureId].refinementLabels.map((label) => <button type="button" key={label} aria-pressed={normalize(refinement) === normalize(label)} onClick={() => { setRefinement(label); void applyRefinement(label); }} disabled={running}>{label}</button>)}</div>
               <button className="relay-reset" type="button" onClick={reset}>Reset demo</button>
             </div>
