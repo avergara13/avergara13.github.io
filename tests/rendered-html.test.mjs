@@ -234,6 +234,11 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
   // Refinements are presets only — no free-text field implying open-ended replanning.
   assert.doesNotMatch(loft, /<input /, "the demo must expose no text input at all");
   assert.match(component, /These are the refinements this example supports/);
+
+  // Both button clusters must be grouped and named. The presets replaced a labelled text
+  // input, so without this they reach assistive tech as an unlabelled set of toggles.
+  assert.match(loft, /role="group" aria-label="Curated examples"/);
+  assert.match(loft, /role="group" aria-label="Available refinements"/);
   assert.match(loft, /Curated demonstration · deterministic fixture · not a live autonomous production run\./);
 });
 

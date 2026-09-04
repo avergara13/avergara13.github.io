@@ -342,7 +342,9 @@ export function DecisionRelay() {
             <MissionView mission={mission} />
             <div className="relay-refinement">
               <span className="relay-label">Refine the plan</span><p>Adjust a constraint without pretending to process new work. These are the refinements this example supports.</p>
-              <div className="relay-samples">{fixtureId && fixtures[fixtureId].refinementLabels.map((label) => <button type="button" key={label} aria-pressed={normalize(refinement) === normalize(label)} onClick={() => { setRefinement(label); void applyRefinement(label); }} disabled={running}>{label}</button>)}</div>
+              {/* Grouped and labelled like the chooser above it: without this the presets
+                  are an unlabelled cluster of toggle buttons to a screen reader. */}
+              <div className="relay-samples" role="group" aria-label="Available refinements">{fixtureId && fixtures[fixtureId].refinementLabels.map((label) => <button type="button" key={label} aria-pressed={normalize(refinement) === normalize(label)} onClick={() => { setRefinement(label); void applyRefinement(label); }} disabled={running}>{label}</button>)}</div>
               <button className="relay-reset" type="button" onClick={reset}>Reset demo</button>
             </div>
           </div>}
