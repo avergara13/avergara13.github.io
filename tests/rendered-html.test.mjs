@@ -220,7 +220,13 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
 
   // Audit repair B: an editable textarea promised that anything typed would be processed.
   // It never was. The capability must be obvious BEFORE the run, not refused after it.
-  assert.doesNotMatch(loft, /<textarea/, "the public demo must not offer a freeform text field");
+  // Scope the negative assertions to the relay section. Run against the whole page they
+  // would fail on any unrelated future form field, which says nothing about whether the
+  // demo is still chooser-only — a brittle test that fails for the wrong reason.
+  const relayAt = loft.indexOf('id="relay-title"');
+  assert.notEqual(relayAt, -1, "fixture sanity: the relay section must be present to scope these checks");
+  const relay = loft.slice(relayAt, loft.indexOf("</section>", relayAt));
+  assert.doesNotMatch(relay, /<textarea/, "the public demo must not offer a freeform text field");
   assert.doesNotMatch(component, /<textarea/);
   assert.doesNotMatch(loft, /Dump everything here/);
 
@@ -232,7 +238,7 @@ test("the public demo is a curated chooser, never a freeform input", async () =>
   assert.match(component, /disabled=\{running \|\| !fixtureId\}/);
 
   // Refinements are presets only — no free-text field implying open-ended replanning.
-  assert.doesNotMatch(loft, /<input /, "the demo must expose no text input at all");
+  assert.doesNotMatch(relay, /<input /, "the demo must expose no text input at all");
   assert.match(component, /These are the refinements this example supports/);
 
   // Both button clusters must be grouped and named. The presets replaced a labelled text
@@ -265,8 +271,10 @@ const mediaSegments = (css) => {
     }
     const condition = css.slice(at, open);
     const maxWidth = condition.match(/max-width:\s*(\d+)px/);
-    // Only plain max-width blocks participate; compound conditions are skipped.
-    if (maxWidth && !/min-width/.test(condition)) {
+    // Only a PLAIN `(max-width: N px)` block participates. The earlier form skipped just
+    // `min-width`, so `screen and (max-width: …)` would have been folded in despite the
+    // comment claiming compound conditions were excluded. Match the whole condition.
+    if (maxWidth && /^@media\s*\(\s*max-width:\s*\d+px\s*\)\s*$/.test(condition.trim())) {
       segments.push({ max: Number.parseInt(maxWidth[1], 10), body: css.slice(open + 1, end - 1) });
     }
     i = end;
