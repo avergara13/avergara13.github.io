@@ -85,11 +85,17 @@ test("homepage opening is role family, then the approved concise value propositi
   for (const seg of mediaSegments(heroCss)) {
     for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
       if (!/\.hero-role-family(?![\w-])/.test(selector)) continue;
-      const size = body.match(/font-size\s*:\s*([\d.]+)rem/);
-      if (!size) continue;
+      const declared = body.match(/font-size\s*:\s*([^;]+)/);
+      if (!declared) continue;
       sizes += 1;
-      assert.ok(Number(size[1]) <= 1,
-        `the role family must stay a small supporting line — ${selector.trim()} sets font-size:${size[1]}rem`);
+      // Read EVERY length in the declaration and take the largest. Matching a leading `rem`
+      // ignored `font-size:80px` entirely, and read `clamp(.72rem,6vw,72px)` as .72rem while
+      // its ceiling made the line the page headline.
+      const rem = [...declared[1].matchAll(/([\d.]+)rem/g)].map((m) => Number(m[1]));
+      const px = [...declared[1].matchAll(/([\d.]+)px/g)].map((m) => Number(m[1]) / 16);
+      const largest = Math.max(...rem, ...px, 0);
+      assert.ok(largest <= 1,
+        `the role family must stay a small supporting line — ${selector.trim()} sets font-size:${declared[1].trim()}`);
     }
   }
   assert.ok(sizes > 0, "no font-size found for .hero-role-family — the scan is not reading the stylesheet");
@@ -131,6 +137,15 @@ test("HOME strengthens Angel's identity and presents RSP as one replaceable genu
   assert.match(product, /data-evidence-slot="rsp-home-overview"/);
   assert.match(product, /\/images\/rsp\/session-overview\.jpg/);
   assert.equal((product.match(/<img/g) ?? []).length, 2, "RSP stage contains one project mark and exactly one screenshot");
+  // HOME's copy of the capture sat outside the whole evidence contract: every alt/caption
+  // assertion was scoped to the case study, so an empty alt here passed. HOME carries no
+  // figcaption by design, which makes the alt the only description a screen reader gets.
+  const evidence = product.match(/<figure class="product-evidence-slot"[\s\S]*?<\/figure>/);
+  assert.ok(evidence, "the HOME evidence slot is missing");
+  const alt = evidence[0].match(/alt="([^"]*)"/);
+  assert.ok(alt && alt[1].trim().length > 20, "the HOME evidence image needs descriptive alt text");
+  assert.doesNotMatch(alt[1], /^(?:a\s+|the\s+)?(?:screenshot|image|photo)\b|screenshot number/i,
+    "HOME alt must describe the capture, not label it");
   // The retired placeholder and the three-phone strip must both stay gone.
   assert.doesNotMatch(product, /\/images\/rsp\/(?:session|listings|sold|agent)\.png/);
 });
@@ -1117,6 +1132,38 @@ test("every published RSP capture carries alt text and a caption", async () => {
   }
 });
 
+test("an evidence figure has no surface for a crop to attach to", async () => {
+  // SOUND, because it pins SHAPE rather than hunting for cropping declarations. A CSS text
+  // scan cannot be sound here at all: `app/globals.css` starts with `@import "tailwindcss"`,
+  // so a utility class compiles into the built chunk that no scan reads. Two vectors were
+  // proven — a wrapper <div style="max-height:…;overflow:hidden"> around the image, and
+  // `className="max-h-[620px] object-cover"` on it. Both are impossible if the figure holds
+  // exactly an <img> and a <figcaption>, the image carries no class, and the only inline
+  // style is the one next/image emits.
+  const main = await readRspMain();
+  const figures = [...main.matchAll(/<figure class="([^"]*)">([\s\S]*?)<\/figure>/g)]
+    .filter(([, cls]) => cls.includes("rsp-proof-frame"));
+  assert.equal(figures.length, 7, "every evidence frame is accounted for");
+
+  const modifiers = new Set(["dominant", "offset", "analysis", "pass", "listing", "scans", "agent"]);
+  for (const [, cls, body] of figures) {
+    const classes = cls.trim().split(/\s+/);
+    assert.equal(classes.length, 2, `an evidence figure carries exactly its frame and modifier class: "${cls}"`);
+    assert.equal(classes[0], "rsp-proof-frame");
+    assert.ok(modifiers.has(classes[1].replace("rsp-proof-", "")), `unknown evidence modifier: ${classes[1]}`);
+
+    // Nothing may sit between the figure and its image — a wrapper is a crop vector.
+    assert.match(body, /^<img\b[^>]*>\s*<figcaption>/, `an evidence image must be the figure's first child: ${cls}`);
+    const tags = [...body.matchAll(/<(\w+)\b/g)].map((m) => m[1]);
+    assert.deepEqual(tags, ["img", "figcaption", "span", "p"], `unexpected structure inside ${cls}: ${tags.join(",")}`);
+
+    const img = body.match(/<img\b[^>]*>/)[0];
+    assert.doesNotMatch(img, /\sclass="/, `an evidence image carries no class — a utility class is a crop vector: ${cls}`);
+    const style = img.match(/\sstyle="([^"]*)"/);
+    assert.ok(!style || style[1] === "color:transparent", `unexpected inline style on an evidence image: ${style?.[1]}`);
+  }
+});
+
 test("no rendered evidence frame can be cropped from the page itself", async () => {
   // SOUND checks on the emitted markup. The stylesheet scan below is a tripwire and cannot
   // prove absence; these two can, for the routes that carry evidence: a page that ships no
@@ -1136,7 +1183,22 @@ test("no rendered evidence frame can be cropped from the page itself", async () 
   }
 
   // A data: URI is content with no file behind it, so every hash-based guard is blind to it.
-  assert.doesNotMatch(markup, /data:image\//i, "images must be published as files, not inlined as data URIs");
+  // Scoping this to one page let the same payload publish on another route.
+  const { readdir } = await import("node:fs/promises");
+  const walk = async (dir) => {
+    const found = [];
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const child = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, dir);
+      found.push(...(entry.isDirectory() ? await walk(child) : [child]));
+    }
+    return found;
+  };
+  const pages = (await walk(new URL("out/", root))).filter((f) => f.pathname.endsWith(".html"));
+  assert.ok(pages.length > 5, "export should contain several HTML pages");
+  for (const page of pages) {
+    const body = await readFile(page, "utf8");
+    assert.ok(!/data:image\//i.test(body), `images must be files, not data URIs: ${page.pathname}`);
+  }
 });
 
 test("no stylesheet rule crops an evidence frame", async () => {
@@ -1233,13 +1295,20 @@ test("withheld RSP captures never reach the public build", async () => {
       const md5 = createHash("md5").update(bytes).digest("hex");
       assert.ok(!withheld.has(md5), `withheld capture ${withheld.get(md5)} is published as ${base}…/${name}`);
 
-      // Allowlist EVERY raster in the evidence directory, not just .jpg — a withheld capture
-      // re-encoded to .png sat in there undetected while the doc claimed re-encoding failed.
-      if (/images\/rsp\/.+\.(jpe?g|png|webp|avif|gif|bmp|tiff?)$/i.test(path)) {
+      // Allowlist EVERY file in the evidence directory. An extension list is a denylist wearing
+      // an allowlist's clothes: an SVG wrapping the capture as a base64 <image href> published
+      // straight through one. No format reasoning — if it lives here, it must be vouched for.
+      if (/images\/rsp\/[^/]+$/i.test(path)) {
         assert.ok(published.has(md5) || known.has(md5),
           `unvouched binary ${base}…/${name} (md5 ${md5}) — record it in rsp-evidence-provenance.md or remove it`);
       }
     }
+  }
+
+  // A referenced binary that does not exist ships a broken image inside a figure whose
+  // caption still describes what should be there.
+  for (const src of rspEvidenceOrder) {
+    await assert.doesNotReject(access(new URL(`out${src}`, root)), `referenced evidence binary is missing from the export: ${src}`);
   }
 
   const pages = (await walk(new URL("out/", root))).filter((f) => f.pathname.endsWith(".html"));

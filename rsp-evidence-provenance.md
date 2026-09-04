@@ -54,44 +54,88 @@ matching neither table fails.
 | `session.png` | `7713298fc0bd85e463ec8d5248b42a15` |
 | `sold.png` | `8d6311fa55c060dcd6c5b5f7ebf33ea0` |
 
-`session.png`, `listings.png`, `sold.png` and `agent.png` are unreferenced but still
-published; deleting them is tracked as separate follow-up work.
+`session.png`, `listings.png`, `sold.png`, `agent.png` and `logo.png` are unreferenced but
+still published — five files, not four. Deleting them is deferred to separate follow-up work.
 
 ## What actually enforces this — and what does not
 
-Two independent reviews found earlier versions of this section overstating its own guards.
-This version states the limits.
+Three independent reviews found earlier versions of this section overstating its own guards.
+Each sentence below has been tested by trying to break it.
 
-**Enforced soundly** (a property of the published artifact, not of a text scan):
+### Enforced soundly
 
-- Every raster in `public/images/rsp/` and `out/images/rsp/` must hash to an md5 recorded in
-  one of the tables above, for any image format — so a withheld capture renamed, moved into a
-  subdirectory, or re-encoded to PNG fails.
+These are properties of the published artifact, checked by shape or by hash rather than by
+reasoning about CSS:
+
+- **Every file** in `public/images/rsp/` and `out/images/rsp/` must hash to an md5 recorded in
+  one of the tables above — no extension list, no format reasoning. An earlier version
+  allowlisted only raster extensions, and an SVG wrapping a withheld capture as a base64
+  `<image href>` published straight through it.
 - No withheld md5 may appear anywhere under `public/` or `out/`.
-- The RSP page ships no `<style>` element, no `data:` image URI, and no geometric inline
-  style on an evidence image — the three routes by which a page can crop or smuggle content
-  past any stylesheet scan.
-- Every screenshot on the page renders inside an evidence figure that has a label and
-  describing caption text; the project mark is the only permitted exception.
-- The approved dek is pinned in the lede and in `<meta name="description">`, and the retired
-  outcome-loop claim is banned document-wide in any inflection.
+- **No exported page** may inline an image as a `data:` URI. Hash guards cannot see bytes
+  inside an HTML file, and scoping this check to one route let the same payload publish on
+  another.
+- Every referenced evidence binary exists in the export, so a figure cannot ship a broken
+  image under a caption describing what should be there.
+- **An evidence figure has no surface for a crop to attach to:** it contains exactly an
+  `<img>` and a `<figcaption>`, the image is the figure's first child, it carries no class,
+  and its only inline style is the `color:transparent` next/image emits. This replaces the
+  hunt for cropping declarations, because that hunt cannot be sound — `app/globals.css`
+  begins with `@import "tailwindcss"`, so a utility class such as
+  `max-h-[620px] object-cover` compiles into a built chunk that no source scan reads. A
+  wrapper `<div style="max-height:620px;overflow:hidden">` did the same. Pinning the shape
+  removes both vectors instead of chasing them.
+- Every screenshot **on the RSP case study** renders inside an accounted-for evidence figure
+  with a label and describing caption text. HOME is scoped differently: it carries the same
+  capture with descriptive alt text and, by the approved composition, no caption — so alt is
+  the only description there, and it is pinned.
+- The approved dek is pinned in the lede and in `<meta name="description">`, and the exact
+  retired phrase family (`learning from outcomes` and its inflections) is banned across the
+  whole document, metadata included.
 
-**A tripwire, not a proof.** The stylesheet scan for cropping rules reads `app/globals.css`
-as text. It catches the defect that actually happened and the obvious variants — media
-blocks (including non-plain conditions), later duplicates, more specific selectors, logical
-properties, `clip-path`, decimal `aspect-ratio` — but a CSS text scan cannot enumerate every
-selector that could reach these images. `@layer`, `@container`, `:is()` forms that avoid the
-class names, and rules in a stylesheet this scan does not read remain outside it. Treat a
-green here as "no known crop pattern", never as "no crop".
+### A tripwire, not a proof
 
-**Nothing runs on the deploy path.** `main` carries only the generated export and no
-workflow, so `.github/workflows/deploy-pages.yml` (which triggers on push to `main`) never
-fires, and GitHub's built-in Pages deployment runs no npm gate. Every guard above is a
-release precondition a human must run locally with `npm test`. It is not CI.
+The stylesheet scan for cropping rules reads `app/globals.css` as text. It catches the defect
+that actually happened and the obvious variants — `@media`, `@supports`, `@container`,
+`@layer`, later duplicates, more specific selectors, logical properties, `clip-path`, decimal
+`aspect-ratio`. It cannot be sound: it does not read the built Tailwind output, and a rule
+that reaches these images without naming an `rsp-` class is outside it. Treat green here as
+"no known crop pattern in the source stylesheet", never as "no crop". The structural pin
+above is what actually holds.
 
-**The allowlist is scoped and self-certifying.** It covers `images/rsp/` only; content placed
-in another directory is checked against the withheld hashes alone. And the tables are
-maintained by hand from this script's own output, so they record "the bytes last published",
-not "these bytes are not a withheld capture". Re-running
-`scripts/generate_rsp_evidence.sh` against the originals and confirming a clean tree is what
-actually proves the derivatives are what they claim to be.
+### Not enforced at all — recorded so nothing implies otherwise
+
+- **Whether a caption is TRUE of its image.** Nothing machine-checks correspondence between
+  a caption and the pixels it describes. A caption can be relabelled from PASS to BUY, with
+  figures that contradict the capture, and every gate stays green. Caption accuracy is a
+  human review responsibility, and it is the reason each of these captures was read against
+  its image by more than one reviewer.
+- **Content placed outside `images/rsp/`.** The allowlist covers the evidence directory only;
+  elsewhere, only the withheld-hash blocklist applies, and a re-encode defeats a hash.
+- **Alt-text quality beyond length and a generic-label check**, and uniqueness across images.
+- **The tables are hand-maintained** from this script's own output, so they record "the bytes
+  last published", not "these bytes are not a withheld capture". Re-running
+  `scripts/generate_rsp_evidence.sh` against the originals and confirming a clean tree is
+  what actually proves the derivatives are what they claim to be.
+
+### Nothing runs on the deploy path
+
+`main` carries only the generated export and no workflow, so
+`.github/workflows/deploy-pages.yml` (which triggers on push to `main`) never fires, and
+GitHub's built-in Pages deployment runs no npm gate. Every guard above is a release
+precondition a human runs locally with `npm test`. It is not CI.
+
+## A published capture with a visible app defect
+
+`agent-scans.jpg` shows the True Botanicals row carrying the GROWLERWERKS uKeg thumbnail —
+the wrong product image. It is published deliberately, with the reasoning recorded here
+because `IMG_0527.jpg` was withheld for a defect of the same family.
+
+The distinction is what the capture is offered as proof of. `IMG_0527` is market evidence,
+and its `Invalid Date` sits inside the recent-sales list that IS the evidence — the defect
+undermines the claim the image is making. `agent-scans.jpg` is offered as proof of the
+multi-item decision ledger: decisions, categories, buy-to-sell figures and the still-open
+buy/pass controls. A stale thumbnail is incidental to that claim, and cropping it away would
+be the concealment these rules exist to forbid. Publishing the capture whole, and saying so
+here, is the honest option. If that trade stops being acceptable, replace the capture — do
+not crop it.
