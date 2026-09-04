@@ -717,7 +717,12 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   /* A fluid h1 and a fixed-floor h2 converge: at 390 the flagship heading (33.6px)
      had overtaken the page h1 (32.8px), inverting the whole page's hierarchy. Both are
      pinned here so the step stays perceptible at every phone width. */
-  .proof-hero h1 { max-width:none; font-size:clamp(2.15rem,8.6vw,2.85rem); line-height:1.03; }
+  /* The vw term grew the headline in lockstep with the column, so the line-fill stayed
+     pinned near 100% instead of relaxing: at 430 the longest line left only 3px of right
+     slack and read edge-to-edge. 390 was fine only because the rem floor took over there.
+     A slower vw coefficient lets the column outpace the type, restoring 390's breathing
+     room across the rest of the phone band. 390 itself is unchanged — still on the floor. */
+  .proof-hero h1 { max-width:none; font-size:clamp(2.15rem,7.6vw,2.6rem); line-height:1.03; }
   .flagship-copy h2 { font-size:clamp(1.7rem,6.6vw,2.1rem); }
   .stage-head h2 { font-size:clamp(1.6rem,6.2vw,2rem); }
   .home-bridge h2 { font-size:clamp(1.25rem,5vw,1.6rem); }
