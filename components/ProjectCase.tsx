@@ -417,13 +417,12 @@ type RspEvidenceFigureProps = {
   caption: string;
   className?: string;
   sizes: string;
-  priority?: boolean;
 };
 
-function RspEvidenceFigure({ src, alt, label, caption, className = "", sizes, priority = false }: RspEvidenceFigureProps) {
+function RspEvidenceFigure({ src, alt, label, caption, className = "", sizes }: RspEvidenceFigureProps) {
   return (
     <figure className={`rsp-proof-frame ${className}`.trim()}>
-      <Image src={src} alt={alt} width={900} height={1950} sizes={sizes} priority={priority} />
+      <Image src={src} alt={alt} width={900} height={1950} sizes={sizes} />
       <figcaption>
         <span>{label}</span>
         <p>{caption}</p>
@@ -470,8 +469,7 @@ function RspCase({ project }: { project: Project }) {
               label="Operating overview"
               caption="A live session brings the decision mix, active items, and session state into one view."
               className="rsp-proof-dominant"
-              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 460px"
-              priority
+              sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 460px"
             />
             <RspEvidenceFigure
               src="/images/rsp/capture-ai-lens.jpg"
@@ -479,7 +477,7 @@ function RspCase({ project }: { project: Project }) {
               label="Capture · AI Lens"
               caption="The capture screen frames the item with AI Lens active, and keeps Scan, Listing and Quick Draft available alongside it."
               className="rsp-proof-offset"
-              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 320px"
+              sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 320px"
             />
           </div>
         </div>
@@ -501,7 +499,7 @@ function RspCase({ project }: { project: Project }) {
               label="Analysis · Market signal · BUY"
               caption="Item identification, market velocity, analysis status, and the final BUY decision remain visible in one completed scan."
               className="rsp-proof-analysis"
-              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 440px"
+              sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 440px"
             />
             <div className="rsp-feature-note">
               <p className="eyebrow light-eyebrow">Research attached to action</p>
@@ -530,7 +528,7 @@ function RspCase({ project }: { project: Project }) {
               label="Decision proof · PASS"
               caption="A finished analysis returns PASS, and Re-analyze, Pass, Maybe and Add to Queue all stay on screen underneath it."
               className="rsp-proof-pass"
-              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 410px"
+              sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 410px"
             />
           </div>
           <p className="case-principle">AI reduces the research and preparation burden. Human judgment remains accountable for the decision and release.</p>
@@ -550,16 +548,16 @@ function RspCase({ project }: { project: Project }) {
               label="Listing preparation"
               caption="The listing editor keeps photos, title, condition and description together, and the draft is marked Ready behind an explicit Review &amp; Push."
               className="rsp-proof-listing"
-              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 460px"
+              sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 460px"
             />
             <div className="rsp-agent-stack">
               <RspEvidenceFigure
                 src="/images/rsp/agent-scans.jpg"
                 alt="Resale Scanner Pro agent scan list showing evaluated items with buy, maybe, and pass decisions"
                 label="Agent · Evaluated items"
-                caption="Every scanned item keeps its decision, category and buy-to-sell figures, with the buy or pass choice still open on the card."
+                caption="Scanned items keep their decision, category and buy-to-sell figures, with the buy or pass choice still open on the card."
                 className="rsp-proof-scans"
-                sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 330px"
+                sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 330px"
               />
               <RspEvidenceFigure
                 src="/images/rsp/agent-recap.jpg"
@@ -567,7 +565,7 @@ function RspCase({ project }: { project: Project }) {
                 label="Agent · Session recap"
                 caption="Asked for a recap, the agent reports scan count, buy rate and the item still undecided, and recommends rather than decides."
                 className="rsp-proof-agent"
-                sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 330px"
+                sizes="(max-width:620px) calc(100vw - 24px), (max-width:900px) 520px, 330px"
               />
             </div>
           </div>

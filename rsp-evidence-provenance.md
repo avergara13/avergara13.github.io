@@ -28,15 +28,28 @@ Two supplied captures are permanently excluded from the public build. Neither ma
 rescued by cropping: removing a defect or an identifier by framing is precisely the kind
 of concealment the evidence rules forbid, so the whole capture is withheld instead.
 
-| Capture | Reason withheld |
-|---|---|
-| `IMG_0550.jpg` | Exposes a customer order identifier and a ZIP code. |
-| `IMG_0527.jpg` | Renders `Invalid Date` in the recent-sales list. |
+| Capture | Source md5 | Reason withheld |
+|---|---|---|
+| `IMG_0550.jpg` | `8a3e3bd44e047cbfdc7de570ecb6cd16` | Exposes a customer order identifier and a ZIP code. |
+| `IMG_0527.jpg` | `bbd4c19bc4f23dd4963b93f8031666de` | Renders `Invalid Date` in the recent-sales list. |
 
 One further capture was reviewed and not published for editorial reasons only:
 `IMG_0546.jpg` shows the same AI Lens capture state already proven by `IMG_0540.jpg` with a
 different item, so it would repeat a capability rather than add one.
 
-`scripts/generate_rsp_evidence.sh` fails closed if a withheld capture is ever added to its
-publish list, and `tests/rendered-html.test.mjs` asserts the withheld filenames never reach
-the build output.
+## What actually enforces this
+
+Both guards are CONTENT-based, because a filename check is trivially defeated: `img_0550.jpg`,
+`IMG_0550.JPG` and `./IMG_0550.jpg` all open the same withheld bytes.
+
+- `scripts/generate_rsp_evidence.sh` hashes every source before reading it and refuses to
+  publish any file whose md5 is withheld above, whatever it is called or wherever it is read
+  from. It also refuses a source whose md5 is not the one this table records.
+- `tests/rendered-html.test.mjs` walks `public/` and `out/` recursively and requires every
+  published `.jpg` under `images/rsp` to carry an md5 from the table above — an allowlist, so
+  a renamed or re-encoded withheld capture fails even though its name looks innocent.
+
+Both run locally. **Neither runs on the deploy path**: `main` carries only the generated
+export and no workflow, so `.github/workflows/deploy-pages.yml` (which triggers on push to
+`main`) never fires, and GitHub's built-in Pages deployment runs no npm gate at all. Treat
+`npm test` as a release precondition a human must run, not as CI.

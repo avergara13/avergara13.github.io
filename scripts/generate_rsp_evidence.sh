@@ -30,26 +30,44 @@ PAIRS=(
   "agent-recap:IMG_0548.jpg"
 )
 
-# Captures withheld from the public build. IMG_0550 exposes an order identifier and a ZIP
-# code; IMG_0527 renders "Invalid Date". Neither may be published, and neither may be
-# rescued by cropping — hiding a defect is exactly what the evidence rules forbid.
-BLOCKED=("IMG_0550.jpg" "IMG_0527.jpg")
+# Enforcement is by CONTENT, never by filename. A name check is trivially defeated —
+# `img_0550.jpg`, `IMG_0550.JPG` and `./IMG_0550.jpg` all open the same withheld bytes — and
+# it cannot see a withheld capture supplied through a different SOURCE_DIR at all.
+# rsp-evidence-provenance.md is the single source of truth for both tables; this script
+# reads it so the two can never drift.
+PROVENANCE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/rsp-evidence-provenance.md"
+[[ -f "$PROVENANCE" ]] || { echo "missing $PROVENANCE" >&2; exit 1; }
 
-for blocked in "${BLOCKED[@]}"; do
-  for pair in "${PAIRS[@]}"; do
-    if [[ "${pair#*:}" == "$blocked" ]]; then
-      echo "refusing to publish withheld capture: $blocked" >&2
-      exit 1
-    fi
-  done
-done
+# Withheld md5s live under the "## Withheld captures" heading; published source md5s are the
+# third column of the table above it. Reading the whole file would mix the two.
+withheld_md5s="$(awk '/^## Withheld captures/,/^## What actually/' "$PROVENANCE" \
+  | grep -oE '`[0-9a-f]{32}`' | tr -d '`')"
+[[ "$(printf '%s\n' "$withheld_md5s" | grep -c .)" -eq 2 ]] || { echo "expected 2 withheld md5s in $PROVENANCE" >&2; exit 1; }
+
+source_md5_for() {  # published-table row: | `asset.jpg` | `IMG_x.jpg` | `source md5` | `derivative md5` |
+  grep -E "^\| \`$1\` \|" "$PROVENANCE" | grep -oE '`[0-9a-f]{32}`' | head -1 | tr -d '`'
+}
 
 mkdir -p "$DEST_DIR"
 for pair in "${PAIRS[@]}"; do
   name="${pair%%:*}"
-  source_file="$SOURCE_DIR/${pair#*:}"
+  capture="${pair#*:}"
+  source_file="$SOURCE_DIR/$capture"
   [[ -f "$source_file" ]] || { echo "missing source capture: $source_file" >&2; exit 1; }
+
+  actual="$(md5 -q "$source_file")"
+  if printf '%s\n' "$withheld_md5s" | grep -qx "$actual"; then
+    echo "refusing to publish withheld capture: $source_file (md5 $actual)" >&2
+    exit 1
+  fi
+  expected="$(source_md5_for "$name.jpg")"
+  if [[ -n "$expected" && "$actual" != "$expected" ]]; then
+    echo "source bytes for $name.jpg do not match the provenance record" >&2
+    echo "  expected md5 $expected, read $actual from $source_file" >&2
+    exit 1
+  fi
+
   sips --resampleWidth "$WIDTH" -s format jpeg -s formatOptions "$QUALITY" \
     "$source_file" --out "$DEST_DIR/$name.jpg" >/dev/null
-  printf '%-22s <- %-14s %s\n' "$name.jpg" "${pair#*:}" "$(md5 -q "$DEST_DIR/$name.jpg")"
+  printf '%-22s <- %-14s %s\n' "$name.jpg" "$capture" "$(md5 -q "$DEST_DIR/$name.jpg")"
 done

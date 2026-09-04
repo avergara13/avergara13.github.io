@@ -757,7 +757,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .verdict-row b { font-size:.7rem; letter-spacing:.08em; }
   .verdict-mark { width:36px; height:36px; }
   .product-evidence-slot { border-radius:var(--r-card); }
-  .product-evidence-slot img { aspect-ratio:900/1215; }
   .stage-cta { width:100%; }
   .stage-lede { font-size:.74rem; }
   /* The lattice is a desktop/tablet explanatory visual. On phones the locked Loft stage
