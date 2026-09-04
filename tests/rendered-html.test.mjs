@@ -266,6 +266,51 @@ const mediaSegments = (css) => {
   return segments;
 };
 
+test("no stylesheet rule has lost a selector separator", async () => {
+  // This pass broke a selector list twice by editing shared rules: once leaving a dangling
+  // continuation with no body, and once dropping the comma after `.resume-card`, which
+  // silently turned the list into a descendant selector and stripped the Loft OS demo
+  // panel of its surface styling. Nothing in the suite could see either — both were caught
+  // by human/agent review. CSS fails silently by design, so the structure is pinned here.
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+
+  // Strip comments so prose inside them cannot be mistaken for a selector.
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+  const offenders = [];
+  let cursor = 0;
+  while (true) {
+    const brace = clean.indexOf("{", cursor);
+    if (brace === -1) break;
+    // A selector starts after the previous rule's brace OR after a statement's semicolon
+    // (`@import "…";`), otherwise that statement is read as part of the next selector.
+    const prevEnd = Math.max(
+      clean.lastIndexOf("}", brace),
+      clean.lastIndexOf("{", brace - 1),
+      clean.lastIndexOf(";", brace),
+    );
+    const selector = clean.slice(prevEnd + 1, brace);
+    cursor = brace + 1;
+    if (/@media|@supports|@keyframes|@font-face|^\s*\d/.test(selector)) continue;
+    const lines = selector.split("\n").map((l) => l.trim()).filter(Boolean);
+    // In this file's convention a multi-line selector list is comma-separated, so every
+    // line but the last must end with a comma. An interior line that does not is a lost
+    // separator, which silently becomes a descendant combinator.
+    for (let i = 0; i < lines.length - 1; i++) {
+      if (!lines[i].endsWith(",")) offenders.push(`${lines[i]} ⟶ ${lines[i + 1]}`);
+    }
+  }
+
+  assert.deepEqual(offenders, [], "a multi-line selector list is missing a separator (this silently becomes a descendant selector)");
+
+  // Fixture sanity: the scan must actually be looking at multi-line selector lists.
+  const multiLine = clean.split("\n").filter((l) => l.trim().endsWith(",") && !l.includes("{")).length;
+  assert.ok(multiLine >= 5, `expected several multi-line selector lists to scan, found ${multiLine}`);
+
+  // And braces must balance — the other way an edit to a shared rule fails silently.
+  assert.equal((clean.match(/\{/g) ?? []).length, (clean.match(/\}/g) ?? []).length, "unbalanced braces in the stylesheet");
+});
+
 test("homepage visual prominence follows the intended ranking at every width", async () => {
   const css = await readFile(new URL("app/globals.css", root), "utf8");
 
