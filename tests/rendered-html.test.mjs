@@ -55,7 +55,13 @@ test("homepage opening is role family, then the approved concise value propositi
   assert.doesNotMatch(main, /<h1[^>]*>Angel Vergara<\/h1>/);
 
   // The role family stays a subordinate mono line and is never promoted into a heading.
-  assert.match(main, /<p class="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems<\/p>/);
+  // TSK-974 segments the line so wraps never dangle a separator, so the contract is the
+  // READING, not the markup: strip the segment spans and compare the text exactly.
+  const roleFamily = main.match(/<p class="hero-role-family">([\s\S]*?)<\/p>/);
+  assert.ok(roleFamily, "the role family line is missing");
+  const roleText = roleFamily[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  assert.equal(roleText, "Hospitality Technology · AI Workflow Automation · Systems Implementation · Business Systems");
+  assert.doesNotMatch(main, /<h[12][^>]*>[^<]*Hospitality Technology/);
   assert.doesNotMatch(main, /<h[12][^>]*>[^<]*AI Workflow Automation/);
   // The retired proof cue must stay retired, and it must not creep back in prose form.
   // The class pin alone was not enough: a support line reintroduced the same three
@@ -92,10 +98,11 @@ test("HOME strengthens Angel's identity and presents RSP as one replaceable genu
 
   const product = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="home-bridge'));
   assert.match(product, /src="\/images\/rsp\/mark-336\.png"/);
-  assert.match(product, /data-evidence-slot="temporary-rsp-home"/);
-  assert.match(product, /src="\/images\/rsp\/session\.png"/);
+  assert.match(product, /data-evidence-slot="rsp-home-overview"/);
+  assert.match(product, /\/images\/rsp\/session-overview\.jpg/);
   assert.equal((product.match(/<img/g) ?? []).length, 2, "RSP stage contains one project mark and exactly one screenshot");
-  assert.doesNotMatch(product, /\/images\/rsp\/(?:listings|sold|agent)\.png/);
+  // The retired placeholder and the three-phone strip must both stay gone.
+  assert.doesNotMatch(product, /\/images\/rsp\/(?:session|listings|sold|agent)\.png/);
 });
 
 test("homepage is three proof stages then one career bridge, with Loft OS first", async () => {
@@ -972,4 +979,106 @@ test("resume generator source honors the public claim boundary", async () => {
   assert.doesNotMatch(source, /up\.railway\.app/i);
   assert.doesNotMatch(source, /github\.com\/avergara13\/(loft_os|resale-scanner-pro)/i);
   assert.doesNotMatch(source, /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+});
+
+// ── TSK-974: RSP evidence spread ──────────────────────────────────────────────
+// The published captures are the case study's actual argument, so the contract worth
+// pinning is about EVIDENCE, not layout: which captures ship, in what narrative order,
+// that each one is described, and that the defective/identifying captures never leak.
+
+// A Next static export repeats every image path three times: a <head> preload for the
+// priority image, the real <img>, and the RSC flight payload inside a <script>. Only the
+// rendered markup is the contract, so scripts are stripped before anything is asserted.
+const readRspMain = async () => {
+  const html = await readOutput("work/resale-scanner-pro/index.html");
+  const markup = html.replace(/<script[\s\S]*?<\/script>/g, "");
+  const at = markup.indexOf('<main id="main"');
+  assert.notEqual(at, -1, "RSP case study <main> landmark is missing");
+  return markup.slice(at);
+};
+
+const rspEvidenceOrder = [
+  "/images/rsp/session-overview.jpg",
+  "/images/rsp/capture-ai-lens.jpg",
+  "/images/rsp/analysis-buy.jpg",
+  "/images/rsp/decision-pass.jpg",
+  "/images/rsp/listing-preparation.jpg",
+  "/images/rsp/agent-scans.jpg",
+  "/images/rsp/agent-recap.jpg",
+];
+
+test("RSP case study tells the evidence story in capability order, once each", async () => {
+  const main = await readRspMain();
+
+  // capture -> analysis -> decision -> listing -> agent support. Each marker must also be
+  // unique, so a duplicated screenshot cannot satisfy the ordering claim.
+  assertOrder(main, rspEvidenceOrder);
+
+  // The retired three-phone strip and its placeholder assets stay retired.
+  assert.doesNotMatch(main, /\/images\/rsp\/(?:session|listings|sold|agent)\.png/);
+  assert.doesNotMatch(main, /class="case-screens"/);
+
+  const frames = main.match(/class="rsp-proof-frame/g) ?? [];
+  assert.equal(frames.length, rspEvidenceOrder.length, "every evidence frame is accounted for");
+});
+
+test("every published RSP capture carries alt text and a caption", async () => {
+  const main = await readRspMain();
+
+  for (const src of rspEvidenceOrder) {
+    const at = main.indexOf(src);
+    assert.notEqual(at, -1, `missing evidence image: ${src}`);
+    // The <img> is emitted inside <figure class="rsp-proof-frame">, so the figcaption
+    // that explains it opens within the same element.
+    const frame = main.slice(main.lastIndexOf("<figure", at), main.indexOf("</figure>", at));
+    const alt = frame.match(/alt="([^"]*)"/);
+    assert.ok(alt && alt[1].trim().length > 20, `evidence image needs descriptive alt: ${src}`);
+    assert.match(frame, /<figcaption>/, `evidence image needs a caption: ${src}`);
+  }
+});
+
+test("RSP evidence frames are never cropped, so a caption cannot outrun the image", async () => {
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+  const rule = css.match(/\.rsp-proof-frame img \{[^}]*\}/);
+  assert.ok(rule, ".rsp-proof-frame img rule is missing");
+
+  // A previous draft used object-fit:cover here and sliced the "Add to Queue" control off
+  // the PASS capture while the caption still claimed the controls were on screen. The
+  // published binaries are whole screens; layout scale is width-only.
+  assert.doesNotMatch(rule[0], /object-fit/);
+  assert.match(rule[0], /aspect-ratio:900\/1950/, "frames keep the capture's own aspect ratio");
+});
+
+test("withheld RSP captures never reach the public build", async () => {
+  // IMG_0550 exposes an order identifier and a ZIP; IMG_0527 renders "Invalid Date".
+  // Neither may ship, and neither may be rescued by cropping.
+  const { readdir } = await import("node:fs/promises");
+
+  for (const dir of ["public/images/rsp", "out/images/rsp"]) {
+    const entries = await readdir(new URL(dir, root));
+    for (const entry of entries) {
+      assert.doesNotMatch(entry, /^IMG_/i, `raw camera-roll capture must not ship: ${dir}/${entry}`);
+    }
+  }
+
+  for (const page of ["index.html", "work/resale-scanner-pro/index.html"]) {
+    const html = await readOutput(page);
+    for (const withheld of ["IMG_0550", "IMG_0527"]) {
+      assert.ok(!html.includes(withheld), `withheld capture referenced in ${page}: ${withheld}`);
+    }
+  }
+});
+
+test("RSP captions claim only what the captures show", async () => {
+  const main = await readRspMain();
+
+  // No supplied capture proves QR scanning, autonomous purchase, autonomous publication,
+  // customers, or guaranteed return. None of those may appear as a claim.
+  for (const banned of [/\bQR\b/, /automatically (?:buys|purchases|lists|publishes)/i,
+    /guaranteed (?:profit|return)/i, /\bcustomers\b/i, /on your behalf/i]) {
+    assert.doesNotMatch(main, banned, `unsupported claim in RSP case study: ${banned}`);
+  }
+
+  // The stopping rule is the page's core claim and must stay stated.
+  assert.match(main, /does not publish or purchase anything/);
 });

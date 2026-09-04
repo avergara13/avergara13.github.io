@@ -62,7 +62,13 @@ export default function Home() {
     <section className="proof-hero" aria-labelledby="hero-title">
       <div className="shell proof-hero-grid">
         <div className="proof-hero-copy">
-          <p className="hero-role-family">AI Workflow Automation · Systems Implementation · Business Systems</p>
+          {/* TSK-974: each separator binds to the phrase before it and each phrase is
+              unbreakable, so a wrap can only fall AFTER a "·" — never starting a line with a
+              dangling separator, never splitting a capability. The reading is unchanged:
+              "Hospitality Technology · AI Workflow Automation · Systems Implementation · Business Systems". */}
+          <p className="hero-role-family">
+            <span>Hospitality Technology ·</span> <span>AI Workflow Automation ·</span> <span>Systems Implementation ·</span> <span>Business Systems</span>
+          </p>
           <h1 id="hero-title">I turn messy operations into clear, controlled systems people can use.</h1>
         </div>
       </div>
@@ -105,12 +111,12 @@ export default function Home() {
           <Link className="stage-cta is-ink" href="/work/resale-scanner-pro/">View case study <span aria-hidden="true">→</span></Link>
         </div>
 
-        <figure className="product-evidence-slot" data-evidence-slot="temporary-rsp-home">
+        <figure className="product-evidence-slot" data-evidence-slot="rsp-home-overview">
           <Image
-            src="/images/rsp/session.png"
-            alt="Resale Scanner Pro — active session screen showing buy, maybe, and pass decisions"
-            width={780}
-            height={1688}
+            src="/images/rsp/session-overview.jpg"
+            alt="Resale Scanner Pro session overview: an open session showing four scans with two buy, one maybe, and one pass decisions"
+            width={900}
+            height={1950}
             sizes="(max-width:800px) calc(100vw - 40px), (max-width:1180px) 52vw, 560px"
           />
         </figure>

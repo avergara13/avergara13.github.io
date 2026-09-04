@@ -176,23 +176,6 @@ export function getProject(slug: string) {
 }
 
 function SectionVisual({ project, kind }: { project: Project; kind: Project["sections"][number]["kind"] }) {
-  if (project.slug === "resale-scanner-pro" && kind === "screens") {
-    return (
-      <div className="case-screens">
-        {[
-          ["/images/rsp/session.png", "01 · Evaluate", "Sourcing signals and the buy/pass decision."],
-          ["/images/rsp/listings.png", "02 · Prepare", "Comparable-market evidence and listing work."],
-          ["/images/rsp/sold.png", "03 · Learn", "Sold/outcome evidence for the next decision."],
-        ].map(([src, label, caption]) => (
-          <figure className="phone" key={src}>
-            <Image src={src} alt={`${project.title} ${label} screen`} width={780} height={1688} sizes="(max-width: 620px) 46vw, 28vw" />
-            <figcaption><b>{label}</b><span>{caption}</span></figcaption>
-          </figure>
-        ))}
-      </div>
-    );
-  }
-
   if (project.slug === "sous-chef" && kind === "screens") {
     return (
       <div className="sous-visual">
@@ -278,11 +261,13 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
       );
     }
 
+    // Resale Scanner Pro renders its own evidence spread in RspCase and never reaches here.
     const rows = project.slug === "office-chef"
       ? [["Atlantic Produce", "Roma tomatoes", "+18%", "Review menu assumptions"], ["Harbor Foods", "Canola oil", "+9%", "Compare alternate vendor"], ["Green Valley", "Avocado", "-4%", "No action required"]]
       : project.slug === "loft-os"
         ? [["Wrong work executed", "Materialized scope + explicit allowed surfaces"], ["Hidden unrelated changes", "Clean-state preflight"], ["Premature release", "Authorization gate"], ["Weak completion claims", "Verification evidence"]]
-        : [["Estimated resale value", "$64–$82"], ["Acquisition cost", "$18"], ["Fee + shipping allowance", "$24"], ["Expected contribution", "$22–$40"]];
+        : [];
+    if (rows.length === 0) return null;
     return (
       <div className={`decision-board ${project.slug === "office-chef" ? "table-board" : ""}`}>
         {rows.map((row) => <div key={row[0]}>{row.map((cell, index) => index === 0 ? <span key={cell}>{cell}</span> : <b key={cell}>{cell}</b>)}</div>)}
@@ -425,6 +410,28 @@ const rspFlow: [string, string, string, boolean][] = [
   ["07", "Learn", "Sold and outcome evidence updates the operating record where the current implementation supports it.", false],
 ];
 
+type RspEvidenceFigureProps = {
+  src: string;
+  alt: string;
+  label: string;
+  caption: string;
+  className?: string;
+  sizes: string;
+  priority?: boolean;
+};
+
+function RspEvidenceFigure({ src, alt, label, caption, className = "", sizes, priority = false }: RspEvidenceFigureProps) {
+  return (
+    <figure className={`rsp-proof-frame ${className}`.trim()}>
+      <Image src={src} alt={alt} width={900} height={1950} sizes={sizes} priority={priority} />
+      <figcaption>
+        <span>{label}</span>
+        <p>{caption}</p>
+      </figcaption>
+    </figure>
+  );
+}
+
 function RspCase({ project }: { project: Project }) {
   return (
     <main id="main" data-section="work-resale-scanner-pro">
@@ -454,9 +461,27 @@ function RspCase({ project }: { project: Project }) {
         <div className="shell">
           <div className="split-head">
             <div><p className="eyebrow">01 &#183; Product proof</p><h2>A working product, not a concept rendering.</h2></div>
-            <p>These screens come from the working application and show the resale workflow in use.</p>
+            <p>Current screens from the working application show the operating context first, then the capture flow that begins each evaluation.</p>
           </div>
-          <SectionVisual project={project} kind="screens" />
+          <div className="rsp-editorial rsp-opening-spread">
+            <RspEvidenceFigure
+              src="/images/rsp/session-overview.jpg"
+              alt="Resale Scanner Pro overview showing an open session with buy, maybe, and pass decisions"
+              label="Operating overview"
+              caption="A live session brings the decision mix, active items, and session state into one view."
+              className="rsp-proof-dominant"
+              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 460px"
+              priority
+            />
+            <RspEvidenceFigure
+              src="/images/rsp/capture-ai-lens.jpg"
+              alt="Resale Scanner Pro capture screen framing an item with AI Lens active alongside Scan, Listing, and Quick Draft modes"
+              label="Capture · AI Lens"
+              caption="The capture screen frames the item with AI Lens active, and keeps Scan, Listing and Quick Draft available alongside it."
+              className="rsp-proof-offset"
+              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 320px"
+            />
+          </div>
         </div>
       </section>
 
@@ -469,6 +494,21 @@ function RspCase({ project }: { project: Project }) {
           <div className="workflow-steps">
             {rspFlow.map(([n, title, copy, active]) => <article className={active ? "active-step" : ""} key={n}><span>{n}</span><h3>{title}</h3><p>{copy}</p></article>)}
           </div>
+          <div className="rsp-editorial rsp-analysis-feature">
+            <RspEvidenceFigure
+              src="/images/rsp/analysis-buy.jpg"
+              alt="Resale Scanner Pro completed analysis pipeline with market velocity and a buy decision"
+              label="Analysis · Market signal · BUY"
+              caption="Item identification, market velocity, analysis status, and the final BUY decision remain visible in one completed scan."
+              className="rsp-proof-analysis"
+              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 440px"
+            />
+            <div className="rsp-feature-note">
+              <p className="eyebrow light-eyebrow">Research attached to action</p>
+              <h3>The evidence stays beside the decision.</h3>
+              <p>The completed pipeline exposes its stages and market signal before the operator chooses what happens next.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -478,7 +518,21 @@ function RspCase({ project }: { project: Project }) {
             <div><p className="eyebrow">03 &#183; Decision design</p><h2>Useful automation has a stopping rule.</h2></div>
             <p>RSP automates research and preparation, then stops where judgment matters. The user decides whether to buy, reviews the listing, and explicitly approves publication.</p>
           </div>
-          <SectionVisual project={project} kind="decision" />
+          <div className="rsp-editorial rsp-decision-feature">
+            <div className="rsp-feature-note is-ink">
+              <p className="eyebrow">Human decision</p>
+              <h3>A completed analysis can still end in PASS.</h3>
+              <p>The result does not publish or purchase anything. The operator can re-analyze, pass, hold the item as maybe, or move an approved item into the queue.</p>
+            </div>
+            <RspEvidenceFigure
+              src="/images/rsp/decision-pass.jpg"
+              alt="Resale Scanner Pro completed analysis ending in a pass decision"
+              label="Decision proof · PASS"
+              caption="A finished analysis returns PASS, and Re-analyze, Pass, Maybe and Add to Queue all stay on screen underneath it."
+              className="rsp-proof-pass"
+              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 410px"
+            />
+          </div>
           <p className="case-principle">AI reduces the research and preparation burden. Human judgment remains accountable for the decision and release.</p>
         </div>
       </section>
@@ -486,10 +540,38 @@ function RspCase({ project }: { project: Project }) {
       <section className="case-section">
         <div className="shell">
           <div className="split-head">
-            <div><p className="eyebrow">04 &#183; Learning loop</p><h2>The workflow gets smarter from outcomes.</h2></div>
-            <p>RSP carries the decision past research and listing preparation. Outcome evidence can return to the operating record so future evaluations have better context where the current implementation supports it.</p>
+            <div><p className="eyebrow">04 &#183; Listing + agent support</p><h2>The decision becomes reviewable work.</h2></div>
+            <p>Approved items move into listing preparation. Session context stays available to the in-app agent as supporting evidence, while review and release remain explicit.</p>
           </div>
-          <p className="case-principle">I designed the workflow around a real operating decision: capture the item, reduce the research burden, preserve human judgment, prepare the work, and carry the outcome back into the system.</p>
+          <div className="rsp-editorial rsp-operations-spread">
+            <RspEvidenceFigure
+              src="/images/rsp/listing-preparation.jpg"
+              alt="Resale Scanner Pro listing editor showing photos, title, subtitle, condition, and description fields with a Review and Push action"
+              label="Listing preparation"
+              caption="The listing editor keeps photos, title, condition and description together, and the draft is marked Ready behind an explicit Review &amp; Push."
+              className="rsp-proof-listing"
+              sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 460px"
+            />
+            <div className="rsp-agent-stack">
+              <RspEvidenceFigure
+                src="/images/rsp/agent-scans.jpg"
+                alt="Resale Scanner Pro agent scan list showing evaluated items with buy, maybe, and pass decisions"
+                label="Agent · Evaluated items"
+                caption="Every scanned item keeps its decision, category and buy-to-sell figures, with the buy or pass choice still open on the card."
+                className="rsp-proof-scans"
+                sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 330px"
+              />
+              <RspEvidenceFigure
+                src="/images/rsp/agent-recap.jpg"
+                alt="Resale Scanner Pro agent chat summarizing the current session and the item still awaiting a decision"
+                label="Agent · Session recap"
+                caption="Asked for a recap, the agent reports scan count, buy rate and the item still undecided, and recommends rather than decides."
+                className="rsp-proof-agent"
+                sizes="(max-width:620px) calc(100vw - 40px), (max-width:900px) 520px, 330px"
+              />
+            </div>
+          </div>
+          <p className="case-principle">I designed the workflow around a real operating decision: capture the item, reduce the research burden, preserve human judgment, prepare the work, and keep the operating context visible.</p>
         </div>
       </section>
 
