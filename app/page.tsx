@@ -75,7 +75,7 @@ export default function Home() {
     <section className="flagship-stage" aria-labelledby="flagship-title">
       <div className="shell flagship-grid">
         <div className="flagship-copy">
-          <Image className="stage-mark" src="/images/loft-os/logo-336.png" alt="" width={336} height={336} sizes="56px" />
+          <Image className="stage-mark" src="/images/loft-os/logo-336.png" alt="" width={336} height={336} sizes="(max-width:960px) 64px, 56px" />
           <p className="eyebrow light-eyebrow">Flagship work</p>
           <h2 id="flagship-title">Loft OS<span className="stage-sub">Governed multi-agent workflow system</span></h2>
           <p className="stage-lede">Scoped work. Independent review. Verified closeout.</p>

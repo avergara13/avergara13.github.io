@@ -301,7 +301,10 @@ test("homepage visual prominence follows the intended ranking at every width", a
 
   // A rank gap has to be SEEN, not merely satisfied numerically.
   const STEP = 1.12;
-  for (const width of [1440, 1024, 768, 430, 390]) {
+  // Sampling only the five acceptance widths left the 621-767 band unchecked, and that is
+  // exactly where a breakpoint boundary put the h1 within 2% of the flagship title. Sample
+  // just inside every boundary and across the gaps between the acceptance widths.
+  for (const width of [1440, 1200, 1024, 961, 960, 900, 800, 768, 720, 700, 680, 640, 621, 620, 600, 520, 470, 430, 414, 390, 360]) {
     const h1 = sizeAt(".proof-hero h1", width);
     const flagship = sizeAt(".flagship-copy h2", width);
     const product = sizeAt(".stage-head h2", width);
@@ -317,6 +320,17 @@ test("homepage visual prominence follows the intended ranking at every width", a
   // override sets — the precise blindness that let the inversion look safe.
   assert.ok(sizeAt(".flagship-copy h2", 390) < 30, "the 390px flagship size must come from the phone override, not the base rule");
   assert.ok(sizeAt(".flagship-copy h2", 1440) > 40, "the desktop flagship size must come from the base rule");
+
+  // Continuity across every breakpoint boundary. A band can satisfy the ranking on both
+  // sides and still drop the heading off a cliff at the boundary itself: at 621 the h1
+  // fell 41.6 -> 34.4px in a single pixel because the wider band floored LOWER than the
+  // narrower one. Ranking checks alone cannot see that.
+  for (const [below, above] of [[620, 621], [960, 961]]) {
+    const before = sizeAt(".proof-hero h1", below);
+    const after = sizeAt(".proof-hero h1", above);
+    const drop = (before - after) / before;
+    assert.ok(drop <= 0.05, `the hero drops ${(drop * 100).toFixed(1)}% across ${below}->${above}px; a breakpoint must not step the heading down`);
+  }
 });
 
 test("Agent Workflow Demo is a bounded curated demo with visible three-agent and human-refinement structure", async () => {

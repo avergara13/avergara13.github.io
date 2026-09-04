@@ -602,6 +602,10 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-samples { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .relay-samples button { min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--r-control); background:transparent; color:var(--ink); font-family:var(--font-geist-mono),monospace; font-size:.67rem; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
 .relay-samples button:hover:not(:disabled) { border-color:var(--ink); background:var(--paper); }
+/* The pressed chip must survive hover: the rule above is more specific, so without this it
+   swaps the dark fill for --paper while the white label stays, making the SELECTED item
+   the one you cannot read. */
+.relay-samples button[aria-pressed="true"]:hover:not(:disabled) { background:var(--ink); color:#fff; }
 .relay-privacy { margin:16px 0 0; color:var(--muted); font-size:.72rem; }
 .relay-warning { margin:0 0 12px; padding:10px; border-left:3px solid var(--copper); background:rgba(180,83,9,.07); color:var(--copper); font-size:.76rem; }
 .relay-output { min-width:0; }
@@ -644,9 +648,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-refinement { padding-top:26px; }
 .relay-refinement>label { font-family:var(--font-geist-mono),monospace; font-size:.7rem; font-weight:800; text-transform:uppercase; }
 .relay-refinement>p { margin:4px 0 12px; color:var(--muted); font-size:.78rem; }
-.relay-refinement>div:first-of-type { display:grid; grid-template-columns:1fr auto; gap:8px; }
 .relay-refinement input { min-height:44px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--r-control); background:white; color:var(--ink); font:inherit; }
-.relay-refinement>div:first-of-type button { min-height:44px; padding:9px 14px; border:1px solid var(--ink); border-radius:var(--r-control); background:var(--ink); color:white; font:inherit; font-weight:800; cursor:pointer; }
 .relay-reset { min-height:44px; margin-top:20px; padding:9px 0; border:0; border-bottom:1px solid currentColor; background:transparent; color:var(--muted); font:inherit; font-size:.75rem; cursor:pointer; }
 .relay-governance { margin:22px 0 0; padding-top:12px; border-top:1px dashed var(--line); color:var(--muted); font-family:var(--font-geist-mono),monospace; font-size:.65rem; letter-spacing:.04em; text-transform:uppercase; }
 .relay-section button:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
@@ -699,7 +701,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 @media (max-width:960px) {
   /* Crop harder rather than shrink proportionally, so the counterweight stays
      legible without squeezing the reading column. */
-  .proof-hero h1 { max-width:13ch; font-size:clamp(2.15rem,5.4vw,3.15rem); }
+  .proof-hero h1 { max-width:13ch; font-size:clamp(2.6rem,5.2vw,4.35rem); }
   .proof-hero-copy { max-width:min(100%,52%); }
   .arch-field { width:48%; }
   .arch-field .arch-art { top:-8%; right:-22%; height:128%; }
@@ -831,7 +833,6 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .relay-plan-body section { grid-column:1!important; }
   .relay-skeleton span { grid-column:1; }
   .relay-plan-heading { align-items:flex-start; flex-direction:column; gap:0; }
-  .relay-refinement>div:first-of-type { grid-template-columns:1fr; }
   .control-grid,.control-stack { grid-template-columns:1fr; }
   .case-hero-marked { grid-template-columns:1fr; gap:20px; }
   .case-mark { width:88px; height:88px; }
@@ -861,7 +862,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .menu-button { border-radius:var(--r-control); border-color:var(--edge-strong); }
 
 /* Luminous surfaces */
-.about-story article,.operations-translation article,.resume-card
+.about-story article,.operations-translation article,.resume-card,
 .relay-input-panel,.case-note,.dark-card,.hero-product,.translation-grid article,
 .three-cards article,.office-card,.loft-plate {
   border-radius:var(--r-card); border-color:var(--edge); box-shadow:var(--lift);
