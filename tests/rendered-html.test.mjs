@@ -46,13 +46,12 @@ test("top navigation preserves Work, About, Resume, and Contact", async () => {
   assert.match(html, /href="\/about\/"/);
 });
 
-test("homepage opening is role family, then the full value proposition, then the architectural field — and no CTA row", async () => {
+test("homepage opening is role family, then the approved concise value proposition, then the architectural field — and no CTA row", async () => {
   const main = await readHomeMain();
 
-  // TSK-970 lock: the VALUE PROPOSITION is the page h1. Identity moved to the header
-  // wordmark, which appears on every route. The full approved sentence is required —
-  // the shorter concept variant ("...clear, controlled systems.") is not approved copy.
-  assert.match(main, /<h1 id="hero-title">I turn messy operating problems into clear, controlled systems people can actually use\.<\/h1>/);
+  // TSK-973: the VALUE PROPOSITION stays the page h1, with Angel's approved concise copy.
+  // Identity remains in the strengthened header wordmark that appears on every route.
+  assert.match(main, /<h1 id="hero-title">I turn messy operations into clear, controlled systems people can use\.<\/h1>/);
   assert.doesNotMatch(main, /<h1[^>]*>Angel Vergara<\/h1>/);
 
   // The role family stays a subordinate mono line and is never promoted into a heading.
@@ -80,6 +79,23 @@ test("homepage opening is role family, then the full value proposition, then the
     'class="arch-field"',
     'class="flagship-stage"',
   ]);
+});
+
+test("HOME strengthens Angel's identity and presents RSP as one replaceable genuine proof image", async () => {
+  const main = await readHomeMain();
+  const header = await readFile(new URL("components/SiteHeader.tsx", root), "utf8");
+  const css = await readFile(new URL("app/globals.css", root), "utf8");
+
+  assert.match(header, /className="wordmark"[^>]*>[\s\S]*Angel Vergara/);
+  assert.match(css, /\.wordmark\s*\{[^}]*font-size:1\.4rem[^}]*font-weight:600/);
+  assert.match(css, /@media \(max-width:620px\)[\s\S]*?\.wordmark\s*\{[^}]*font-size:1\.18rem/);
+
+  const product = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="home-bridge'));
+  assert.match(product, /src="\/images\/rsp\/mark-336\.png"/);
+  assert.match(product, /data-evidence-slot="temporary-rsp-home"/);
+  assert.match(product, /src="\/images\/rsp\/session\.png"/);
+  assert.equal((product.match(/<img/g) ?? []).length, 2, "RSP stage contains one project mark and exactly one screenshot");
+  assert.doesNotMatch(product, /\/images\/rsp\/(?:listings|sold|agent)\.png/);
 });
 
 test("homepage is three proof stages then one career bridge, with Loft OS first", async () => {
@@ -156,7 +172,8 @@ test("HOME ships no concept evidence and no unsupported identity metadata", asyn
   for (const banned of ["Nike", "Air Max", "Market Size", "Confidence:", "Profit Potential", "Risk Level", "$110", "hello@angelvergara.com", "Austin"]) {
     assert.ok(!html.includes(banned), `concept evidence must not ship: ${banned}`);
   }
-  // The approved shorter concept headline is also not approved copy.
+  // The retired concept-only truncation remains unapproved; TSK-973's exact sentence
+  // continues through "people can use" and is guarded above.
   assert.doesNotMatch(html, /controlled systems\.<\/h1>/);
 
   // Audit repair A: the Person schema claimed a jobTitle no held-title authority supports.

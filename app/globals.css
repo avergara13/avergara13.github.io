@@ -72,7 +72,7 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
 .review-section .eyebrow, .materials-cta .eyebrow { color:var(--copper-on-dark); }
 .topbar { position:sticky; top:0; z-index:40; border-bottom:1px solid rgba(11,18,32,.18); background:rgba(246,244,241,.92); backdrop-filter:blur(16px); }
 .nav { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
-.wordmark { font-family:var(--font-playfair),Georgia,serif; font-size:1.05rem; text-decoration:none; }
+.wordmark { font-family:var(--font-playfair),Georgia,serif; font-size:1.4rem; font-weight:600; line-height:1; letter-spacing:-.025em; text-decoration:none; }
 .navlinks { display:flex; align-items:center; gap:22px; font-size:.84rem; font-weight:780; }
 .navlinks>a:not(.button) { text-decoration:none; }
 /* TSK-970: shared target sizing. These links were 19-27px tall, under the 44px the
@@ -492,7 +492,7 @@ section { padding:96px 0; }
   h2 { font-size:2.65rem; }
   section { padding:72px 0; }
   .nav { min-height:62px; }
-  .wordmark { font-size:.95rem; }
+  .wordmark { font-size:1.18rem; }
   .navlinks { gap:0; }
   .button-small { min-height:38px; font-size:.75rem; padding:8px 10px; }
   .hero { padding-top:44px; }
@@ -674,17 +674,21 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 
 /* Product stage — lighter, product-led, and evidence-backed. */
 .product-stage { padding:clamp(54px,7vw,90px) 0; background:var(--surface); }
+.product-stage-grid { display:grid; grid-template-columns:minmax(280px,.74fr) minmax(0,1.26fr); gap:clamp(42px,6vw,82px); align-items:center; }
+.product-stage-copy { min-width:0; }
+.product-stage-mark { width:72px; }
 .stage-head { max-width:56ch; }
 .stage-head h2 { margin:14px 0 0; font-size:clamp(1.9rem,3.4vw,2.9rem); line-height:1.05; letter-spacing:-.025em; }
 .stage-head .stage-lede { color:var(--copper); }
 .verdict-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:clamp(30px,4vw,44px) 0 0; padding:0; list-style:none; border-block:1px solid var(--line); }
-.verdict-row li { padding:26px 24px; text-align:center; border-left:1px solid var(--line); }
+.verdict-row li { padding:24px 12px; text-align:center; border-left:1px solid var(--line); }
 .verdict-row li:first-child { border-left:0; padding-left:0; }
 .verdict-row li:last-child { padding-right:0; }
 .verdict-icon { display:block; color:var(--copper); }
 .verdict-mark { width:44px; height:44px; margin-inline:auto; }
 .verdict-row b { display:block; margin:14px 0 0; font-family:var(--font-geist-mono),monospace; font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
-.product-evidence { margin-top:clamp(30px,4vw,42px); }
+.product-evidence-slot { width:min(100%,560px); margin:0; justify-self:end; overflow:hidden; border:1px solid var(--edge-strong); border-radius:var(--r-surface); background:var(--navy-deep); box-shadow:var(--lift-lg); }
+.product-evidence-slot img { width:100%; aspect-ratio:780/1180; object-fit:cover; object-position:top; }
 
 /* Career bridge — one compact operating-reality note and the recruiter exits. */
 .home-bridge { display:grid; grid-template-columns:1.25fr .75fr; gap:clamp(24px,4vw,56px); align-items:start; margin-bottom:clamp(58px,7vw,90px); padding-top:clamp(44px,5vw,64px); border-top:1px solid var(--line); }
@@ -709,6 +713,12 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .flagship-grid,.home-bridge { grid-template-columns:1fr; }
   .flagship-visual { max-width:520px; }
   .stage-mark { width:64px; }
+}
+
+@media (max-width:800px) {
+  .product-stage-grid { grid-template-columns:1fr; gap:clamp(34px,7vw,52px); }
+  .product-stage-copy { max-width:580px; }
+  .product-evidence-slot { width:min(100%,540px); justify-self:start; }
 }
 
 @media (max-width:620px) {
@@ -741,17 +751,8 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .verdict-row li { padding:20px 8px; }
   .verdict-row b { font-size:.7rem; letter-spacing:.08em; }
   .verdict-mark { width:36px; height:36px; }
-  /* Keep the evidence as a three-up strip rather than stacking it. Stacked full-height
-     phones pushed the product stage to ~2950px on a 390 viewport — the evidence stopped
-     being a glance and became the page. Cropped shorter, it still reads as real product
-     texture at a fraction of the scroll. */
-  .product-evidence { grid-template-columns:repeat(3,1fr); gap:8px; }
-  /* Must out-rank .case-screens .phone:nth-child(2|3), which this element also matches:
-     at (0,2,0) this rule was inert and the desktop stagger survived on phones, leaving
-     ragged tops and 36px of the height the crop above exists to remove. */
-  .product-evidence.case-screens .phone { margin-top:0; }
-  .product-evidence .phone img { aspect-ratio:780/1150; }
-  .product-evidence .phone figcaption { padding:9px 8px; font-size:.6rem; }
+  .product-evidence-slot { border-radius:var(--r-card); }
+  .product-evidence-slot img { aspect-ratio:780/1240; }
   .stage-cta { width:100%; }
   .stage-lede { font-size:.74rem; }
   /* The lattice is a desktop/tablet explanatory visual. On phones the locked Loft stage
