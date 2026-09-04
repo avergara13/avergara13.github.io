@@ -22,7 +22,9 @@ export const metadata: Metadata = {
 // judgment"). Labels and mark only: the per-verdict explanatory sentences that briefly
 // stood here were newly authored, and no approved-copy authority covers them, so they are
 // not canonised on a public surface. Meaning belongs in the case study.
-const verdicts = [
+type VerdictKind = "buy" | "maybe" | "pass";
+
+const verdicts: { key: VerdictKind; label: string }[] = [
   { key: "buy", label: "Buy" },
   { key: "maybe", label: "Maybe" },
   { key: "pass", label: "Pass" },
@@ -36,7 +38,9 @@ const evidence: { src: string; title: string; note: string; alt?: string }[] = [
   { src: "/images/rsp/sold.png", title: "Sold", note: "Where completed sales are recorded.", alt: "Resale Scanner Pro — the sold tab, with no sales recorded yet" },
 ];
 
-function VerdictMark({ kind }: { kind: string }) {
+// Typed to the three real variants: as `string` a typo compiled fine and rendered an
+// empty <svg>, so a mislabelled verdict would have shipped with no mark at all.
+function VerdictMark({ kind }: { kind: VerdictKind }) {
   return (
     <svg viewBox="0 0 44 44" className="verdict-mark" role="presentation" aria-hidden="true" focusable="false">
       {kind === "buy" && (

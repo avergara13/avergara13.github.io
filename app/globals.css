@@ -597,7 +597,11 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .relay-samples button[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:#fff; }
 .relay-run { width:100%; min-height:46px; border:1px solid var(--cobalt); border-radius:var(--r-control); background:var(--cobalt); color:#fff; font:inherit; font-weight:800; cursor:pointer; box-shadow:0 1px 2px rgba(36,102,253,.18); }
 .relay-run:hover:not(:disabled) { background:var(--cobalt-ink); border-color:var(--cobalt-ink); box-shadow:0 4px 16px rgba(36,102,253,.28); }
-.relay-run:disabled,.relay-samples button:disabled,.relay-refinement button:disabled { opacity:.58; cursor:wait; }
+/* Run is disabled in two different situations and they must not look alike: BLOCKED
+   (no example chosen yet) reads as not-allowed, BUSY (a run in flight) as wait. Before
+   this, the idle button showed a wait cursor before anything had started. */
+.relay-run:disabled,.relay-samples button:disabled,.relay-refinement button:disabled { opacity:.58; cursor:not-allowed; }
+.relay-run[aria-busy="true"]:disabled { cursor:wait; }
 .relay-samples { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .relay-samples button { min-height:44px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--r-control); background:transparent; color:var(--ink); font-family:var(--font-geist-mono),monospace; font-size:.67rem; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
 .relay-samples button:hover:not(:disabled) { border-color:var(--ink); background:var(--paper); }

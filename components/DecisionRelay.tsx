@@ -325,7 +325,7 @@ export function DecisionRelay() {
           {input ? <p>{input}</p> : <p className="relay-example-empty">No example selected yet. Pick one above to load its input.</p>}
         </div>
         {warning && <p className="relay-warning" aria-live="polite">{warning}</p>}
-        <button className="relay-run" type="button" onClick={runDemo} disabled={running || !fixtureId}>{running ? "Relay running…" : "Run demo"}</button>
+        <button className="relay-run" type="button" onClick={runDemo} aria-busy={running} disabled={running || !fixtureId}>{running ? "Relay running…" : "Run demo"}</button>
         <p className="relay-privacy">This demo runs fixed examples only — there is nothing to type, so no personal or confidential text can be entered.</p>
       </div>
       <div className="relay-output">
