@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Portfolio — Angel Vergara", descri
 // Chooser cards answer only: what is it, why care, where next. Type/Role/Status grids
 // and case-study taxonomy live inside each case study (TSK-961 Phase 4).
 const primary = [
-  { number: "01", title: "🛋️ Loft OS", href: "/work/loft-os/", label: "Flagship · Governed multi-agent workflow system", summary: "A system for moving AI-assisted work from request to verified closeout with controlled authority, independent review, and evidence.", cta: "View case study", image: "/images/loft-os/logo-336.png", alt: "", mark: true },
+  { number: "01", title: "🛋️ Loft OS", href: "/work/loft-os/", label: "Flagship · Governed Multi-Agent Workflow System", summary: "A system for moving AI-assisted work from request to verified closeout with controlled authority, independent review, and evidence.", cta: "View case study", image: "/images/loft-os/logo-336.png", alt: "", mark: true },
   { number: "02", title: "📱 Resale Scanner Pro", href: "/work/resale-scanner-pro/", label: "Working product · In operating use", summary: "A mobile workflow for evaluating resale finds with market evidence, AI-assisted research, and human judgment.", cta: "View case study", image: "/images/rsp/mark-336.png", alt: "", mark: true },
 ];
 

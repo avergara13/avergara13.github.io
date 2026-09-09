@@ -192,8 +192,8 @@ test("homepage is three proof stages then one career bridge, with Loft OS first"
   // Locked stage copy. The Proof Stage deliberately REDUCES copy: the explanatory
   // paragraphs that briefly stood on each stage belong in the case studies, so their
   // absence is pinned rather than left unguarded.
-  assert.match(main, /Governed multi-agent workflow system/);
-  assert.match(main, /Scoped work\. Independent review\. Verified closeout\./);
+  assert.match(main, /Governed Multi-Agent Workflow System/);
+  assert.match(main, /An execution harness for coordinating AI agents, approvals, evidence, and controlled handoffs\./);
   assert.match(main, /Working product\. In operating use\./);
   assert.doesNotMatch(main, /class="stage-note"/);
   assert.doesNotMatch(main, /Specialist agents do the work/);
@@ -282,7 +282,7 @@ test("the HOME architectural field is decorative, project-owned, and carries no 
   const loftHtml = html.slice(html.indexOf('class="flagship-stage"'), html.indexOf('class="product-stage"'));
   assert.match(loftHtml, /class="stage-mark"/);
   assert.match(loftHtml, /id="flagship-title"/);
-  assert.match(loftHtml, /Scoped work\. Independent review\. Verified closeout\./);
+  assert.match(loftHtml, /An execution harness for coordinating AI agents, approvals, evidence, and controlled handoffs\./);
   assert.match(loftHtml, /class="stage-cta"/);
 });
 
@@ -571,7 +571,7 @@ test("portfolio chooser leads with Loft OS, then RSP, with supporting work subor
   assert.ok(additional < arp && additional < sous, "supporting work sits under Additional work");
 
   // Locked card contract: label + one sentence + explicit CTA, and no metadata grid.
-  assert.match(html, /Flagship · Governed multi-agent workflow system/);
+  assert.match(html, /Flagship · Governed Multi-Agent Workflow System/);
   assert.match(html, /Working product · In operating use/);
   assert.match(html, /View case study/);
   assert.match(html, /View project/);
