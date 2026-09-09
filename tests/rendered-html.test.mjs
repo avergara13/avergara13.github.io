@@ -1726,6 +1726,40 @@ test("each Sous Chef evidence figure carries a label, a caption, and describing 
   }
 });
 
+test("each Sous Chef capture is bound to the label that describes it", async () => {
+  const main = await readSousMain();
+  // The evidence tests prove each capture appears once, in order, inside a well-formed
+  // figure. None of them notices if two allowlisted captures swap places WITH their
+  // captions — the order assertion would still hold and every figure would still be
+  // well-formed. Pinning the pairing closes that: a swap now has to survive this table.
+  // It still cannot prove a caption is TRUE of its image; that stays a human reading
+  // responsibility, recorded in sous-chef-evidence-provenance.md.
+  const expected = [
+    ["home-command-center.jpg", "Home"],
+    ["recipe-library.jpg", "Library"],
+    ["collections.jpg", "Home · collections"],
+    ["recipe-record.jpg", "The record · identity"],
+    ["recipe-structure.jpg", "The record · structure"],
+    ["pantry-inventory.jpg", "Pantry"],
+    ["assistant-in-context.jpg", "Assistant · in context"],
+    ["research-desk.jpg", "Assistant · research"],
+  ];
+  const actual = [...main.matchAll(/<img[^>]+src="[^"]*sous-chef\/([^"]+)"[\s\S]{0,900}?<figcaption><span>([^<]+)<\/span>/g)]
+    .map((m) => [m[1], m[2]]);
+  assert.deepEqual(actual, expected, "an evidence capture is paired with the wrong label");
+});
+
+test("Sous Chef states no adoption figure", async () => {
+  const main = await readSousMain();
+  // The only numerals the page carries are its section numbers and the scaling engine's
+  // correction factors. A numeral attached to a scale noun would be an adoption claim, and
+  // there is no evidence for one — no user count, no install count, no saved hours.
+  const scale = /\b\d[\d,.]*\+?\s*(?:k|m|million|thousand)?\s*(?:users?|customers?|restaurants?|kitchens?|chefs?|downloads?|installs?|sign-?ups?|teams?|businesses|stars?|hours?\s+saved)\b/i;
+  const hit = main.replace(/<[^>]+>/g, " ").match(scale);
+  assert.equal(hit, null, `an adoption figure must not appear: ${hit?.[0]}`);
+  assert.doesNotMatch(main, /\b\d[\d,.]*\s*%\s*(?:faster|cheaper|savings|reduction|growth)\b/i);
+});
+
 test("the Sous Chef route links the public repository and never a private surface", async () => {
   const html = await readOutput("work/sous-chef/index.html");
   assert.match(html, /href="https:\/\/github\.com\/avergara13\/sous-chef-app"/);
