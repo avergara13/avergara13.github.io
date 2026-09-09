@@ -333,7 +333,7 @@ function LoftOsCase({ project }: { project: Project }) {
         <div className="shell">
           <div className="split-head">
             <div><p className="eyebrow">01 &#183; Architecture</p><h2>How Loft OS is structured</h2></div>
-            <p>Control lives in three boundaries every piece of work passes through: what may change, who may approve it, and what proves the result. The strip below shows where the human gate sits; the full governed lifecycle is named once, in the Agent Workflow Demo.</p>
+            <p>Control lives in three boundaries every piece of work passes through: what may change, who may approve it, and what proves the result. The strip below shows how work is handed between roles and where the human gate sits; the full governed lifecycle is named once, in the Agent Workflow Demo.</p>
           </div>
           <SectionVisual project={project} kind="controls" />
         </div>
