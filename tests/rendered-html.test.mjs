@@ -1447,9 +1447,11 @@ test("HOME carries Sous Chef directly below RSP, with the same prominence primit
   assert.match(sous, /Working product\. Public source\./);
   assert.match(sous, /class="stage-cta is-ink"[^>]*href="\/work\/sous-chef\/"|href="\/work\/sous-chef\/"[^>]*class="stage-cta is-ink"/);
 
-  // One mark and exactly one capture, matching RSP's composition.
+  // One mark and exactly one capture, matching RSP's composition. HOME leads with the
+  // recipe library rather than the app's dashboard: the stage is a shop window, so it
+  // shows the food. The dashboard still opens the case study.
   assert.equal((sous.match(/<img/g) ?? []).length, 2, "Sous Chef stage contains one project mark and exactly one screenshot");
-  assert.match(sous, /\/images\/sous-chef\/home-command-center\.jpg/);
+  assert.match(sous, /\/images\/sous-chef\/recipe-library\.jpg/);
 
   // HOME carries no figcaption by design, so the alt is the only description a screen
   // reader gets — the same rule the RSP stage is held to.

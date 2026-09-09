@@ -57,9 +57,13 @@ pairing above was established by **reading the pixels of each file**, not by tru
 filename, and the differences are not cosmetic:
 
 - The list named `IMG_0584` as "Pantry Inventory". It is the **Account & Preferences
-  screen**, carrying Angel's personal email address in plain text, "San Francisco, CA", and
-  a membership tier. Publishing on the list's numbering would have put a scrapable personal
-  email and a home city on a public employer-facing page.
+  screen**, carrying Angel's personal email address in plain text, a city-level location,
+  and a membership tier. Publishing on the list's numbering would have put a scrapable
+  personal email and a home city on a public employer-facing page.
+
+  This file is itself committed to a public repository, so it deliberately describes what
+  the withheld capture contains without reproducing any of it. Naming the city here would
+  have leaked the thing the withhold exists to protect.
 - The list named `IMG_0587` as the account screen to exclude. It is in fact the **second
   half of the recipe detail** — servings, the ingredient list, and the numbered method — and
   is one of the strongest captures in the set.

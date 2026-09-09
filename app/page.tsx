@@ -24,7 +24,8 @@ export const metadata: Metadata = {
 // hand-tuned size, and the ranking test measures the one shared selector. Only the surface
 // differs: a warm culinary stage (.sous-stage) against RSP's white.
 //
-// The capture is a genuine current product screen, supplied by Angel and recorded in
+// The capture is the recipe library — a genuine current product screen, chosen because the
+// homepage stage should lead with the food rather than with a dashboard. Recorded in
 // sous-chef-evidence-provenance.md. It replaces two binaries that were live on this site
 // showing the SIGN-IN screen while the alt text called them the culinary workspace.
 // The stage carries no caption by design, exactly as RSP's does not, so the alt text is
@@ -160,10 +161,10 @@ export default function Home() {
 
         <figure className="product-evidence-slot" data-evidence-slot="sous-home-overview">
           <Image
-            src="/images/sous-chef/home-command-center.jpg"
-            alt="Sous Chef home screen: an evening greeting over Inventory, Development, Planning and Inspiration workspaces, a recipe input field, and a cooking session log"
+            src="/images/sous-chef/recipe-library.jpg"
+            alt="Sous Chef recipe library: full-width photographs of a shrimp and soft-egg noodle bowl and avocado toast, each card carrying the recipe name, its total time, its ingredient count and a locked badge"
             width={900}
-            height={1827}
+            height={1815}
             sizes="(max-width:800px) calc(100vw - 40px), (max-width:1180px) 52vw, 560px"
           />
         </figure>
