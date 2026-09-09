@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "verify:resume-artifact": "python3 scripts/generate_resumes.py --emit-json --check",
+    "verify:resume-artifact": "python3 scripts/generate_resumes.py --emit-json --check && python3 scripts/generate_resumes.py --verify-derivatives",
     "build": "npm run verify:resume-artifact && next build",
     "build:pages": "npm run build",
     "test": "npm run build:pages && node --test tests/rendered-html.test.mjs",

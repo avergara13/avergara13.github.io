@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { access, readFile, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -941,6 +942,313 @@ test("private application artifacts remain absent", async () => {
 
   for (const path of paths) {
     await assert.rejects(access(new URL(path, root)), undefined, `${path} must not exist`);
+  }
+});
+
+// --- TSK-967: resume derivative synchronization -------------------------------
+// /resume/ renders general-resume.json but hands the reader a PDF. The JSON half was
+// already gated; the PDF half was not, so a content edit could publish a page and a
+// download that disagreed with every check green. These three tests pin the cure:
+// the gate is WIRED into the build, the lock is TRUE of the committed bytes, and the
+// gate actually REFUSES when the source moves.
+
+test("the resume derivative gate is wired into the release path and actually fails closed", async () => {
+  // A gate nothing calls is capability, not enforcement -- and a gate whose test only
+  // matches substrings cannot tell a fail-CLOSED chain from a fail-OPEN one. Replacing
+  // `&&` with `;`, or appending `|| true`, would satisfy any string assertion while the
+  // script always exits 0. So this walks the chain from the entry point the DEPLOY
+  // workflow actually invokes, then executes the resolved command against a tampered
+  // fixture and requires a non-zero exit.
+  const pkg = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const workflow = await readFile(new URL(".github/workflows/deploy-pages.yml", root), "utf8");
+  const entry = workflow.match(/npm run ([\w:-]+)/);
+  assert.ok(entry, "the deploy workflow must invoke an npm script");
+
+  // Walk package.json from the deploy entry point until the resume gate is reached, so
+  // the pin follows the release path instead of guessing at a script name.
+  const chain = [];
+  let name = entry[1];
+  for (let hop = 0; hop < 6 && name; hop += 1) {
+    const command = pkg.scripts[name];
+    assert.ok(command, `package.json has no script named ${name}`);
+    chain.push(name);
+    if (name === "verify:resume-artifact") break;
+    name = (command.match(/npm run ([\w:-]+)/) ?? [])[1];
+  }
+  assert.ok(
+    chain.includes("verify:resume-artifact"),
+    `the deploy entry point (${entry[1]}) must reach verify:resume-artifact; walked: ${chain.join(" -> ")}`,
+  );
+
+  // Behavioural: tamper one PDF and require the resolved gate command to exit non-zero.
+  const command = pkg.scripts["verify:resume-artifact"];
+  const dir = mkdtempSync(join(tmpdir(), "resume-wiring-"));
+  try {
+    mkdirSync(join(dir, "scripts"));
+    mkdirSync(join(dir, "public", "downloads"), { recursive: true });
+    mkdirSync(join(dir, "app", "resume"), { recursive: true });
+    const rootPath = fileURLToPath(root);
+    for (const rel of [
+      ["scripts", "generate_resumes.py"],
+      ["scripts", "resume_derivatives.lock.json"],
+      ["app", "resume", "general-resume.json"],
+    ]) {
+      copyFileSync(join(rootPath, ...rel), join(dir, ...rel));
+    }
+    const lock = JSON.parse(await readFile(new URL("scripts/resume_derivatives.lock.json", root), "utf8"));
+    for (const filename of Object.keys(lock.entries)) {
+      copyFileSync(join(rootPath, "public", "downloads", filename), join(dir, "public", "downloads", filename));
+    }
+    const runChain = () => {
+      try {
+        execFileSync("sh", ["-c", command], { cwd: dir, encoding: "utf8", stdio: "pipe" });
+        return 0;
+      } catch (error) {
+        return error.status ?? 1;
+      }
+    };
+    assert.equal(runChain(), 0, "fixture sanity: the untampered copy must pass the whole chain");
+    writeFileSync(
+      join(dir, "public", "downloads", "Angel_Vergara_Resume_General.pdf"),
+      Buffer.concat([
+        await readFile(join(dir, "public", "downloads", "Angel_Vergara_Resume_General.pdf")),
+        Buffer.from("\n% tampered\n"),
+      ]),
+    );
+    assert.notEqual(runChain(), 0, "a tampered PDF must make the wired gate command exit non-zero");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the derivative lock is true of the committed PDFs (independent recomputation)", async () => {
+  // Recomputed here in JS rather than trusting the Python gate's own arithmetic: if the
+  // lock and the shipped bytes ever disagree, two independent implementations must both
+  // have to be wrong for it to go unnoticed.
+  const lock = JSON.parse(await readFile(new URL("scripts/resume_derivatives.lock.json", root), "utf8"));
+  assert.equal(lock.schema, "resume-derivatives/v1");
+
+  const source = await readFile(new URL("scripts/generate_resumes.py", root), "utf8");
+  const filenames = [...source.matchAll(/"filename": "([^"]+\.pdf)"/g)].map((m) => m[1]);
+  assert.equal(filenames.length, 4, "fixture sanity: four resume variants are expected");
+  assert.deepEqual(
+    Object.keys(lock.entries).sort(),
+    [...filenames].sort(),
+    "the lock must describe exactly the resumes the generator defines - no orphans, no gaps",
+  );
+
+  for (const filename of filenames) {
+    const bytes = await readFile(new URL(`public/downloads/${filename}`, root));
+    assert.ok(bytes.length > 4000, `fixture sanity: ${filename} should be a complete PDF`);
+    const actual = createHash("sha256").update(bytes).digest("hex");
+    assert.equal(
+      actual,
+      lock.entries[filename].pdf_sha256,
+      `${filename} does not match the lock - rebuild: python3 scripts/generate_resumes.py`,
+    );
+    assert.match(lock.entries[filename].source_sha256, /^[0-9a-f]{64}$/);
+    // Generator provenance is recorded PER ENTRY so a preserved prior entry keeps the
+    // generator that actually built it; a single top-level field would be refreshed by
+    // any --only run and defeat the guarantee it exists for.
+    assert.match(lock.entries[filename].generator_sha256, /^[0-9a-f]{64}$/);
+  }
+});
+
+test("the derivative gate REFUSES when resume content changes without a rebuild", async () => {
+  // The defect this gate exists to prevent, reproduced end to end in a throwaway copy.
+  const dir = mkdtempSync(join(tmpdir(), "resume-derivatives-"));
+  try {
+    mkdirSync(join(dir, "scripts"));
+    mkdirSync(join(dir, "public", "downloads"), { recursive: true });
+    const rootPath = fileURLToPath(root);
+    copyFileSync(join(rootPath, "scripts", "generate_resumes.py"), join(dir, "scripts", "generate_resumes.py"));
+    copyFileSync(
+      join(rootPath, "scripts", "resume_derivatives.lock.json"),
+      join(dir, "scripts", "resume_derivatives.lock.json"),
+    );
+    const lock = JSON.parse(await readFile(new URL("scripts/resume_derivatives.lock.json", root), "utf8"));
+    for (const filename of Object.keys(lock.entries)) {
+      copyFileSync(join(rootPath, "public", "downloads", filename), join(dir, "public", "downloads", filename));
+    }
+
+    // FIXTURE SANITY: the untouched copy must PASS. Without this, a malformed fixture
+    // would make the refusal below pass for entirely the wrong reason.
+    const clean = execFileSync("python3", ["scripts/generate_resumes.py", "--verify-derivatives"], {
+      cwd: dir,
+      encoding: "utf8",
+    });
+    assert.match(clean, /OK 4 resume derivative\(s\)/, "fixture sanity: the unmutated copy must pass");
+
+    // Now change published resume CONTENT without rebuilding the PDFs.
+    const scriptPath = join(dir, "scripts", "generate_resumes.py");
+    const original = await readFile(scriptPath, "utf8");
+    const anchor = '"Loft OS - Sanitized architecture case study:';
+    assert.ok(original.includes(anchor), "fixture sanity: the Loft OS project line must be present to mutate");
+    writeFileSync(scriptPath, original.replace(anchor, '"Loft OS - MUTATED BY TEST:'));
+
+    let failed = false;
+    let message = "";
+    try {
+      execFileSync("python3", ["scripts/generate_resumes.py", "--verify-derivatives"], {
+        cwd: dir,
+        encoding: "utf8",
+        stdio: "pipe",
+      });
+    } catch (error) {
+      failed = true;
+      message = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+    }
+    assert.ok(failed, "a content edit with stale PDFs MUST fail the gate");
+    assert.match(
+      message,
+      /RESUMES content changed since this PDF was built/,
+      "the refusal must name the content drift, not merely fail",
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a partial rebuild cannot vouch for a resume it did not rebuild", async () => {
+  // The bypass this gate would otherwise have: edit resume A's content, rebuild only
+  // resume B, and a lock that re-fingerprinted EVERY resume would file A's new source
+  // hash beside A's stale PDF hash -- two halves that agree with each other and with
+  // nothing real. Untouched resumes must keep their PRIOR entry so the stale source
+  // hash disagrees with the live one. Verified without reportlab by editing the lock
+  // the way a partial build would have: only the rebuilt entry is refreshed.
+  const dir = mkdtempSync(join(tmpdir(), "resume-partial-"));
+  try {
+    mkdirSync(join(dir, "scripts"));
+    mkdirSync(join(dir, "public", "downloads"), { recursive: true });
+    const rootPath = fileURLToPath(root);
+    const scriptPath = join(dir, "scripts", "generate_resumes.py");
+    copyFileSync(join(rootPath, "scripts", "generate_resumes.py"), scriptPath);
+    copyFileSync(
+      join(rootPath, "scripts", "resume_derivatives.lock.json"),
+      join(dir, "scripts", "resume_derivatives.lock.json"),
+    );
+    const lock = JSON.parse(await readFile(new URL("scripts/resume_derivatives.lock.json", root), "utf8"));
+    for (const filename of Object.keys(lock.entries)) {
+      copyFileSync(join(rootPath, "public", "downloads", filename), join(dir, "public", "downloads", filename));
+    }
+
+    const run = () => {
+      try {
+        return { ok: true, out: execFileSync("python3", ["scripts/generate_resumes.py", "--verify-derivatives"], { cwd: dir, encoding: "utf8", stdio: "pipe" }) };
+      } catch (error) {
+        return { ok: false, out: `${error.stdout ?? ""}${error.stderr ?? ""}` };
+      }
+    };
+    assert.ok(run().ok, "fixture sanity: the unmutated copy must pass");
+
+    // Change the GENERAL resume's content, leaving its PDF untouched.
+    const original = await readFile(scriptPath, "utf8");
+    const anchor = '"Loft OS - Sanitized architecture case study:';
+    assert.ok(original.includes(anchor), "fixture sanity: the Loft OS project line must be present to mutate");
+    writeFileSync(scriptPath, original.replace(anchor, '"Loft OS - PARTIAL REBUILD PROBE:'));
+
+    // Drive the REAL lock writer with a partial `built` set, the way `--only` does.
+    // Simulating the corrected lock by hand would pin the gate's reading behaviour while
+    // leaving the writer -- where the bypass actually lived -- untested, so reverting the
+    // fix would turn no test red.
+    const written = execFileSync(
+      "python3",
+      [
+        "-c",
+        [
+          "import json,importlib.util,pathlib",
+          "spec=importlib.util.spec_from_file_location('g','scripts/generate_resumes.py')",
+          "m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)",
+          "print(m.derivatives_lock_json({'Angel_Vergara_Resume_AI_Workflow_Automation.pdf'}), end='')",
+        ].join("\n"),
+      ],
+      { cwd: dir, encoding: "utf8" },
+    );
+    const after = JSON.parse(written);
+    assert.equal(
+      after.entries["Angel_Vergara_Resume_General.pdf"].source_sha256,
+      lock.entries["Angel_Vergara_Resume_General.pdf"].source_sha256,
+      "a resume the run did not rebuild must keep its PRIOR source fingerprint, not be re-fingerprinted against the edited source",
+    );
+    writeFileSync(join(dir, "scripts", "resume_derivatives.lock.json"), written);
+
+    const result = run();
+    assert.equal(result.ok, false, "a partial rebuild must not launder a stale PDF past the gate");
+    assert.match(
+      result.out,
+      /Angel_Vergara_Resume_General\.pdf: RESUMES content changed/,
+      "the refusal must name the resume whose PDF is stale",
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("every derivative-gate refusal branch actually refuses", async () => {
+  // The gate performs several distinct checks. Only the source-drift comparison was
+  // pinned, so the rest could be deleted and the suite would stay green -- three of them
+  // are live fail-opens if removed. Each row below mutates the FIXTURE (never the gate)
+  // and requires both a non-zero exit and the message belonging to that specific check,
+  // so a refusal cannot pass for a neighbouring reason.
+  const rootPath = fileURLToPath(root);
+  const lockText = await readFile(new URL("scripts/resume_derivatives.lock.json", root), "utf8");
+  const baseLock = JSON.parse(lockText);
+
+  const makeFixture = () => {
+    const dir = mkdtempSync(join(tmpdir(), "resume-refusal-"));
+    mkdirSync(join(dir, "scripts"));
+    mkdirSync(join(dir, "public", "downloads"), { recursive: true });
+    copyFileSync(join(rootPath, "scripts", "generate_resumes.py"), join(dir, "scripts", "generate_resumes.py"));
+    writeFileSync(join(dir, "scripts", "resume_derivatives.lock.json"), lockText);
+    for (const filename of Object.keys(baseLock.entries)) {
+      copyFileSync(join(rootPath, "public", "downloads", filename), join(dir, "public", "downloads", filename));
+    }
+    return dir;
+  };
+  const run = (dir) => {
+    try {
+      return { code: 0, out: execFileSync("python3", ["scripts/generate_resumes.py", "--verify-derivatives"], { cwd: dir, encoding: "utf8", stdio: "pipe" }) };
+    } catch (error) {
+      return { code: error.status ?? 1, out: `${error.stdout ?? ""}${error.stderr ?? ""}` };
+    }
+  };
+  const general = "Angel_Vergara_Resume_General.pdf";
+  const lockAt = (dir) => join(dir, "scripts", "resume_derivatives.lock.json");
+  const writeLock = (dir, value) => writeFileSync(lockAt(dir), `${JSON.stringify(value, null, 2)}\n`);
+
+  const rows = [
+    ["lock deleted", (dir) => rmSync(lockAt(dir)), /MISSING/],
+    ["lock unparseable", (dir) => writeFileSync(lockAt(dir), "{ not json"), /UNREADABLE/],
+    ["schema mismatch", (dir) => writeLock(dir, { ...baseLock, schema: "resume-derivatives/v0" }), /SCHEMA MISMATCH/],
+    ["entries malformed", (dir) => writeLock(dir, { ...baseLock, entries: [] }), /MALFORMED entries/],
+    ["orphan entry", (dir) => writeLock(dir, { ...baseLock, entries: { ...baseLock.entries, "Ghost_Resume.pdf": baseLock.entries[general] } }), /no longer defined in RESUMES/],
+    ["entry dropped", (dir) => {
+      const entries = { ...baseLock.entries };
+      delete entries[general];
+      writeLock(dir, { ...baseLock, entries });
+    }, /never been vouched for/],
+    ["published PDF deleted", (dir) => rmSync(join(dir, "public", "downloads", general)), /published PDF missing/],
+    ["published PDF tampered", (dir) => writeFileSync(join(dir, "public", "downloads", general), "not a pdf"), /does not match the lock/],
+    ["rendering code changed", (dir) => {
+      const path = join(dir, "scripts", "generate_resumes.py");
+      const src = readFileSync(path, "utf8");
+      const match = src.match(/fontSize=(\d+)/);
+      assert.ok(match, "fixture sanity: a fontSize must exist to perturb");
+      writeFileSync(path, src.replace(match[0], `fontSize=${Number(match[1]) + 1}`));
+    }, /different version of this generator/],
+  ];
+
+  for (const [label, mutate, expected] of rows) {
+    const dir = makeFixture();
+    try {
+      assert.equal(run(dir).code, 0, `fixture sanity (${label}): the unmutated copy must pass`);
+      mutate(dir);
+      const result = run(dir);
+      assert.notEqual(result.code, 0, `${label}: the gate must refuse`);
+      assert.match(result.out, expected, `${label}: the refusal must name its own check`);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   }
 });
 

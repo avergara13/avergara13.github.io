@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import ast
+import hashlib
 import json
 import re
 import sys
@@ -21,6 +23,14 @@ try:
         SimpleDocTemplate,
         Spacer,
     )
+    # TSK-967: reportlab stamps /CreationDate, /ModDate and a random document /ID on
+    # every run, so two builds of IDENTICAL content produce different bytes. That makes a
+    # PDF hash useless as a staleness signal. `invariant` freezes those fields, so a PDF's
+    # bytes become a pure function of (content + this generator + reportlab version) and
+    # anyone with reportlab can reproduce a committed PDF byte-for-byte.
+    from reportlab import rl_config
+
+    rl_config.invariant = 1
 except ModuleNotFoundError:  # pragma: no cover - exercised only without reportlab
     colors = None
 
@@ -31,6 +41,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DIR = ROOT / "public" / "downloads"
 ARCHIVE_DIR = ROOT / "output" / "pdf"
 WEB_JSON_PATH = ROOT / "app" / "resume" / "general-resume.json"
+DERIVATIVES_LOCK_PATH = ROOT / "scripts" / "resume_derivatives.lock.json"
 
 if PDF_AVAILABLE:
     INK = colors.HexColor("#0B1533")
@@ -549,6 +560,227 @@ def build_resume(resume: dict, destination: Path) -> None:
     doc.build(story)
 
 
+# ---------------------------------------------------------------------------
+# TSK-967 - resume derivative synchronization gate.
+#
+# /resume/ renders app/resume/general-resume.json but hands the reader a PDF.
+# Before this gate only the JSON half was verified (--emit-json --check), so a
+# content edit that regenerated the JSON and not the PDFs published a page and a
+# download that disagreed, with every check green. reportlab is deliberately NOT
+# required here: the build environment has no reportlab, so the gate verifies
+# recorded fingerprints rather than rebuilding. The lock file is written ONLY by
+# the PDF build path, so the only way to satisfy this gate after a content edit
+# is to actually rebuild the PDFs.
+# ---------------------------------------------------------------------------
+
+DERIVATIVES_LOCK_SCHEMA = "resume-derivatives/v1"
+
+
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    return _sha256_bytes(path.read_bytes())
+
+
+def _strip_docstrings(tree: ast.AST) -> ast.AST:
+    for node in ast.walk(tree):
+        body = getattr(node, "body", None)
+        if not isinstance(body, list) or not body:
+            continue
+        if not isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        first = body[0]
+        if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(
+            first.value.value, str
+        ):
+            body.pop(0)
+    return tree
+
+
+def generator_fingerprint() -> str:
+    """Semantic hash of this generator's code.
+
+    A PDF is a function of the CONTENT and of the rendering code that lays it out
+    (section headings, styles, spacing). Fingerprinting only the content data would
+    let a layout edit change every PDF while the gate stayed green.
+
+    Deliberately the AST with docstrings removed, NOT the file bytes. A byte hash
+    fires on a comment or docstring edit, which cannot change a single pixel, and the
+    only remedy the gate can offer is a full PDF rebuild needing reportlab -- which
+    the build environment does not have. A gate that fails on a no-op edit and whose
+    remedy is unavailable where the failure appears is how fail-closed gates train
+    people to route around them.
+    """
+    tree = _strip_docstrings(ast.parse(Path(__file__).resolve().read_text(encoding="utf-8")))
+    return _sha256_bytes(ast.dump(tree).encode("utf-8"))
+
+
+def resume_source_fingerprint(resume: dict) -> str:
+    """Canonical hash of every content input that reaches this resume's PDF.
+
+    EDUCATION is module-level and shared by all four resumes, so it is folded in;
+    otherwise an education edit would change all four PDFs without moving any
+    per-resume fingerprint.
+    """
+    payload = json.dumps(
+        {"resume": resume, "education": EDUCATION},
+        sort_keys=True,
+        ensure_ascii=False,
+        default=list,
+    )
+    return _sha256_bytes(payload.encode("utf-8"))
+
+
+def _existing_lock_entries() -> dict:
+    """Entries from the committed lock, or {} when there is no readable lock."""
+    if not DERIVATIVES_LOCK_PATH.exists():
+        return {}
+    try:
+        prior = json.loads(DERIVATIVES_LOCK_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    entries = prior.get("entries")
+    return entries if isinstance(entries, dict) else {}
+
+
+def build_derivatives_lock(built: set[str]) -> dict:
+    """Record fingerprints, vouching ONLY for the resumes this run actually built.
+
+    `built` is the set of filenames rebuilt in this invocation. A `--only` run must NOT
+    re-fingerprint the resumes it skipped: recomputing their source hash from the live
+    generator while copying their STALE pdf hash off disk would file a lock entry whose
+    two halves agree with each other and with nothing real, and `--verify-derivatives`
+    would then pass over a PDF that no longer matches its source. So untouched resumes
+    keep their PRIOR entry verbatim -- the old source hash then disagrees with the live
+    one and the gate fails closed, which is the correct outcome. A skipped resume with
+    no prior entry is omitted entirely, which the gate reports as never vouched for.
+    """
+    prior = _existing_lock_entries()
+    entries = {}
+    for resume in RESUMES:
+        filename = resume["filename"]
+        if filename in built:
+            # Only the PUBLISHED derivative is recorded. output/pdf/ is a local build
+            # archive, is gitignored, and does not exist in a clean-room checkout --
+            # gating on it would fail closed on every fresh release build for a copy
+            # no reader can reach.
+            entries[filename] = {
+                # Recorded PER ENTRY, not once at the top of the lock: a preserved
+                # prior entry must carry the generator that actually built it. A single
+                # top-level field would be refreshed by any --only run, so a layout-only
+                # edit -- which moves no per-resume source hash -- would leave every
+                # skipped PDF unreproducible from the committed generator while the gate
+                # still passed.
+                "generator_sha256": generator_fingerprint(),
+                "source_sha256": resume_source_fingerprint(resume),
+                "pdf_sha256": _sha256_file(PUBLIC_DIR / filename),
+            }
+        elif filename in prior:
+            entries[filename] = prior[filename]
+    return {
+        "schema": DERIVATIVES_LOCK_SCHEMA,
+        "note": (
+            "Written by scripts/generate_resumes.py when it builds the PDFs. This is an "
+            "unsigned record, not a tamper-proof one: anyone can recompute these hashes "
+            "with the standard library. It defends against ACCIDENTAL drift -- the "
+            "content edit that forgets the PDFs -- not against a determined forger."
+        ),
+        "entries": entries,
+    }
+
+
+def derivatives_lock_json(built: set[str]) -> str:
+    return json.dumps(build_derivatives_lock(built), indent=2, ensure_ascii=False) + "\n"
+
+
+_REBUILD_HINT = (
+    "To resync, in this order:\n"
+    "  1. python3 scripts/generate_resumes.py --emit-json\n"
+    "       refreshes app/resume/general-resume.json, which the /resume/ page renders.\n"
+    "  2. <python-with-reportlab> scripts/generate_resumes.py\n"
+    "       FULL rebuild of all four PDFs. This repo's python3 has NO reportlab by\n"
+    "       design (CI parity), so use a venv:\n"
+    "         python3 -m venv .rlvenv && .rlvenv/bin/pip install reportlab\n"
+    "         .rlvenv/bin/python scripts/generate_resumes.py\n"
+    "       Do NOT use --only: a partial rebuild cannot satisfy this gate, by design.\n"
+    "  3. commit: public/downloads/*.pdf, scripts/resume_derivatives.lock.json,\n"
+    "     and app/resume/general-resume.json.\n"
+    "     output/pdf/ is a gitignored local archive -- do not commit it."
+)
+
+
+def verify_derivatives() -> None:
+    """Fail closed when any resume PDF is stale, missing, or edited out of band.
+
+    Never repairs. A build that silently regenerated a derivative would publish
+    resume content nobody reviewed.
+    """
+    if not DERIVATIVES_LOCK_PATH.exists():
+        raise SystemExit(f"MISSING {DERIVATIVES_LOCK_PATH}.\n{_REBUILD_HINT}")
+    try:
+        lock = json.loads(DERIVATIVES_LOCK_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"UNREADABLE {DERIVATIVES_LOCK_PATH}: {exc}\n{_REBUILD_HINT}")
+
+    if lock.get("schema") != DERIVATIVES_LOCK_SCHEMA:
+        raise SystemExit(
+            f"SCHEMA MISMATCH in {DERIVATIVES_LOCK_PATH}: found {lock.get('schema')!r}, "
+            f"expected {DERIVATIVES_LOCK_SCHEMA!r}.\n{_REBUILD_HINT}"
+        )
+
+    entries = lock.get("entries")
+    if not isinstance(entries, dict):
+        raise SystemExit(f"MALFORMED entries in {DERIVATIVES_LOCK_PATH}.\n{_REBUILD_HINT}")
+
+    problems: list[str] = []
+    current_generator = generator_fingerprint()
+
+    known = {resume["filename"] for resume in RESUMES}
+    for orphan in sorted(set(entries) - known):
+        problems.append(
+            f"{orphan}: recorded in the lock but no longer defined in RESUMES - the "
+            "lock describes a derivative this generator can no longer produce."
+        )
+
+    for resume in RESUMES:
+        filename = resume["filename"]
+        entry = entries.get(filename)
+        if entry is None:
+            problems.append(
+                f"{filename}: no lock entry - this PDF has never been vouched for."
+            )
+            continue
+        if entry.get("generator_sha256") != current_generator:
+            problems.append(
+                f"{filename}: built by a different version of this generator's rendering "
+                "code, so the committed PDF cannot be reproduced from the generator that "
+                "would run now."
+            )
+        if entry.get("source_sha256") != resume_source_fingerprint(resume):
+            problems.append(
+                f"{filename}: RESUMES content changed since this PDF was built. The "
+                "/resume/ page and the download would disagree."
+            )
+        published = PUBLIC_DIR / filename
+        if not published.exists():
+            problems.append(f"{filename}: published PDF missing at {published}.")
+        elif _sha256_file(published) != entry.get("pdf_sha256"):
+            problems.append(
+                f"{filename}: published PDF does not match the lock - it was edited, "
+                "replaced, or rebuilt without updating the lock."
+            )
+
+    if problems:
+        raise SystemExit(
+            "RESUME DERIVATIVES OUT OF SYNC:\n  - "
+            + "\n  - ".join(problems)
+            + f"\n{_REBUILD_HINT}"
+        )
+    print(f"OK {len(RESUMES)} resume derivative(s) match {DERIVATIVES_LOCK_PATH.name}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate portfolio resume PDFs.")
     parser.add_argument(
@@ -581,7 +813,20 @@ def parse_args() -> argparse.Namespace:
             "runs before producing anything publishable."
         ),
     )
+    parser.add_argument(
+        "--verify-derivatives",
+        action="store_true",
+        dest="verify_derivatives",
+        help=(
+            "VERIFY every resume PDF still matches the source it was built from, using "
+            "the committed lock file. Stdlib-only, needs no reportlab, writes nothing. "
+            "This is the gate that stops a content edit from publishing a /resume/ page "
+            "and a PDF that disagree."
+        ),
+    )
     args = parser.parse_args()
+    if args.verify_derivatives and (args.emit_json or args.stdout or args.check or args.only):
+        parser.error("--verify-derivatives is a standalone verification mode")
     if args.stdout and not args.emit_json:
         parser.error("--stdout is only meaningful with --emit-json")
     if args.check and not args.emit_json:
@@ -593,6 +838,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+
+    if args.verify_derivatives:
+        verify_derivatives()
+        return
 
     if args.emit_json:
         payload = general_resume_json()
@@ -641,6 +890,7 @@ def main() -> None:
 
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    built: set[str] = set()
     for resume in RESUMES:
         if requested and resume["filename"] not in requested:
             continue
@@ -648,7 +898,13 @@ def main() -> None:
         archive_path = ARCHIVE_DIR / resume["filename"]
         build_resume(resume, public_path)
         archive_path.write_bytes(public_path.read_bytes())
+        built.add(resume["filename"])
         print(public_path)
+
+    # The lock is written ONLY here, after a real build, and vouches ONLY for what this
+    # run rebuilt (see build_derivatives_lock).
+    DERIVATIVES_LOCK_PATH.write_text(derivatives_lock_json(built), encoding="utf-8")
+    print(DERIVATIVES_LOCK_PATH)
 
 
 if __name__ == "__main__":

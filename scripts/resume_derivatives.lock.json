@@ -1,0 +1,26 @@
+{
+  "schema": "resume-derivatives/v1",
+  "note": "Written by scripts/generate_resumes.py when it builds the PDFs. This is an unsigned record, not a tamper-proof one: anyone can recompute these hashes with the standard library. It defends against ACCIDENTAL drift -- the content edit that forgets the PDFs -- not against a determined forger.",
+  "entries": {
+    "Angel_Vergara_Resume_General.pdf": {
+      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
+      "source_sha256": "f75ec166366c47ea7d4820c9d22fd32a68eba4ce20fea6f237da9f546fba206e",
+      "pdf_sha256": "efe9156e005d14adcb9a7d8ab83a882dce9ada417fae1bf0836ae49a9a425524"
+    },
+    "Angel_Vergara_Resume_Implementation_Onboarding.pdf": {
+      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
+      "source_sha256": "e01ad8ae0a78684a2b2d5c1a57f6b94f4a1a042c1ca90250a41cd7b41173511d",
+      "pdf_sha256": "72851ffa5846684127f4dcb84df211cdc292d63a30e88d6cac4374b743f453ce"
+    },
+    "Angel_Vergara_Resume_Business_Systems_Operations.pdf": {
+      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
+      "source_sha256": "8c5b3cdbb7f37df119864f4a10801ee20b15ffbb9d8e892e04ec7e91537ea0a5",
+      "pdf_sha256": "5fead60beb8006fd9f35cb3e975e712bb730bdb37be4b53a9f1685ecf483dfc7"
+    },
+    "Angel_Vergara_Resume_AI_Workflow_Automation.pdf": {
+      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
+      "source_sha256": "62b8b3f126cc17027fb9292469e383b84b45f116e2b1240a8c485ffc7223ecdb",
+      "pdf_sha256": "f52ce7bf03925179a4f0bf376034fb792dad3c332514ce19df1f3a9dddb6a1f2"
+    }
+  }
+}

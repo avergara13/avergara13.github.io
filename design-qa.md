@@ -339,17 +339,37 @@ that removed `og-office-chef.png`. Rendering the untouched cards through the sam
 reproduces four of them byte-for-byte, so only the copy changed. The HTML sweeps could not
 have caught this because the claim lived in a PNG; the card's writer is pinned instead.
 
-**Known gap, deliberately not closed here.** The build gate covers the JSON artifact, not
-the PDF the same page links. Both derive from `RESUMES[0]`, so a content edit that
-regenerates only the artifact would leave the page and its download disagreeing. Verified
-this is **latent, not live**: all 49 content fields of `app/resume/general-resume.json`
-appear verbatim in the committed General PDF (checked with pypdf; positive control
-`May 2018-Dec 2022` present, negative control absent, no `- Present` end date). It is not
-closed here because the PDF branch needs reportlab, which is deliberately absent from this
-environment and from CI -- so any fingerprint or hash gate would have to be seeded with a
-hand-authored claim about the state it verifies, which is the one thing a gate's input must
-never be. Closing it properly means regenerating the PDFs in an environment that has
-reportlab and recording the fingerprint from that run.
+**That gap is now closed (TSK-967).** The build gate previously covered the JSON artifact
+and not the PDF the same page links, so a content edit that regenerated only the artifact
+left the page and its download disagreeing. It was **latent, not live** when closed: all
+four committed PDFs were content-identical to a fresh build.
+
+What enforces it now. `rl_config.invariant = 1` stops reportlab stamping a creation date,
+modification date and random document id on every run, so a PDF's bytes became a pure
+function of (content + this generator's rendering code + reportlab version) and are
+reproducible byte-for-byte. `scripts/resume_derivatives.lock.json` records, per resume, a
+fingerprint of its content inputs, a fingerprint of the generator's code, and the sha256 of
+the published PDF. `--verify-derivatives` is stdlib-only -- it needs no reportlab, which is
+why it can run in this environment and in CI -- and is chained into `verify:resume-artifact`
+ahead of `next build`. The lock is written only by the PDF build path, and a run vouches
+only for the resumes it rebuilt, so a `--only` build cannot launder a stale PDF.
+
+The generator fingerprint is the AST with docstrings removed, not the file bytes: a byte
+hash fires on a comment edit that cannot change a pixel, and the only remedy the gate can
+offer needs reportlab, which is unavailable where the failure appears.
+
+**What it still does not cover.** The lock proves PROVENANCE -- each derivative came from
+the recorded content and generator -- not AGREEMENT between the two derivatives. The page
+and the PDF are deliberately different projections (the PDF carries phone and city; the
+public page must not), so they cannot simply be byte-compared. `general_resume_document()`
+is a projection layer that feeds the JSON only, so an edit inside it can still change the
+page without changing the PDF, and both halves stay honestly provenanced. Closing that
+means either rendering the PDF from the same projected document or adding a text-layer
+agreement check on the fields that must match. It is recorded, not claimed closed.
+
+The lock is also an unsigned self-attestation: its hashes are recomputable with the
+standard library, so it defends against accidental drift -- the content edit that forgets
+the PDFs -- not against a determined forger.
 
 ## Second review round
 
