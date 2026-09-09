@@ -1697,6 +1697,17 @@ test("every published Sous Chef binary is vouched for, and no withheld capture s
   for (const src of sousEvidenceOrder) {
     await assert.doesNotReject(access(new URL(`out${src}`, root)), `referenced evidence binary is missing from the export: ${src}`);
   }
+
+  // Vouch by REFERENCE, not only by directory. The walk above hashes everything under
+  // images/sous-chef/, so a binary dropped in a SIBLING directory and referenced from the
+  // page was never hashed against the allowlist at all.
+  const page = await readOutput("work/sous-chef/index.html");
+  for (const [, src] of page.matchAll(/<img[^>]+src="(\/[^"]+\.(?:jpe?g|png|webp|avif|gif|svg))"/gi)) {
+    const bytes = await readFile(new URL(`out${src}`, root));
+    const md5 = createHash("md5").update(bytes).digest("hex");
+    assert.ok(allow.has(md5),
+      `the page references an unvouched binary ${src} (md5 ${md5}) — record it in sous-chef-evidence-provenance.md or remove it`);
+  }
   const html = await readOutput("work/sous-chef/index.html");
   assert.doesNotMatch(html, /<img[^>]+src="data:/i, "an evidence image must not be inlined as a data: URI");
 });
@@ -1723,7 +1734,32 @@ test("each Sous Chef evidence figure carries a label, a caption, and describing 
     assert.ok(label && label[1].trim().length > 2, "evidence figure needs a label");
     const caption = frame.match(/<\/span><p>([\s\S]*?)<\/p>/);
     assert.ok(caption && caption[1].trim().length > 40, "evidence figure needs a describing caption");
+
+    // An inline style is a crop surface. RSP pins its evidence images to exactly the one
+    // next/image emits; the same rule has to hold here, because THIS is the page that
+    // promises every capture is the whole screen.
+    const style = frame.match(/<img[^>]+style="([^"]*)"/);
+    assert.ok(!style || style[1] === "color:transparent",
+      `an evidence image carries no inline style but the one next/image emits — found: ${style?.[1]}`);
   }
+
+  // The loop above can only inspect images it already found INSIDE a frame. An <img> placed
+  // anywhere else in <main> — a fabricated Pro screen, say — was invisible to every
+  // assertion on this page. No directory filter here on purpose: RSP's equivalent guard
+  // short-circuits on "/images/rsp/", which a sibling directory walks straight past.
+  const inside = frames.join("");
+  for (const [, tag] of main.matchAll(/(<img\b[^>]*>)/g)) {
+    const src = tag.match(/src="([^"]*)"/)?.[1] ?? "";
+    if (src.endsWith("/images/sous-chef/mark-336.png")) continue;
+    assert.ok(inside.includes(tag),
+      `screenshot rendered outside an evidence figure: ${src}`);
+  }
+
+  // No inline <style> may reach this page either — it is the other way a crop arrives
+  // without touching the stylesheet the tripwire scans.
+  const html = await readOutput("work/sous-chef/index.html");
+  assert.doesNotMatch(html, /<style[^>]*>[\s\S]*?<\/style>/i,
+    "an inline <style> block can crop an evidence image without appearing in globals.css");
 });
 
 test("each Sous Chef capture is bound to the label that describes it", async () => {
