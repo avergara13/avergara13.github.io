@@ -1887,9 +1887,13 @@ test("no stylesheet rule crops an evidence frame", async () => {
   let sawRatio = false, sawSegmentedRule = false;
   for (const seg of segments) {
     for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
-      // Match the whole rsp- family: a rule can reach an evidence image through the layout
-      // wrappers (.rsp-decision-feature img), not only through a .rsp-proof-* class.
-      if (!/\brsp-[a-z-]+/.test(selector)) continue;
+      // Match the whole rsp- AND sous- families: a rule can reach an evidence image through
+      // the layout wrappers (.rsp-decision-feature img, .sous-record-spread img), not only
+      // through a .rsp-proof-* / .sous-proof-* class. Scoping this to rsp- alone left every
+      // Sous Chef rule unread — the tripwire could not see a crop on eight of the site's
+      // sixteen evidence images, which is precisely the blind spot it exists to close.
+      const family = selector.match(/\b(rsp|sous)-[a-z-]+/);
+      if (!family) continue;
       if (!seg.plain || seg.max < Infinity) sawSegmentedRule = true;
       const where = `${selector.trim()}${seg.condition ? ` in ${seg.condition}` : ""}`;
 
@@ -1909,10 +1913,19 @@ test("no stylesheet rule crops an evidence frame", async () => {
       // `aspect-ratio:0.72` through.
       const ratio = body.match(/aspect-ratio\s*:\s*([\d.]+)(?:\s*\/\s*([\d.]+))?/);
       if (ratio) {
-        sawRatio = true;
         const value = ratio[2] ? Number(ratio[1]) / Number(ratio[2]) : Number(ratio[1]);
-        assert.ok(Math.abs(value - 900 / 1950) < 1e-4,
-          `evidence frames must keep the capture's own ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        if (family[1] === "rsp") {
+          // Every RSP capture shares one ratio, so the frame pins it.
+          sawRatio = true;
+          assert.ok(Math.abs(value - 900 / 1950) < 1e-4,
+            `evidence frames must keep the capture's own ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        } else {
+          // The Sous Chef captures do NOT share a ratio (900x1815, 900x1827 and 900x1851
+          // all appear), so any pinned ratio would letterbox or distort at least one of
+          // them. next/image supplies each file's own dimensions instead; declaring a
+          // ratio here is the defect, whatever value it carries.
+          assert.fail(`Sous Chef evidence frames must declare no aspect-ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        }
       }
     }
   }

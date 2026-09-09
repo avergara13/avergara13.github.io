@@ -159,7 +159,7 @@ export default function Home() {
           <Link className="stage-cta is-ink" href="/work/sous-chef/">View case study <span aria-hidden="true">→</span></Link>
         </div>
 
-        <figure className="product-evidence-slot" data-evidence-slot="sous-home-overview">
+        <figure className="product-evidence-slot" data-evidence-slot="sous-home-library">
           <Image
             src="/images/sous-chef/recipe-library.jpg"
             alt="Sous Chef recipe library: full-width photographs of a shrimp and soft-egg noodle bowl and avocado toast, each card carrying the recipe name, its total time, its ingredient count and a locked badge"

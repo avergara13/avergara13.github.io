@@ -446,8 +446,6 @@ section { padding:96px 0; }
    parity is structural, not a hand-tuned size. Only the surface differs. */
 .sous-stage { background:var(--cream); border-top:1px solid var(--cream-line); }
 .sous-stage .stage-head .stage-lede { color:var(--copper); }
-.sous-stage .pass-art { display:block; width:100%; height:auto; }
-.sous-pass-slot { width:min(100%,560px); margin:0; justify-self:end; padding:clamp(14px,2vw,22px); border:1px solid var(--cream-line); border-radius:var(--r-surface); background:var(--cream-deep); box-shadow:var(--lift); }
 .sous-domain-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:clamp(30px,4vw,44px) 0 0; padding:0; list-style:none; border-block:1px solid var(--cream-line); }
 .sous-domain-row li { padding:24px 12px; border-left:1px solid var(--cream-line); }
 .sous-domain-row li:first-child { border-left:0; padding-left:0; }
@@ -812,11 +810,12 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .product-stage-grid { grid-template-columns:1fr; gap:clamp(34px,7vw,52px); }
   .product-stage-copy { max-width:580px; }
   .product-evidence-slot { width:min(100%,540px); justify-self:start; }
-  /* The Sous Chef stage stacks on the same rule as RSP's, from the same class. */
-  .sous-pass-slot { width:min(100%,540px); justify-self:start; }
 }
 
-@media (max-width:960px) {
+/* Bounded at BOTH ends on purpose: this block is declared after the 620px block, so an
+   open-ended max-width:960px beat the phone rule and left six cards in two 170px columns
+   at 375px. A min-width floor makes the intent independent of source order. */
+@media (min-width:621px) and (max-width:960px) {
   .sous-deterministic { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 
@@ -1242,6 +1241,11 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
   font-size:clamp(1.6rem,2.8vw,2.5rem); font-weight:500; line-height:1.06;
 }
 .sous-note>p:last-child { margin:0; color:var(--muted); }
+/* The markup carries .is-ink, copied from .rsp-feature-note where it flips the accent off
+   the on-dark tier. Declared here so the class means something rather than passing only
+   because the base already happens to be right. */
+.sous-note.is-ink { border-left-color:var(--copper); }
+.sous-note.is-ink>p:last-child { color:var(--muted); }
 
 .dark-section .sous-proof-frame { border-color:var(--dark-line); }
 .dark-section .sous-proof-frame figcaption { border-top-color:var(--dark-line); background:var(--navy-deep); }
@@ -1263,7 +1267,11 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
   .sous-open-spread,.sous-pair,.sous-record-spread {
     grid-template-columns:minmax(0,1fr); gap:clamp(26px,5vw,44px);
   }
-  .sous-proof-frame { --frame:520px; }
+  /* Specificity, not order: .sous-pair/.sous-record-spread set --frame:100% at (0,2,0),
+     so a bare .sous-proof-frame cap at (0,1,0) never applied to them. */
+  .sous-proof-frame,
+  .sous-pair .sous-proof-frame,
+  .sous-record-spread .sous-proof-frame { --frame:520px; }
   .sous-proof-hero { justify-self:start; }
   .sous-pair-step { margin-top:0; }
   .sous-note { max-width:620px; padding:10px 0 10px 20px; }
@@ -1281,7 +1289,10 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
   .rsp-proof-frame figcaption { padding:14px 16px 16px; }
   .rsp-feature-note { padding:8px 0 8px 16px; }
   .sous-editorial { margin-top:32px; }
-  .sous-proof-frame { --frame:100%; border-radius:var(--r-card); }
+  .sous-proof-frame,
+  .sous-pair .sous-proof-frame,
+  .sous-record-spread .sous-proof-frame { --frame:100%; }
+  .sous-proof-frame { border-radius:var(--r-card); }
   .sous-proof-frame figcaption { padding:14px 16px 16px; }
   .sous-note { padding:8px 0 8px 16px; }
 }
