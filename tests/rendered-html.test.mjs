@@ -1557,6 +1557,25 @@ test("Sous Chef security wording stays inside what the source can show", async (
   // The open half of the story is present, not merely the fix.
   assert.match(main, /has not been proven end to end/);
   assert.match(main, /not declared in the repository/);
+
+  // Eleven sentences on this page were walked back after an independent review checked
+  // each against the application source and found them stronger than the code supports.
+  // They are pinned here by their exact retracted wording so they cannot drift back in.
+  for (const retracted of [
+    "dropped, not guessed at",                    // the applicator coerces loose op names by shape
+    "every transition that could lose work",      // the plain editor save writes no snapshot
+    "inlined it into every browser chunk",        // Vite define substitutes per reference, not per chunk
+    "it shipped",                                 // no deployed artifact was ever inspected
+    "and restock signals",                        // no restock signal type is emitted
+    "stays picked up where it was left",          // no resumption state exists
+    "refused before any model call is made",      // the pre-call guard is one surface's keyword regex
+    "does not depend on a network call",          // two of the six engines are database round-trips
+    "rather than an open-ended prompt",           // both captures visibly show a free-text input
+    "rather than a blank box",                    // same
+    "⅓ ⅔",                                        // the rounding grid emits no thirds
+  ]) {
+    assert.ok(!main.includes(retracted), `retracted claim must not return: ${retracted}`);
+  }
 });
 
 test("Sous Chef claims no adoption, customers, savings, or scale", async () => {

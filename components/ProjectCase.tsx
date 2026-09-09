@@ -630,7 +630,7 @@ function SousEvidenceFigure({ src, alt, label, caption, height, className = "", 
 const sousDomainModel: [string, string, string][] = [
   ["Ingredients", "Addressable rows, not a text blob", "Each ingredient carries its own id, amount, unit, preparation and sort order — which is what makes a precise edit possible at all."],
   ["Steps", "Numbered, timed, and temperature-aware", "A step holds its instruction, duration and temperature, so the kitchen surface can turn a written duration into a running timer."],
-  ["Yield and timings", "The basis every scale is computed from", "Yield amount and unit, prep and cook minutes: the fields the scaling engine divides against."],
+  ["Yield and timings", "The basis every scale is computed from", "Yield amount is what a scale divides against — target servings over the recipe\u2019s own yield. Prep and cook minutes are the timings the kitchen surface reads."],
   ["Lifecycle", "Working, locked, archived", "Status is a two-value union backed by a database constraint, paired with a lock timestamp; archiving is a soft delete, so nothing is destroyed."],
 ];
 
@@ -645,7 +645,7 @@ const sousDeterministic: [string, string, string, string][] = [
     "Rounding",
     "roundToPractical",
     "Amounts a cook can actually measure",
-    "Cups round to the quarter, tablespoons to the half, teaspoons to the quarter — and render as ¼ ½ ¾ ⅓ ⅔ rather than as decimals.",
+    "At a cup or more, cups round to the quarter and tablespoons to the half; teaspoons round to the quarter at any size, and render as ¼ ½ ¾ rather than as decimals.",
   ],
   [
     "Matching",
@@ -663,21 +663,21 @@ const sousDeterministic: [string, string, string, string][] = [
     "Signals",
     "generateAndSavePantrySignals",
     "Stated formulas, not vibes",
-    "High-velocity, staple and restock signals each carry an explicit confidence formula, so a reader can check the arithmetic instead of trusting a score.",
+    "High-velocity and staple signals each carry an explicit confidence formula, so a reader can check the arithmetic instead of trusting a score.",
   ],
   [
     "Versioning",
     "saveRecipeVersion",
     "A snapshot before anything is lost",
-    "Full snapshots are written before lock, before unlock, before an AI replace and before archive — every transition that could lose work.",
+    "Full snapshots are written before lock, before unlock, before an AI replace and before archive.",
   ],
 ];
 
 const sousBoundedAI: [string, string, string][] = [
   ["01", "It proposes; it does not write", "A model response is a structured envelope — content, citations, confidence, assumptions, and an optional edit proposal. No model call reaches the database."],
-  ["02", "A closed list of operations", "Proposals are expressed as typed operations over a fixed union: set a field, add, edit, remove, reorder or swap an ingredient or step. An operation outside the list is dropped, not guessed at."],
+  ["02", "A closed list of operations", "Proposals are expressed as typed operations over a fixed union: set a field, add, edit, remove, reorder or swap an ingredient or step. A loose name like \u201Cadd\u201D is resolved against the shape of the action, and anything that still does not land on the union is skipped rather than applied."],
   ["03", "A preview, then a decision", "Accepting a recipe proposal computes the next version in memory and shows it. Nothing is saved until the cook chooses: save as a new draft, or replace the current recipe."],
-  ["04", "A locked recipe refuses", "Edit intent against a locked or archived recipe is refused before any model call is made, and the refusal is repeated at three further layers behind it."],
+  ["04", "A locked recipe refuses", "A locked or archived recipe cannot accept an edit: the apply path refuses it and the accept control is not rendered. On the recipe surface an explicitly worded edit request is also turned away before the model is called at all."],
   ["05", "Uncertainty is shown, not hidden", "Confidence, sources and the assumptions behind an answer are rendered next to it, so the person approving the change can see what it rests on."],
 ];
 
@@ -689,7 +689,7 @@ const sousBoundedAI: [string, string, string][] = [
 // inspected (none was), that the server verifies the token (those functions live outside the
 // repository), and that the credential itself was retired or invalidated (unestablished).
 const sousFound: [string, string, string][] = [
-  ["Found", "A provider key was being compiled into the browser build", "The Vite config read a Gemini API key out of the build environment and inlined it into every browser chunk. That is the defect; it shipped, and it is on the record here rather than left out."],
+  ["Found", "A provider key was being compiled into the browser build", "The Vite config read a Gemini API key out of the build environment and substituted it into the client source wherever the key was referenced, so it became a literal in the bundle. That is the defect; it was merged to main, and it is on the record here rather than left out."],
   ["Contained", "The injection was removed at its source", "The build-time injection is gone, and both client-side provider integrations and their SDK dependencies were deleted with it. No module in the client reads a provider credential today."],
   ["Re-routed", "AI requests carry the caller's own session", "Every remaining AI request goes through one call to a server-side endpoint with the signed-in user's access token attached, and returns a typed auth error instead of a result when there is no session."],
   ["Declared", "The deploy configuration was made explicit", "A start command, and a build config pinning the deploy output to the built front end plus the small Node server that serves it with a health check and an SPA fallback."],
@@ -809,9 +809,9 @@ function SousChefCase({ project }: { project: Project }) {
             />
             <SousEvidenceFigure
               src="/images/sous-chef/collections.jpg"
-              alt="Sous Chef collections view: a grain bowl photograph tagged Active Recipe above a prompt to reopen it, with a Signature Collection card below"
-              label="Collections"
-              caption="The same records, grouped. An active recipe stays picked up where it was left, and collections gather the rest."
+              alt="Sous Chef home screen further down: a From Your Collections section with a grain bowl photograph tagged Active Recipe above a prompt to reopen it, and a Signature Collection card below"
+              label="Home · collections"
+              caption="The same records, surfaced from Home. A working recipe is offered back for another pass, and the collection gathers the rest."
               height={1827}
               className="sous-pair-step"
               sizes="(max-width:900px) calc(100vw - 40px), 42vw"
@@ -835,7 +835,7 @@ function SousChefCase({ project }: { project: Project }) {
         <div className="shell">
           <div className="split-head">
             <div><p className="eyebrow">03 &#183; The record</p><h2>Lock it, and the product starts defending it.</h2></div>
-            <p>A recipe that is right gets locked. From that point the product treats it as something to be protected rather than edited freely: the lock carries a timestamp, archiving is a soft delete rather than a destruction, and every transition that could lose work writes a full snapshot first.</p>
+            <p>A recipe that is right gets locked. From that point the product treats it as something to be protected rather than edited freely: the lock carries a timestamp, archiving is a soft delete rather than a destruction, and the transitions that lock, unlock, replace or archive it each write a full snapshot first.</p>
           </div>
           <div className="sous-editorial sous-record-spread">
             <SousEvidenceFigure
@@ -869,7 +869,7 @@ function SousChefCase({ project }: { project: Project }) {
         <div className="shell">
           <div className="split-head">
             <div><p className="eyebrow">04 &#183; Deterministic logic</p><h2>The parts a kitchen relies on do not ask a model.</h2></div>
-            <p>The work that has to be right every time is ordinary, inspectable code. It runs the same way twice, it can be read in the public repository, and it does not depend on a network call or a provider being available.</p>
+            <p>The work that has to be right every time is ordinary, inspectable code. It runs the same way twice, it can be read in the public repository, and none of it asks a model — the arithmetic is settled before anything is stored.</p>
           </div>
           <div className="sous-deterministic">
             {sousDeterministic.map(([label, ref, title, copy]) => (
@@ -908,7 +908,7 @@ function SousChefCase({ project }: { project: Project }) {
               src="/images/sous-chef/assistant-in-context.jpg"
               alt="Sous Chef assistant panel opened over a recipe, headed Smart Sous Chef with a Technique and Scaling Expert subtitle, a context line naming the recipe, and a list of the tasks it offers"
               label="Assistant · in context"
-              caption="The panel opens over a recipe and names it. What it offers is scoped and stated up front — scaling, technique, timing — rather than an open-ended prompt with a kitchen attached."
+              caption="The panel opens over a recipe and names it. What it offers is scoped and stated up front — scaling, technique, timing — before the cook types anything."
               height={1815}
               sizes="(max-width:900px) calc(100vw - 40px), 42vw"
             />
@@ -916,7 +916,7 @@ function SousChefCase({ project }: { project: Project }) {
               src="/images/sous-chef/research-desk.jpg"
               alt="Sous Chef research workspace with Research, Recipe and Journal tabs above four actions — Analyze Ingredients, Suggest Pairings, Find Origins, Smart Substitutes — and Fast, Balanced and Deep effort settings"
               label="Assistant · research"
-              caption="The separate research surface offers named culinary operations rather than a blank box, and exposes the effort setting behind them."
+              caption="The separate research surface leads with named culinary operations, and exposes the effort setting behind them."
               height={1827}
               className="sous-pair-step"
               sizes="(max-width:900px) calc(100vw - 40px), 42vw"
