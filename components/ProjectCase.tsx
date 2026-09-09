@@ -700,6 +700,44 @@ const sousOpen: [string, string][] = [
   ["Deployment rules are not in the repository", "The rules that decide when this project redeploys are not declared in the repository, so they cannot be reviewed alongside the code they govern. Tracked as open work, not repaired here."],
 ];
 
+// Sous Chef Pro — the planned direction, supplied by Angel and grouped the way a restaurant
+// actually divides its work rather than as a flat feature list. The grouping is the argument:
+// an Executive Chef who became a General Manager ran all three of these domains, which is why
+// the same person can specify them. NONE of it is built, and the section that renders it is
+// prose in a dashed panel — never a product surface. A test asserts it carries no image and
+// no evidence frame, and that none of these names leaks into the current-product copy.
+//
+// Recipe Library is deliberately absent: it ships today, so listing it as planned would be
+// wrong in the one direction that matters.
+const sousPro: [string, string, [string, string][]][] = [
+  [
+    "The plate",
+    "Where the existing record already reaches, if cost is attached to it.",
+    [
+      ["Recipe costing", "Attach cost to the ingredient rows the recipe already stores, so a plate cost falls out of the record rather than out of a spreadsheet."],
+      ["Menu builder", "Compose menus from costed recipes, with the same lock-and-version discipline applied to the menu itself."],
+      ["Live menu economics", "Let a change in an ingredient cost surface where it lands across the menu, while the decision stays with the operator."],
+    ],
+  ],
+  [
+    "The kitchen",
+    "The work between the record and service, which is where most of a shift is spent.",
+    [
+      ["Inventory management", "Extend the pantry from a household cupboard to a walk-in: par levels, counts, waste, and what a count implies about the next order."],
+      ["Prep lists", "Derive the day's prep from what is on the menu, what is already made, and what the counts say is short — rather than from memory."],
+    ],
+  ],
+  [
+    "The back office",
+    "The half of the job a chef inherits on becoming a general manager.",
+    [
+      ["Purchasing and cost monitoring", "Watch what is being bought against what was planned, and surface a price move before it turns up in the month's numbers."],
+      ["Vendor management", "Hold the vendor, the item, the agreed price and the substitution history in one place, so a change is visible rather than discovered."],
+      ["Scheduling", "Build the schedule against forecast covers and real availability, and keep labour visible next to the sales it is staffed for."],
+    ],
+  ],
+];
+
 function SousChefCase({ project }: { project: Project }) {
   const repo = project.links?.[0];
   return (
@@ -933,12 +971,16 @@ function SousChefCase({ project }: { project: Project }) {
           </div>
           <div className="sous-pro">
             <p className="sous-pro-chip">Planned &#183; not built</p>
-            <ul className="sous-pro-list">
-              <li><b>Recipe costing</b><p>Attach cost to the ingredient rows the recipe already stores, so a plate cost falls out of the record rather than out of a spreadsheet.</p></li>
-              <li><b>Menu builder</b><p>Compose menus from costed recipes, with the same lock-and-version discipline applied to the menu itself.</p></li>
-              <li><b>Live menu economics</b><p>Let a change in an ingredient cost surface where it lands across the menu, while the decision stays with the operator.</p></li>
-            </ul>
-            <p className="case-gap-note">Written as direction, not as a commitment: no dates, no delivery promise, and no claim about who would use it.</p>
+            {sousPro.map(([group, note, items]) => (
+              <section className="sous-pro-group" key={group}>
+                <h3>{group}</h3>
+                <p className="sous-pro-note">{note}</p>
+                <ul className="sous-pro-list">
+                  {items.map(([name, copy]) => <li key={name}><b>{name}</b><p>{copy}</p></li>)}
+                </ul>
+              </section>
+            ))}
+            <p className="case-gap-note">Written as direction, not as a commitment: no dates, no delivery promise, and no claim about who would use it. Nothing on this list is built.</p>
           </div>
         </div>
       </section>

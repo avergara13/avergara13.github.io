@@ -1506,11 +1506,20 @@ test("Sous Chef separates the current product from the planned Pro direction", a
   assert.match(pro, /Planned · not built/);
   assert.equal((pro.match(/<img/g) ?? []).length, 0, "the planned Pro direction must never be shown as a product screen");
   assert.equal((pro.match(/class="sous-proof-frame/g) ?? []).length, 0, "no evidence frame may sit inside the planned section");
-  for (const capability of ["Recipe costing", "Menu builder", "Live menu economics"]) {
+  for (const capability of [
+    "Recipe costing", "Menu builder", "Live menu economics",
+    "Inventory management", "Prep lists",
+    "Purchasing and cost monitoring", "Vendor management", "Scheduling",
+  ]) {
     assert.ok(pro.includes(capability), `planned capability missing: ${capability}`);
+  }
+  // Grouped by operating domain rather than listed flat — the grouping is the argument.
+  for (const group of ["The plate", "The kitchen", "The back office"]) {
+    assert.ok(pro.includes(group), `planned-direction group missing: ${group}`);
   }
   // Recipe Library ships today, so it must not be listed as a planned Pro capability.
   assert.doesNotMatch(pro, /Recipe library/i);
+  assert.match(pro, /Nothing on this list is built\./);
 
   // Nothing anywhere may present Pro as delivered.
   for (const banned of [
@@ -1556,7 +1565,10 @@ test("Sous Chef claims no adoption, customers, savings, or scale", async () => {
   const sousMain = await readSousMain();
   const planned = sousMain.slice(sousMain.indexOf("07 · Planned direction"), sousMain.indexOf("08 · Public boundary"));
   const current = sousMain.replace(planned, "");
-  for (const banned of ["plate cost", "recipe costing", "menu builder", "live menu economics"]) {
+  for (const banned of [
+    "plate cost", "recipe costing", "menu builder", "live menu economics",
+    "prep list", "vendor management", "par level",
+  ]) {
     assert.ok(!new RegExp(`\\b${banned}\\b`, "i").test(current),
       `a planned capability must not be named outside the planned section: ${banned}`);
   }
