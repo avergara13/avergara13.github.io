@@ -29,7 +29,7 @@
     },
     {
       "name": "Loft OS",
-      "summary": "Sanitized architecture case study: governed multi-agent AI workflows with scoped roles, human authorization, evidence-backed review, fail-closed controls, recovery paths, and deterministic closeout."
+      "summary": "Sanitized architecture case study: governed multi-agent workflow system and execution harness coordinating AI agents, approvals, evidence, and controlled handoffs, with fail-closed controls, recovery paths, and verified closeout."
     },
     {
       "name": "Sous Chef",

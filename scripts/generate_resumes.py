@@ -98,9 +98,9 @@ RESUMES = [
             "Resale Scanner Pro - Working personal AI-assisted application used in the family resale workflow: item "
             "capture, AI-assisted identification, market research, BUY / MAYBE / PASS decision support, listing "
             "preparation, publishing, and operating records.",
-            "Loft OS - Sanitized architecture case study: governed multi-agent AI workflows with scoped roles, "
-            "human authorization, evidence-backed review, fail-closed controls, recovery paths, and "
-            "deterministic closeout.",
+            "Loft OS - Sanitized architecture case study: governed multi-agent workflow system and "
+            "execution harness coordinating AI agents, approvals, evidence, and controlled handoffs, "
+            "with fail-closed controls, recovery paths, and verified closeout.",
             "Sous Chef - Public AI-assisted culinary workspace: authenticated recipe workflows, pantry and inventory "
             "signals, cookbooks, and cooking-session history.",
         ],
@@ -159,8 +159,9 @@ RESUMES = [
             "Resale Scanner Pro - Personal workflow application built for Hobbyst Resale, a small family eBay resale "
             "business: item capture, AI-assisted identification, market research, BUY / MAYBE / PASS decisions, listing "
             "preparation, publishing, and operating records; actively evolving personal project evidence.",
-            "Loft OS - Sanitized architecture case study: governed workflow moving work through scoped intake, "
-            "role-separated execution, human approval, evidence-backed review, recovery, and deterministic closeout.",
+            "Loft OS - Sanitized architecture case study: governed multi-agent workflow system moving work "
+            "through scoped intake, role-separated execution, controlled handoffs, human approval, "
+            "evidence-backed review, recovery, and verified closeout.",
             "Sous Chef - Public application: hospitality-domain workspace for authenticated recipe workflows, pantry and "
             "inventory signals, cookbooks, session history, and AI-assisted creation.",
         ],
@@ -215,8 +216,9 @@ RESUMES = [
             "Resale Scanner Pro - Working personal AI-assisted workflow application used in a small family resale "
             "workflow: structured intake, AI-assisted research, human review gates, external-service integration, "
             "publishing workflows, and operating records within a family-use context.",
-            "Loft OS - Sanitized architecture case study: governed workflow patterns for scope, authorization, evidence, "
-            "recovery, and closeout, focused on visible ownership and fail-closed controls.",
+            "Loft OS - Sanitized architecture case study: governed multi-agent workflow system coordinating "
+            "AI agents, approvals, evidence, and controlled handoffs, with visible ownership, "
+            "fail-closed controls, and verified closeout.",
         ],
         "experience": [
             (
@@ -268,8 +270,9 @@ RESUMES = [
             "Resale Scanner Pro - Private working personal AI-assisted application used in a small family resale workflow; "
             "built with React, TypeScript, Vite, Node/Express, Supabase, and Railway, with Gemini, Claude, "
             "marketplace/API integrations, automation, and GitHub delivery workflows. Private working-product evidence only; no live deployment or source link is included.",
-            "Loft OS - Sanitized architecture case study: agentic workflows with scoped roles, human authorization, "
-            "evidence-backed review, fail-closed controls, recovery paths, and deterministic closeout.",
+            "Loft OS - Sanitized architecture case study: governed multi-agent workflow system and execution "
+            "harness coordinating AI agents, approvals, evidence, and controlled handoffs, with scoped "
+            "roles, fail-closed controls, recovery paths, and verified closeout.",
             "Sous Chef - Public application: AI-assisted culinary workspace with authenticated recipe flows, pantry and "
             "inventory signals, cookbooks, and cooking-session history.",
         ],
