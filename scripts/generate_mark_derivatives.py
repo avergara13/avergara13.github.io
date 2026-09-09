@@ -52,6 +52,12 @@ MARKS = {
         "3df208121f32da59784c20a00601f296b909dd6a3fe9cd4aefcad64f63532006",
         "c6c863b8a61bb7ac24e0a31c1eefc2f7074e946a0ec7d3e97f5129bfa8e3175c",
     ),
+    # Sous Chef's canonical original is the owner-supplied app icon exactly as delivered —
+    # a JPEG, kept byte-for-byte. It is not converted, recomposed, or re-encoded in place.
+    "public/images/sous-chef/mark.jpeg": (
+        "ec33642869adf0162d8f77dcdaf42bb36cdbcbe4e21ed0cd8aa5cc792d30a7ea",
+        "ea490ee2040c100d95da412eed6f83a73ab88c8a1b859281e19a6cb7c506f855",
+    ),
 }
 
 # Encoder the committed derivatives were produced with. Recorded so a byte mismatch can be
@@ -67,7 +73,10 @@ def sha256_bytes(data: bytes) -> str:
 
 
 def derivative_path(source: Path) -> Path:
-    return source.with_name(f"{source.stem}-{DERIVATIVE_PX}{source.suffix}")
+    # Derivatives are always PNG (see render), regardless of the canonical original's
+    # container. Sous Chef's owner-supplied mark is a JPEG and is kept byte-exact; deriving
+    # "mark-336.jpeg" from it would name a PNG with a JPEG extension.
+    return source.with_name(f"{source.stem}-{DERIVATIVE_PX}.png")
 
 
 def ancillary_chunks(data: bytes) -> list[str]:

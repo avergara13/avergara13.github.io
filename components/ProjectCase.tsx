@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import HumanGatedHandoff from "@/components/HumanGatedHandoff";
 import { DecisionRelay } from "@/components/DecisionRelay";
+import { KitchenPass } from "@/components/KitchenPass";
 
 export type Project = {
   slug: string;
@@ -84,32 +85,28 @@ const projectData: Record<string, Project> = {
   },
   "sous-chef": {
     slug: "sous-chef",
-    eyebrow: "AI-assisted domain workflow",
+    eyebrow: "Working product · Public source",
     title: "Sous Chef",
-    dek: "A recipe and kitchen-knowledge workspace that applies AI-assisted workflows to practical culinary work.",
-    role: "Domain workflow design · Product implementation · Hospitality / culinary translation",
-    boundaryNote: "This is a public application / product-delivery case study, not a commercial customer deployment.",
-    status: "Public application repository",
-    statusTone: "cobalt",
-    proof: ["Domain-first UX", "Recipe workflows", "Pantry signals", "AI-assisted creation"],
+    dek: "A culinary workspace where the recipe is a protected, versioned record — and the assistant can only propose changes a person accepts.",
+    role: "Product design · Hospitality-domain translation · Implementation",
+    status: "Working product · public source",
+    statusTone: "copper",
+    proof: ["Structured recipes", "Locked + versioned", "Deterministic scaling", "Propose-only AI"],
     links: [{ label: "View public repository", href: "https://github.com/avergara13/sous-chef-app", primary: true }],
     facts: [
       { label: "Role", value: "Product design, domain translation, and implementation" },
-      { label: "Primary user", value: "Cooks organizing recipes, pantry context, and cooking sessions" },
-      { label: "Constraint", value: "Use culinary language and sequences that feel familiar to operators" },
-      { label: "Delivered outcome", value: "Inspectable product work grounded in hospitality-domain judgment" },
+      { label: "Primary user", value: "A cook working from a recipe, against a real pantry, under time pressure" },
+      { label: "Constraint", value: "The kitchen has to be able to trust the record; the assistant may never quietly change it" },
+      { label: "Delivered outcome", value: "A working authenticated product whose source is public and directly inspectable" },
     ],
     workflow: [
-      { number: "01", title: "Discover & create", copy: "Start with a cooking goal and shape a structured recipe." },
-      { number: "02", title: "Organize", copy: "Save reusable work into cookbooks and collections." },
-      { number: "03", title: "Prepare", copy: "Connect recipes to pantry and shopping context." },
-      { number: "04", title: "Cook", copy: "Carry the recipe through a focused cooking session." },
-      { number: "05", title: "Remember", copy: "Preserve history so the next session begins with context." },
+      { number: "01", title: "Capture", copy: "Bring a recipe in from a link, a description, or the structured editor." },
+      { number: "02", title: "Structure", copy: "Ingredients, steps, yield and timings become addressable fields." },
+      { number: "03", title: "Protect", copy: "Lock the recipe once it is right; every later transition snapshots first." },
+      { number: "04", title: "Cook", copy: "Scale to the covers on hand and work the steps against the pantry." },
+      { number: "05", title: "Revise", copy: "The assistant proposes a change; the cook decides whether it lands." },
     ],
-    sections: [
-      { number: "02", label: "Product surface", title: "A culinary workspace, not a chat box.", copy: "The interface gives recipes, cookbooks, pantry state, and cooking continuity visible places to live.", kind: "screens" },
-      { number: "03", label: "Domain translation", title: "Operational experience becomes product judgment.", copy: "Years of kitchen leadership inform the information hierarchy, preparation sequence, and exception handling.", kind: "domain" },
-    ],
+    sections: [],
   },
   "office-chef": {
     slug: "office-chef",
@@ -176,15 +173,6 @@ export function getProject(slug: string) {
 }
 
 function SectionVisual({ project, kind }: { project: Project; kind: Project["sections"][number]["kind"] }) {
-  if (project.slug === "sous-chef" && kind === "screens") {
-    return (
-      <div className="sous-visual">
-        <Image className="sous-desktop" src="/images/sous-chef/desktop.png" alt="Sous Chef desktop application showing recipe and culinary workspace" width={1440} height={1000} sizes="(max-width: 620px) 75vw, 900px" />
-        <Image className="sous-mobile" src="/images/sous-chef/mobile.png" alt="Sous Chef mobile application" width={390} height={913} sizes="(max-width: 620px) 130px, 260px" />
-      </div>
-    );
-  }
-
   if (kind === "controls") {
     return (
       <div className="loft-controls">
@@ -240,9 +228,7 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
   }
 
   if (kind === "domain") {
-    const items = project.slug === "office-chef"
-      ? [["Input", "Invoices & vendor changes"], ["Analysis", "Food cost & menu margin"], ["Review", "Human exception handling"], ["Output", "Owner-ready operating brief"]]
-      : [["Kitchen reality", "Prep, service, inventory, and exceptions"], ["Product response", "Recipe structure and visible continuity"], ["Adoption", "Familiar language and useful defaults"], ["Proof", "Public screens and inspectable source"]];
+    const items = [["Input", "Invoices & vendor changes"], ["Analysis", "Food cost & menu margin"], ["Review", "Human exception handling"], ["Output", "Owner-ready operating brief"]];
     return <div className="domain-strip">{items.map(([label, value]) => <article key={label}><span>{label}</span><b>{value}</b></article>)}</div>;
   }
 
@@ -277,10 +263,8 @@ function SectionVisual({ project, kind }: { project: Project; kind: Project["sec
 
   return (
     <div className="system-grid">
-      {(project.slug === "sous-chef"
-        ? [["Recipes", "Structured creation"], ["Pantry", "Ingredient signals"], ["Cookbooks", "Reusable organization"], ["Sessions", "Cooking continuity"]]
-        : [["Inputs", "Role requirements"], ["Strategy", "Boolean search variants"], ["Review", "Recruiter relevance feedback"], ["Loop", "Refined search strategy"]]
-      ).map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)}
+      {[["Inputs", "Role requirements"], ["Strategy", "Boolean search variants"], ["Review", "Recruiter relevance feedback"], ["Loop", "Refined search strategy"]]
+        .map(([a, b]) => <article key={a}><span>{a}</span><h3>{b}</h3></article>)}
     </div>
   );
 }
@@ -593,9 +577,439 @@ function RspCase({ project }: { project: Project }) {
   );
 }
 
+// Sous Chef — seven evidence moments, in the order the work actually happened:
+// operator -> requirements -> domain model -> the record as source of truth ->
+// deterministic logic -> bounded AI -> architecture + verification -> planned direction.
+//
+// EVIDENCE RULE FOR THIS PAGE. Two kinds of proof, and they check each other. The captures
+// are genuine current product screens supplied by Angel, downscaled and re-encoded with no
+// crop (sous-chef-evidence-provenance.md records the md5 of both sides of every pair). The
+// prose alongside them names files in the PUBLIC application repository, so a reader who
+// distrusts a screenshot can open the source instead.
+//
+// Three captions were written against verified source rather than against the pixels,
+// because the pixels are misleading on their own: HOME's "Kitchen Status" and "Inventory
+// Status" tiles are hard-coded display strings and are NOT described as live state; the
+// Pantry stat tiles ARE computed from inventory and are described as such; and the
+// assistant capture shows the panel's stated scope, not a completed request, so it is not
+// offered as evidence that an authenticated AI call succeeded.
+//
+// CLAIM LAW. Nothing here asserts adoption, customers, savings, or scale. The Pro section
+// is planned direction and is deliberately rendered as prose in a dashed panel — never as
+// a product screen. Three things verified NOT to be true of the shipped product are
+// excluded on purpose: the Home status tiles are hard-coded display strings rather than
+// telemetry, the "Working v{n}" library badge is derived from title length rather than
+// version history, and the intent-classifier/orchestrator layer has no importer and does
+// not run. None of them appears on this page.
+
+type SousFigureProps = {
+  src: string;
+  alt: string;
+  label: string;
+  caption: string;
+  height: number;
+  className?: string;
+  sizes: string;
+};
+
+// The same shape as RspEvidenceFigure — exactly an <img> and a <figcaption>, so the
+// no-crop-surface assertion holds here too. Height is per-image rather than pinned: the
+// supplied captures are not all one ratio, and a shared aspect-ratio would distort one.
+function SousEvidenceFigure({ src, alt, label, caption, height, className = "", sizes }: SousFigureProps) {
+  return (
+    <figure className={`sous-proof-frame ${className}`.trim()}>
+      <Image src={src} alt={alt} width={900} height={height} sizes={sizes} />
+      <figcaption>
+        <span>{label}</span>
+        <p>{caption}</p>
+      </figcaption>
+    </figure>
+  );
+}
+
+const sousDomainModel: [string, string, string][] = [
+  ["Ingredients", "Addressable rows, not a text blob", "Each ingredient carries its own id, amount, unit, preparation and sort order — which is what makes a precise edit possible at all."],
+  ["Steps", "Numbered, timed, and temperature-aware", "A step holds its instruction, duration and temperature, so the kitchen surface can turn a written duration into a running timer."],
+  ["Yield and timings", "The basis every scale is computed from", "Yield amount is what a scale divides against — target servings over the recipe\u2019s own yield. Prep and cook minutes are the timings the kitchen surface reads."],
+  ["Lifecycle", "Working, locked, archived", "Status is a two-value union backed by a database constraint, paired with a lock timestamp; archiving is a soft delete, so nothing is destroyed."],
+];
+
+const sousDeterministic: [string, string, string, string][] = [
+  [
+    "Scaling",
+    "lib/scaling.ts",
+    "Culinary scaling, not multiplication",
+    "Above 2×, leavening and salt are reduced to 0.75, spices to 0.80, baking sugar to 0.90; below 0.5×, salt is raised by 1.25. Every corrected line carries the reason in plain words.",
+  ],
+  [
+    "Rounding",
+    "roundToPractical",
+    "Amounts a cook can actually measure",
+    "At a cup or more, cups round to the quarter and tablespoons to the half; teaspoons round to the quarter at any size, and render as ¼ ½ ¾ rather than as decimals.",
+  ],
+  [
+    "Matching",
+    "normalizeIngredientName",
+    "The pantry knows what it has",
+    "Names are lowercased, stripped of descriptors like fresh, dried and large, de-pluralised, then matched by equality or containment. No model is consulted.",
+  ],
+  [
+    "Cookability",
+    "detectAlmostCookableRecipes",
+    "What could be cooked tonight",
+    "A pure function scores every recipe against the pantry and keeps those missing at most two ingredients, sorted by fewest missing first.",
+  ],
+  [
+    "Signals",
+    "generateAndSavePantrySignals",
+    "Stated formulas, not vibes",
+    "High-velocity and staple signals each carry an explicit confidence formula, so a reader can check the arithmetic instead of trusting a score.",
+  ],
+  [
+    "Versioning",
+    "saveRecipeVersion",
+    "A snapshot before anything is lost",
+    "Full snapshots are written before lock, before unlock, before an AI replace and before archive.",
+  ],
+];
+
+const sousBoundedAI: [string, string, string][] = [
+  ["01", "It proposes; it does not write", "A model response is a structured envelope — content, citations, confidence, assumptions, and an optional edit proposal. No model call reaches the database."],
+  ["02", "A closed list of operations", "Proposals are expressed as typed operations over a fixed union: set a field, add, edit, remove, reorder or swap an ingredient or step. A loose name like \u201Cadd\u201D is resolved against the shape of the action, and anything that still does not land on the union is skipped rather than applied."],
+  ["03", "A preview, then a decision", "Accepting a recipe proposal computes the next version in memory and shows it. Nothing is saved until the cook chooses: save as a new draft, or replace the current recipe."],
+  ["04", "A locked recipe refuses", "A locked or archived recipe cannot accept an edit: the apply path refuses it and the accept control is not rendered. On the recipe surface an explicitly worded edit request is also turned away before the model is called at all."],
+  ["05", "Uncertainty is shown, not hidden", "Confidence, sources and the assumptions behind an answer are rendered next to it, so the person approving the change can see what it rests on."],
+];
+
+// Every line below was rewritten after an adversarial review refuted the stronger version
+// of each. The pattern in all four refutations was the same: the engineering was real, the
+// wording claimed more than the source can show. So each is now scoped to what a reader can
+// re-derive from the public repository — a change made on a branch, not a state proven in a
+// running system. The three things deliberately NOT said: that a deployed bundle was
+// inspected (none was), that the server verifies the token (those functions live outside the
+// repository), and that the credential itself was retired or invalidated (unestablished).
+const sousFound: [string, string, string][] = [
+  ["Found", "A provider key was being compiled into the browser build", "The Vite config read a Gemini API key out of the build environment and substituted it into the client source wherever the key was referenced, so it became a literal in the bundle. That is the defect; it was merged to main, and it is on the record here rather than left out."],
+  ["Contained", "The injection was removed at its source", "The build-time injection is gone, and both client-side provider integrations and their SDK dependencies were deleted with it. No module in the client reads a provider credential today."],
+  ["Re-routed", "AI requests carry the caller's own session", "Every remaining AI request goes through one call to a server-side endpoint with the signed-in user's access token attached, and returns a typed auth error instead of a result when there is no session."],
+  ["Declared", "The deploy configuration was made explicit", "A start command, and a build config pinning the deploy output to the built front end plus the small Node server that serves it with a health check and an SPA fallback."],
+];
+
+const sousOpen: [string, string][] = [
+  ["Verified at source, not in a running system", "All of the above is verified by reading the source on the main branch. No built bundle or deployed artifact was inspected, and the server-side endpoint implementations are not in this repository — so the client half is shown here and the server half is not. The authenticated path has not been proven end to end."],
+  ["Deployment rules are not in the repository", "The rules that decide when this project redeploys are not declared in the repository, so they cannot be reviewed alongside the code they govern. Tracked as open work, not repaired here."],
+];
+
+// Sous Chef Pro — the planned direction, supplied by Angel and grouped the way a restaurant
+// actually divides its work rather than as a flat feature list. The grouping is the argument:
+// an Executive Chef who became a General Manager ran all three of these domains, which is why
+// the same person can specify them. NONE of it is built, and the section that renders it is
+// prose in a dashed panel — never a product surface. A test asserts it carries no image and
+// no evidence frame, and that none of these names leaks into the current-product copy.
+//
+// Recipe Library is deliberately absent: it ships today, so listing it as planned would be
+// wrong in the one direction that matters.
+const sousPro: [string, string, [string, string][]][] = [
+  [
+    "The plate",
+    "Where the existing record already reaches, if cost is attached to it.",
+    [
+      ["Recipe costing", "Attach cost to the ingredient rows the recipe already stores, so a plate cost falls out of the record rather than out of a spreadsheet."],
+      ["Menu builder", "Compose menus from costed recipes, with the same lock-and-version discipline applied to the menu itself."],
+      ["Live menu economics", "Let a change in an ingredient cost surface where it lands across the menu, while the decision stays with the operator."],
+    ],
+  ],
+  [
+    "The kitchen",
+    "The work between the record and service, which is where most of a shift is spent.",
+    [
+      ["Inventory management", "Extend the pantry from a household cupboard to a walk-in: par levels, counts, waste, and what a count implies about the next order."],
+      ["Prep lists", "Derive the day's prep from what is on the menu, what is already made, and what the counts say is short — rather than from memory."],
+    ],
+  ],
+  [
+    "The back office",
+    "The half of the job a chef inherits on becoming a general manager.",
+    [
+      ["Purchasing and cost monitoring", "Watch what is being bought against what was planned, and surface a price move before it turns up in the month's numbers."],
+      ["Vendor management", "Hold the vendor, the item, the agreed price and the substitution history in one place, so a change is visible rather than discovered."],
+      ["Scheduling", "Build the schedule against forecast covers and real availability, and keep labour visible next to the sales it is staffed for."],
+    ],
+  ],
+];
+
+function SousChefCase({ project }: { project: Project }) {
+  const repo = project.links?.[0];
+  return (
+    <main id="main" data-section="work-sous-chef">
+      <section className="case-hero">
+        <div className="shell case-hero-single case-hero-marked">
+          {/* Web-delivery derivative of Angel's supplied Sous Chef app icon, generated from
+              the canonical original by scripts/generate_mark_derivatives.py. The canonical
+              binary is unchanged at /images/sous-chef/mark.jpeg. alt is empty by design:
+              the adjacent h1 already names the product, and the mark asserts no capability. */}
+          <Image className="case-mark" src="/images/sous-chef/mark-336.png" alt="" width={336} height={336} />
+          <div>
+            <p className="eyebrow">{project.eyebrow}</p>
+            <h1>&#127821; Sous Chef</h1>
+            <p className="case-descriptor">AI-assisted culinary workspace</p>
+            <p className="lede">{project.dek}</p>
+            <p className="case-support">I ran kitchens before I built software. This is what that experience says a kitchen tool has to get right.</p>
+            {repo && <div className="actions"><a className="button primary" href={repo.href} target="_blank" rel="noreferrer">{repo.label} <span aria-hidden="true">&#8599;</span></a></div>}
+          </div>
+        </div>
+      </section>
+
+      <section className="case-role-band" aria-label="Contribution">
+        <div className="shell">
+          <p className="case-role"><span>My role</span>{project.role}</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">01 &#183; Operator</p><h2>The requirements came from running the kitchen.</h2></div>
+            <p>Executive Chef to General Manager. Hospitality is where I learned that a process has to survive real operating pressure — and that the thing a kitchen cannot tolerate is a record it is not sure it can trust. Sous Chef is that observation built into a product: five surfaces, one of which is the record itself.</p>
+          </div>
+          <div className="sous-editorial sous-open-spread">
+            <div className="sous-note is-ink">
+              <p className="eyebrow">The working product</p>
+              <h3>Five surfaces, one of which is the record.</h3>
+              <p>Home opens on the workspaces a cook actually moves between — inventory, development, planning, inspiration — with a single field that takes either a link or a description. The library, the studio, the pantry and the account sit behind one persistent bar. It is a workspace with state, not a chat box with a recipe in it.</p>
+            </div>
+            <SousEvidenceFigure
+              src="/images/sous-chef/home-command-center.jpg"
+              alt="Sous Chef home screen: an evening greeting above Inventory, Development, Planning and Inspiration workspaces, a recipe input field, three summary tiles, and a cooking session log card"
+              label="Home"
+              caption="The home screen lays out four culinary workspaces and a recipe-input field above three summary tiles and the cooking session log."
+              height={1827}
+              className="sous-proof-hero"
+              sizes="(max-width:900px) calc(100vw - 40px), 430px"
+            />
+          </div>
+          <p className="case-principle">A kitchen tool earns its place by being right about small things under pressure, not by being clever.</p>
+        </div>
+      </section>
+
+      <section className="case-section tinted-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">02 &#183; Domain model</p><h2>A recipe is a record, not a note.</h2></div>
+            <p>Most recipe tools store prose. Sous Chef stores structure, because everything useful downstream — scaling, timers, pantry matching, a precise AI edit — depends on the parts being individually addressable.</p>
+          </div>
+          <div className="sous-editorial sous-pair">
+            <SousEvidenceFigure
+              src="/images/sous-chef/recipe-library.jpg"
+              alt="Sous Chef recipe library: full-width food photographs with the recipe name, total time and ingredient count beneath each, and a Locked badge on every card"
+              label="Library"
+              caption="Each recipe carries its photograph, its total time and its ingredient count — and a Locked badge, which is the recipe's protection state rather than a paywall."
+              height={1815}
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+            <SousEvidenceFigure
+              src="/images/sous-chef/collections.jpg"
+              alt="Sous Chef home screen further down: a From Your Collections section with a grain bowl photograph tagged Active Recipe above a prompt to reopen it, and a Signature Collection card below"
+              label="Home · collections"
+              caption="The same records, surfaced from Home. A working recipe is offered back for another pass, and the collection gathers the rest."
+              height={1827}
+              className="sous-pair-step"
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+          </div>
+
+          <div className="sous-record">
+            {sousDomainModel.map(([label, title, copy]) => (
+              <article key={label}><span>{label}</span><b>{title}</b><p>{copy}</p></article>
+            ))}
+            <article className="is-truth">
+              <span>Why it matters</span>
+              <b>The recipe is the operational source of truth for the kitchen.</b>
+              <p>Everything else in the product defers to it: the pantry answers against it, the assistant proposes against it, and the version history exists to protect it.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">03 &#183; The record</p><h2>Lock it, and the product starts defending it.</h2></div>
+            <p>A recipe that is right gets locked. From that point the product treats it as something to be protected rather than edited freely: the lock carries a timestamp, archiving is a soft delete rather than a destruction, and the transitions that lock, unlock, replace or archive it each write a full snapshot first.</p>
+          </div>
+          <div className="sous-editorial sous-record-spread">
+            <SousEvidenceFigure
+              src="/images/sous-chef/recipe-record.jpg"
+              alt="Sous Chef recipe detail for Spicy Arrabbiata with Fresh Basil: a pasta photograph above Unlock Recipe, Locked and Archive Recipe controls, an italic origin story, and prep and cook times"
+              label="The record · identity"
+              caption="Unlock, Locked and Archive sit at the top of the recipe, above its origin story and its timings. The lock is the first thing the screen offers, not a setting buried in a menu."
+              height={1827}
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+            <SousEvidenceFigure
+              src="/images/sous-chef/recipe-structure.jpg"
+              alt="Sous Chef recipe detail continued: a servings stepper set to four, a seven-item checkable ingredient list under The Pantry, and the first numbered method step with its cook time highlighted"
+              label="The record · structure"
+              caption="The same recipe, further down: a servings stepper, seven checkable ingredients with their measures, and numbered method steps whose written durations become timers."
+              height={1851}
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+          </div>
+
+          <div className="sous-deterministic">
+            <article><span>Lock</span><b>Protected, with a timestamp</b><code>protectRecipe</code><p>Status moves to locked and records when. Editing intent is refused from here until the recipe is explicitly unlocked.</p></article>
+            <article><span>Unlock</span><b>A round trip, not a one-way door</b><code>unlockRecipe</code><p>Unlocking snapshots first, then steers the cook back toward re-locking once the edit is done.</p></article>
+            <article><span>Archive</span><b>A soft delete</b><code>deleted_at</code><p>Archived recipes stay queryable and restorable rather than being destroyed.</p></article>
+          </div>
+          <p className="case-principle">The kitchen has to be able to trust the record. That is a product property, not a promise.</p>
+        </div>
+      </section>
+
+      <section className="case-section tinted-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">04 &#183; Deterministic logic</p><h2>The parts a kitchen relies on do not ask a model.</h2></div>
+            <p>The work that has to be right every time is ordinary, inspectable code. It runs the same way twice, it can be read in the public repository, and none of it asks a model — the arithmetic is settled before anything is stored.</p>
+          </div>
+          <div className="sous-deterministic">
+            {sousDeterministic.map(([label, ref, title, copy]) => (
+              <article key={label}><span>{label}</span><b>{title}</b><code>{ref}</code><p>{copy}</p></article>
+            ))}
+          </div>
+
+          <div className="sous-editorial sous-open-spread">
+            <SousEvidenceFigure
+              src="/images/sous-chef/pantry-inventory.jpg"
+              alt="Sous Chef pantry inventory: Scan Receipt and Manual Entry actions above four stat tiles reading one total item, zero low stock, zero expiring soon and a pantry value, then Inventory, Shopping List and AI Insights tabs"
+              label="Pantry"
+              caption="These four tiles are computed from the inventory itself, unlike the summary tiles on Home. The value shown is a household grocery total — not a food cost, and not a costing feature."
+              height={1827}
+              className="sous-proof-hero"
+              sizes="(max-width:900px) calc(100vw - 40px), 430px"
+            />
+            <div className="sous-note">
+              <p className="eyebrow">Where the kitchen state lives</p>
+              <h3>The pantry answers against the recipe.</h3>
+              <p>Matching an ingredient to a pantry item is a normalisation pipeline, not string equality — lowercase, strip descriptors like <em>fresh</em> and <em>large</em>, drop a trailing plural, then match on equality or containment. That is what lets the product say which recipes are short by two ingredients rather than merely listing what is in the cupboard.</p>
+            </div>
+          </div>
+          <p className="case-principle">Doubling a recipe is not doubling the salt. A cook knows that; the product has to know it too.</p>
+        </div>
+      </section>
+
+      <section className="case-section dark-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">05 &#183; Bounded AI</p><h2>The assistant proposes. A person accepts.</h2></div>
+            <p>The AI surface is bounded by construction rather than by instruction: the shape of the code, not the wording of a prompt, is what prevents the model from changing the record on its own.</p>
+          </div>
+          <div className="sous-editorial sous-pair">
+            <SousEvidenceFigure
+              src="/images/sous-chef/assistant-in-context.jpg"
+              alt="Sous Chef assistant panel opened over a recipe, headed Smart Sous Chef with a Technique and Scaling Expert subtitle, a context line naming the recipe, and a list of the tasks it offers"
+              label="Assistant · in context"
+              caption="The panel opens over a recipe and names it. What it offers is scoped and stated up front — scaling, technique, timing — before the cook types anything."
+              height={1815}
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+            <SousEvidenceFigure
+              src="/images/sous-chef/research-desk.jpg"
+              alt="Sous Chef research workspace with Research, Recipe and Journal tabs above four actions — Analyze Ingredients, Suggest Pairings, Find Origins, Smart Substitutes — and Fast, Balanced and Deep effort settings"
+              label="Assistant · research"
+              caption="The separate research surface leads with named culinary operations, and exposes the effort setting behind them."
+              height={1827}
+              className="sous-pair-step"
+              sizes="(max-width:900px) calc(100vw - 40px), 42vw"
+            />
+          </div>
+
+          <div className="control-stack">
+            {sousBoundedAI.map(([n, title, copy]) => (
+              <article key={n}><span>{n}</span><b>{title}</b><p>{copy}</p></article>
+            ))}
+          </div>
+          <p className="case-gap-note">Bounded by construction and by a closed type union — not by an automated test suite. The product ships no tests asserting it. These two captures show the assistant&#8217;s stated scope; neither is offered as proof that a request completed.</p>
+          <p className="case-principle">Useful assistance ends where the record begins.</p>
+        </div>
+      </section>
+
+      <section className="case-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">06 &#183; Architecture &amp; security</p><h2>I shipped a key into the browser. Here is the whole story.</h2></div>
+            <p>The interesting part of a security incident is not the fix. It is what you can still not prove afterwards — so this section carries both, and the open half is the half that is usually missing.</p>
+          </div>
+          <div className="sous-editorial sous-open-spread">
+            <div className="sous-note">
+              <p className="eyebrow">The shape of it</p>
+              <h3>Pantry in, record at the centre, one human gate out.</h3>
+              <p>A diagram rather than a screen: the recipe sits at the middle because everything else defers to it. Pantry state feeds in, prep runs out through a gate that stays human, and what was cooked returns to the record.</p>
+            </div>
+            <figure className="sous-diagram" data-diagram-slot="sous-architecture">
+              <KitchenPass />
+            </figure>
+          </div>
+
+          <div className="sous-ledger">
+            {sousFound.map(([stage, title, copy]) => (
+              <article key={stage}><span>{stage}</span><b>{title}</b><p>{copy}</p></article>
+            ))}
+            {sousOpen.map(([title, copy]) => (
+              <article className="is-open" key={title}><span>Still open</span><b>{title}</b><p>{copy}</p></article>
+            ))}
+          </div>
+          <p className="case-gap-note">The only values that still reach the browser are the public Supabase URL and anonymous key, which are designed to ship there. The status of the credential the removed build path once used is not established, and is not claimed either way.</p>
+          <p className="case-principle">A security story that lists only what was fixed is half a story.</p>
+        </div>
+      </section>
+
+      <section className="case-section tinted-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">07 &#183; Planned direction</p><h2>Sous Chef Pro.</h2></div>
+            <p>Where the same domain model points if it is taken back into the professional kitchen it came from. None of this is built.</p>
+          </div>
+          <div className="sous-pro">
+            <p className="sous-pro-chip">Planned &#183; not built</p>
+            {sousPro.map(([group, note, items]) => (
+              <section className="sous-pro-group" key={group}>
+                <h3>{group}</h3>
+                <p className="sous-pro-note">{note}</p>
+                <ul className="sous-pro-list">
+                  {items.map(([name, copy]) => <li key={name}><b>{name}</b><p>{copy}</p></li>)}
+                </ul>
+              </section>
+            ))}
+            <p className="case-gap-note">Written as direction, not as a commitment: no dates, no delivery promise, and no claim about who would use it. Nothing on this list is built.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="case-section blue-section">
+        <div className="shell">
+          <div className="split-head">
+            <div><p className="eyebrow">08 &#183; Public boundary</p><h2>Public Boundary</h2></div>
+            <p>The application source is public, so this case study can point at implementation rather than describe it. What stays private is the operating account behind the sign-in — and two supplied captures were withheld rather than published, one of them because it renders a personal email address.</p>
+          </div>
+          <div className="boundary-grid">
+            <article><h3>Shown</h3><ul><li>Genuine current product screens, uncropped</li><li>The deterministic engines, by name, in public source</li><li>The AI boundary and where the human gate sits</li><li>A security defect I shipped, and its unclosed verification</li></ul></article>
+            <article><h3>Withheld</h3><ul><li>Credentials, environment values, and deployment detail</li><li>The account screen — it carries a personal email address and a city</li><li>Server-side function source and infrastructure state</li><li>The sign-in screen, whose copy describes an arrangement since changed</li></ul></article>
+          </div>
+          <p className="case-principle">Every capture on this page is the whole screen. Nothing here was cropped to remove something.</p>
+        </div>
+      </section>
+
+      <section id="next-step" className="case-next-step">
+        <div className="shell case-next-step-grid"><div><p className="eyebrow">Next step</p><h2>Connect the proof to the role.</h2><p>Use the recommended resume for the fastest review, or start a direct conversation about the operating problem your team needs to solve.</p></div><div className="actions"><Link className="button primary" href="/resume/">Review the resume <span aria-hidden="true">&#8594;</span></Link><a className="button" href="mailto:avergara13@me.com">Email Angel <span aria-hidden="true">&#8594;</span></a></div></div>
+      </section>
+    </main>
+  );
+}
+
 export function ProjectCase({ project }: { project: Project }) {
   if (project.slug === "loft-os") return <LoftOsCase project={project} />;
   if (project.slug === "resale-scanner-pro") return <RspCase project={project} />;
+  if (project.slug === "sous-chef") return <SousChefCase project={project} />;
 
   return (
     <main id="main" data-section={`work-${project.slug}`}>

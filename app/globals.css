@@ -14,6 +14,14 @@
   --green:#17b26a; --green-ink:#0b6b3f;
   --copper:#b45309; --copper-on-dark:#e8934a;
   --red:#c02535;
+  /* Sous Chef identity, sampled from the owner-supplied app icon. DECORATIVE ONLY —
+     rules, hairlines and surface tints. Culinary TEXT uses --copper (4.57:1) and
+     --green-ink (6.0:1), both already contrast-audited above. */
+  --saffron:#e08b33; --cream:#fdf7ef; --cream-deep:#f8ecdb; --cream-line:#ecd9be;
+  /* --copper is 4.57:1 on the grey canvas but only 4.31:1 on --cream-deep, so small text
+     on the warm tiers fails AA by a hair. This darker step clears 5.1:1 on the deepest
+     cream and 6.0:1 on white, and is used only where copper text meets a cream surface. */
+  --copper-warm:#a04a08;
 
   /* text tiers on deep proof surfaces */
   --on-dark:#ffffff; --on-dark-muted:#c3cbdb; --on-dark-faint:#94a0bb; --dark-line:#25324f;
@@ -60,7 +68,7 @@ main[data-section] { --accent:var(--cobalt); }
 main[data-section="resume"] { --accent:var(--green); }
 main[data-section="work-resale-scanner-pro"] { --accent:var(--green); }
 main[data-section="work-loft-os"] { --accent:var(--copper); }
-main[data-section="work-sous-chef"] { --accent:var(--cobalt); }
+main[data-section="work-sous-chef"] { --accent:var(--saffron); }
 main[data-section="work-office-chef"] { --accent:var(--ink); }
 main[data-section="work-assistant-recruiter-pro"] { --accent:var(--cobalt); }
 main[data-section]::before { content:""; display:block; height:4px; background:var(--accent); }
@@ -300,6 +308,21 @@ section { padding:96px 0; }
 .workflow-steps p { color:var(--on-dark-faint); font-size:.7rem; margin-bottom:0; }
 .workflow-steps .active-step p { color:white; }
 .case-section { background:var(--white); }
+/* .dark-section is declared ABOVE .case-section, so on an element carrying both the
+   later .case-section background wins and the section renders white — while the text
+   colour stays white, making the heading invisible. (.blue-section is declared after
+   .case-section and does not have this problem, which is why the collision only shows up
+   on this pairing.) Raising the specificity fixes the one combination without reordering
+   rules that other pages depend on. */
+.case-section.dark-section { background:var(--ink); color:var(--on-dark); }
+/* .control-stack articles are WHITE cards. Inheriting the dark section's white text made
+   every card heading white-on-white — invisible, not merely low-contrast. On a dark
+   section the cards take the raised navy surface instead, where all three text tiers
+   clear AA comfortably (15.6:1, 9.6:1 and 6.5:1). */
+.dark-section .control-stack article { background:var(--navy-raised); border-color:var(--dark-line); }
+.dark-section .control-stack b { color:var(--on-dark); }
+.dark-section .control-stack p { color:var(--on-dark-muted); }
+.dark-section .control-stack span { color:var(--copper-on-dark); }
 .tinted-section { background:var(--paper); }
 .blue-section { background:var(--cobalt); color:white; }
 .blue-section .split-head p:last-child { color:var(--on-dark-muted); }
@@ -361,13 +384,77 @@ section { padding:96px 0; }
 .relay-chain { margin:0 0 34px; padding:34px 30px 28px; border-radius:var(--r-card); }
 .relay-disclosure { margin:12px 0 0!important; color:var(--muted)!important; font-family:var(--font-geist-mono),monospace; font-size:.68rem!important; letter-spacing:.05em; text-transform:uppercase; }
 .blue-section .case-principle { color:var(--on-dark); }
+/* .case-principle is --ink and .case-gap-note is --copper: on the ink surface the first is
+   invisible and the second is 3.48:1 (the documented AA fail --copper-on-dark exists for).
+   .blue-section already had the principle override; .dark-section had neither. */
+.dark-section .case-principle { color:var(--on-dark); }
+.dark-section .case-gap-note,.blue-section .case-gap-note { color:var(--copper-on-dark); }
 .failure-lab { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 .failure-lab article { min-height:150px; padding:22px; border:1px solid var(--line); background:var(--white); }
 .failure-lab article:last-child { border-color:var(--copper); }
 .failure-lab b { margin-top:16px; font-size:1.2rem; }
-.sous-visual { position:relative; max-width:1050px; min-height:650px; margin:auto; padding-right:130px; }
-.sous-desktop { width:100%; border:1px solid var(--line); box-shadow:0 24px 60px rgba(11,18,32,.16); }
-.sous-mobile { position:absolute; right:0; bottom:0; width:260px; border:1px solid var(--line); box-shadow:0 24px 60px rgba(11,18,32,.2); }
+/* ── Sous Chef ──────────────────────────────────────────────────────────────
+   Architecture is shared with RSP and Loft OS; identity is not. Sous Chef reuses the
+   stage, split-head, section and principle primitives unchanged, and separates itself
+   with a warm culinary surface family (--cream tiers) plus the saffron hairline. The
+   retired .sous-visual/.sous-desktop/.sous-mobile rules framed two captures of the
+   SIGN-IN screen that were labelled as the culinary workspace; both the rules and the
+   binaries are gone. See sous-chef-evidence-provenance.md. */
+
+/* The recipe as the kitchen's source of truth — a structured record, not a screenshot. */
+.sous-record { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.sous-record article { padding:24px; border:1px solid var(--cream-line); border-radius:var(--r-card); background:var(--cream); }
+.sous-record article.is-truth { grid-column:1/-1; border-left:3px solid var(--saffron); background:var(--cream-deep); }
+.sous-record span { display:block; color:var(--copper-warm); font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+.sous-record b { display:block; margin-top:16px; font-family:var(--font-playfair),Georgia,serif; font-size:1.3rem; font-weight:500; }
+.sous-record p { margin:9px 0 0; color:var(--muted); font-size:.79rem; }
+
+/* Deterministic product logic: what the kitchen can rely on without asking a model. */
+.sous-deterministic { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.sous-deterministic article { padding:22px; border:1px solid var(--line); border-radius:var(--r-card); background:var(--white); }
+/* max-width + anywhere: the longest identifiers (detectAlmostCookableRecipes,
+   generateAndSavePantrySignals) are single unbreakable tokens wider than a 375px
+   viewport, and an inline-block chip pushed the whole document into horizontal scroll. */
+.sous-deterministic code { display:inline-block; max-width:100%; margin-top:14px; padding:3px 8px; border-radius:var(--r-chip); background:var(--cream-deep); color:var(--copper-warm); font-family:var(--font-geist-mono),monospace; font-size:.68rem; letter-spacing:.02em; overflow-wrap:anywhere; }
+.sous-deterministic b { display:block; margin-top:14px; font-family:var(--font-playfair),Georgia,serif; font-size:1.2rem; font-weight:500; }
+.sous-deterministic p { margin:9px 0 0; color:var(--muted); font-size:.78rem; }
+
+/* Security evolution: a two-column ledger of what was verified and what stays open. */
+.sous-ledger { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.sous-ledger article { padding:24px; border:1px solid var(--line); border-radius:var(--r-card); background:var(--white); }
+.sous-ledger article.is-open { border-color:var(--copper); background:var(--cream); }
+.sous-ledger span { display:block; font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--green-ink); }
+.sous-ledger article.is-open span { color:var(--copper-warm); }
+.sous-ledger b { display:block; margin-top:14px; font-family:var(--font-playfair),Georgia,serif; font-size:1.18rem; font-weight:500; }
+.sous-ledger p { margin:9px 0 0; color:var(--muted); font-size:.78rem; }
+
+/* Planned direction. Deliberately NOT a product surface: no frame, no chrome, no screen.
+   The dashed edge and the PLANNED chip are what stop it reading as shipped. */
+.sous-pro { border:1px dashed var(--cream-line); border-radius:var(--r-surface); background:var(--cream); padding:clamp(26px,4vw,40px); }
+.sous-pro-chip { display:inline-block; margin:0 0 18px; padding:5px 12px; border:1px solid var(--copper-warm); border-radius:var(--r-chip); color:var(--copper-warm); font-family:var(--font-geist-mono),monospace; font-size:.66rem; font-weight:900; letter-spacing:.13em; text-transform:uppercase; }
+/* These render as nested <section> elements for their headings, which means they also match
+   the global `section { padding:96px 0 }`. Three groups inherited 576px of dead vertical
+   space on desktop and 432px on a phone, leaving the panel mostly empty. */
+.sous-pro-group { padding:0; margin-top:clamp(24px,3vw,36px); }
+.sous-pro-group:first-of-type { margin-top:0; }
+.sous-pro-group h3 { margin:0; font-family:var(--font-playfair),Georgia,serif; font-size:clamp(1.25rem,2vw,1.55rem); font-weight:500; }
+.sous-pro-note { margin:6px 0 16px; max-width:62ch; color:var(--muted); font-size:.84rem; }
+.sous-pro-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0; padding:0; list-style:none; }
+.sous-pro-list li { padding:20px; border:1px dashed var(--cream-line); border-radius:var(--r-card); background:rgba(255,255,255,.55); }
+.sous-pro-list b { display:block; font-family:var(--font-playfair),Georgia,serif; font-size:1.15rem; font-weight:500; }
+.sous-pro-list p { margin:8px 0 0; color:var(--muted); font-size:.78rem; }
+
+/* HOME: the Sous Chef stage. It reuses .product-stage and .stage-head verbatim so its
+   heading prominence is IDENTICAL to Resale Scanner Pro's at every width — the flagship
+   parity is structural, not a hand-tuned size. Only the surface differs. */
+.sous-stage { background:var(--cream); border-top:1px solid var(--cream-line); }
+.sous-stage .stage-head .stage-lede { color:var(--copper); }
+.sous-domain-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:clamp(30px,4vw,44px) 0 0; padding:0; list-style:none; border-block:1px solid var(--cream-line); }
+.sous-domain-row li { padding:24px 12px; border-left:1px solid var(--cream-line); }
+.sous-domain-row li:first-child { border-left:0; padding-left:0; }
+.sous-domain-row li:last-child { padding-right:0; }
+.sous-domain-row b { display:block; font-family:var(--font-geist-mono),monospace; font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--copper-warm); }
+.sous-domain-row p { margin:9px 0 0; color:var(--muted); font-size:.79rem; }
 .case-next-step { padding:72px 0; background:var(--paper); }
 .case-next-step-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:50px; align-items:end; }
 .case-next-step h2 { font-size:clamp(2.3rem,4vw,3.6rem); margin-bottom:14px; }
@@ -538,8 +625,10 @@ section { padding:96px 0; }
   .workflow-steps article { min-height:150px; }
   .table-board>div { grid-template-columns:1fr; }
   .table-board>div b,.decision-board b { text-align:left; }
-  .sous-visual { min-height:390px; padding-right:50px; }
-  .sous-mobile { width:130px; }
+  .sous-record,.sous-deterministic,.sous-ledger,.sous-pro-list { grid-template-columns:1fr; }
+  .sous-domain-row { grid-template-columns:1fr; }
+  .sous-domain-row li { padding:18px 0; border-left:0; border-top:1px solid var(--cream-line); }
+  .sous-domain-row li:first-child { border-top:0; padding-top:0; }
   .fit-list article { grid-template-columns:1fr; gap:10px; }
   .resume-projects>div { grid-template-columns:1fr; gap:4px; }
   .application-flow { grid-template-columns:1fr 1fr; }
@@ -724,6 +813,13 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
   .product-stage-grid { grid-template-columns:1fr; gap:clamp(34px,7vw,52px); }
   .product-stage-copy { max-width:580px; }
   .product-evidence-slot { width:min(100%,540px); justify-self:start; }
+}
+
+/* Bounded at BOTH ends on purpose: this block is declared after the 620px block, so an
+   open-ended max-width:960px beat the phone rule and left six cards in two 170px columns
+   at 375px. A min-width floor makes the intent independent of source order. */
+@media (min-width:621px) and (max-width:960px) {
+  .sous-deterministic { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 
 @media (max-width:620px) {
@@ -1095,6 +1191,72 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
 }
 .rsp-proof-scans,.rsp-proof-agent { --frame:330px; }
 
+/* ── Sous Chef evidence figures ─────────────────────────────────────────────
+   Same contract as .rsp-proof-frame — a frame holds exactly an <img> and a
+   <figcaption>, and no crop happens in CSS — but a warm culinary surround rather
+   than RSP's navy, so the two products do not read as the same page twice.
+
+   No aspect-ratio is declared here on purpose. RSP's frame pins 900/1950 because
+   every RSP capture shares that ratio; the Sous Chef set does not (1290x2619 and
+   1236x2664 both appear), so a single pinned ratio would letterbox or distort one
+   of them. next/image emits each file's own width and height, which reserves the
+   right box per image and still prevents layout shift. */
+.sous-editorial { margin-top:clamp(38px,6vw,76px); }
+/* The architecture diagram sits in the same slot an evidence figure would, but in a warm
+   panel rather than a device frame — so it cannot be mistaken for one of the captures. */
+.sous-diagram { margin:0; padding:clamp(14px,2vw,24px); border:1px solid var(--cream-line); border-radius:var(--r-surface); background:var(--cream-deep); box-shadow:var(--lift); }
+.sous-diagram .pass-art { display:block; width:100%; height:auto; }
+.sous-proof-frame {
+  width:min(100%,var(--frame,420px)); min-width:0; margin:0; overflow:hidden;
+  border:1px solid var(--cream-line); border-radius:var(--r-surface);
+  background:#0c0c0e; box-shadow:var(--lift-lg);
+}
+.sous-proof-frame img { width:100%; height:auto; }
+.sous-proof-frame figcaption { padding:16px 18px 18px; border-top:1px solid var(--cream-line); background:var(--cream); }
+.sous-proof-frame figcaption span {
+  display:block; margin-bottom:6px; color:var(--copper);
+  font-family:var(--font-geist-mono),monospace; font-size:.66rem; font-weight:850;
+  letter-spacing:.09em; text-transform:uppercase;
+}
+.sous-proof-frame figcaption p { margin:0; color:var(--muted); font-size:.82rem; line-height:1.5; }
+
+/* 01 — the working product, stated once and large, against the operator framing. */
+.sous-open-spread {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.92fr);
+  gap:clamp(28px,5vw,72px); align-items:center;
+}
+.sous-proof-hero { --frame:430px; justify-self:end; }
+
+/* 02 / 04 — two captures read as a pair, the second stepped down so the eye moves
+   diagonally rather than scanning a grid of equal tiles. */
+.sous-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(26px,4vw,60px); align-items:start; }
+.sous-pair .sous-proof-frame { --frame:100%; }
+.sous-pair-step { margin-top:clamp(54px,8vw,112px); }
+
+/* 03 — the record. One spread, two halves of the same recipe, side by side. */
+.sous-record-spread { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(24px,4vw,52px); align-items:start; }
+.sous-record-spread .sous-proof-frame { --frame:100%; }
+
+/* A text note that sits beside a capture, in the Sous Chef accent. */
+.sous-note { padding:clamp(20px,3vw,36px); border-left:3px solid var(--copper); }
+.sous-note h3 {
+  margin:9px 0 14px; font-family:var(--font-playfair),Georgia,serif;
+  font-size:clamp(1.6rem,2.8vw,2.5rem); font-weight:500; line-height:1.06;
+}
+.sous-note>p:last-child { margin:0; color:var(--muted); }
+/* The markup carries .is-ink, copied from .rsp-feature-note where it flips the accent off
+   the on-dark tier. Declared here so the class means something rather than passing only
+   because the base already happens to be right. */
+.sous-note.is-ink { border-left-color:var(--copper); }
+.sous-note.is-ink>p:last-child { color:var(--muted); }
+
+.dark-section .sous-proof-frame { border-color:var(--dark-line); }
+.dark-section .sous-proof-frame figcaption { border-top-color:var(--dark-line); background:var(--navy-deep); }
+.dark-section .sous-proof-frame figcaption span { color:var(--copper-on-dark); }
+.dark-section .sous-proof-frame figcaption p { color:var(--on-dark-muted); }
+.dark-section .sous-note { border-left-color:var(--copper-on-dark); }
+.dark-section .sous-note>p:last-child { color:var(--on-dark-muted); }
+
 .dark-section .rsp-proof-frame { border-color:var(--dark-line); }
 .dark-section .rsp-proof-frame figcaption { border-top-color:var(--dark-line); background:var(--navy-deep); }
 .dark-section .rsp-proof-frame figcaption span { color:var(--copper-on-dark); }
@@ -1104,9 +1266,18 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
    column: offsets collapse, every frame aligns to the same edge, and the
    figures grow rather than shrink so the UI keeps working as evidence. */
 @media (max-width:900px) {
-  .rsp-opening-spread,.rsp-analysis-feature,.rsp-decision-feature,.rsp-operations-spread {
+  .rsp-opening-spread,.rsp-analysis-feature,.rsp-decision-feature,.rsp-operations-spread,
+  .sous-open-spread,.sous-pair,.sous-record-spread {
     grid-template-columns:minmax(0,1fr); gap:clamp(26px,5vw,44px);
   }
+  /* Specificity, not order: .sous-pair/.sous-record-spread set --frame:100% at (0,2,0),
+     so a bare .sous-proof-frame cap at (0,1,0) never applied to them. */
+  .sous-proof-frame,
+  .sous-pair .sous-proof-frame,
+  .sous-record-spread .sous-proof-frame { --frame:520px; }
+  .sous-proof-hero { justify-self:start; }
+  .sous-pair-step { margin-top:0; }
+  .sous-note { max-width:620px; padding:10px 0 10px 20px; }
   .rsp-proof-frame { --frame:520px; }
   .rsp-proof-offset,.rsp-agent-stack { margin-top:0; }
   .rsp-proof-offset,.rsp-proof-pass,.rsp-agent-stack { justify-self:start; }
@@ -1120,4 +1291,11 @@ main[data-section] .blue-section .eyebrow:not(.light-eyebrow) { color:var(--copp
   .rsp-proof-frame { --frame:100%; border-radius:var(--r-card); }
   .rsp-proof-frame figcaption { padding:14px 16px 16px; }
   .rsp-feature-note { padding:8px 0 8px 16px; }
+  .sous-editorial { margin-top:32px; }
+  .sous-proof-frame,
+  .sous-pair .sous-proof-frame,
+  .sous-record-spread .sous-proof-frame { --frame:100%; }
+  .sous-proof-frame { border-radius:var(--r-card); }
+  .sous-proof-frame figcaption { padding:14px 16px 16px; }
+  .sous-note { padding:8px 0 8px 16px; }
 }

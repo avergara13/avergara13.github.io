@@ -136,7 +136,10 @@ test("HOME strengthens Angel's identity and presents RSP as one replaceable genu
   assert.match(css, /\.wordmark\s*\{[^}]*font-size:1\.4rem[^}]*font-weight:600/);
   assert.match(css, /@media \(max-width:620px\)[\s\S]*?\.wordmark\s*\{[^}]*font-size:1\.18rem/);
 
-  const product = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="home-bridge'));
+  // End the slice at the Sous Chef stage, not at the career bridge: Sous Chef now sits
+  // between them, and a slice running to .home-bridge counted its mark and capture as RSP's.
+  // `class="product-stage"` still matches only RSP — Sous Chef's is `class="product-stage sous-stage"`.
+  const product = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="product-stage sous-stage"'));
   assert.match(product, /src="\/images\/rsp\/mark-336\.png"/);
   assert.match(product, /data-evidence-slot="rsp-home-overview"/);
   assert.match(product, /\/images\/rsp\/session-overview\.jpg/);
@@ -561,15 +564,20 @@ test("portfolio chooser leads with Loft OS, then RSP, with supporting work subor
   assert.match(html, /Selected products and systems I’ve designed, built, and implemented\./);
   assert.doesNotMatch(html, /Evidence Atlas|Systems Field Manual|proof surface/i);
 
-  // Chooser hierarchy: Loft OS first, RSP second, supporting work after both.
+  // Chooser hierarchy: Loft OS, then the two working products, then supporting work.
+  // Sous Chef was promoted out of "Additional work" when HOME began carrying it as the
+  // second product; a chooser that still filed it below would contradict the page the
+  // reader just came from.
   const loft = html.indexOf("Loft OS");
   const rsp = html.indexOf("Resale Scanner Pro");
+  const sous = html.indexOf("Sous Chef");
   const additional = html.indexOf("Additional work");
   const arp = html.indexOf("Assistant Recruiter Pro");
-  const sous = html.indexOf("Sous Chef");
   assert.ok(loft < rsp, "Loft OS must lead the chooser");
-  assert.ok(rsp < additional, "Additional work must follow the two primary projects");
-  assert.ok(additional < arp && additional < sous, "supporting work sits under Additional work");
+  assert.ok(rsp < sous, "Resale Scanner Pro precedes Sous Chef");
+  assert.ok(sous < additional, "Additional work must follow the three primary projects");
+  assert.ok(additional < arp, "supporting work sits under Additional work");
+  assert.match(html, /Working product · Public source/);
 
   // Locked card contract: label + one sentence + explicit CTA, and no metadata grid.
   assert.match(html, /Flagship · Governed Multi-Agent Workflow System/);
@@ -1383,6 +1391,420 @@ const rspEvidenceOrder = [
   "/images/rsp/agent-recap.jpg",
 ];
 
+/* ── Sous Chef ──────────────────────────────────────────────────────────────
+   Three previously-published Sous Chef images were removed: two captures of the SIGN-IN
+   screen labelled as the culinary workspace, and a Google AI Studio marketing banner.
+   The tests below exist so none of that can recur silently, and so the claim boundaries
+   this case study depends on stay mechanically enforced rather than merely intended. */
+
+const sousEvidenceOrder = [
+  "/images/sous-chef/home-command-center.jpg",
+  "/images/sous-chef/recipe-library.jpg",
+  "/images/sous-chef/collections.jpg",
+  "/images/sous-chef/recipe-record.jpg",
+  "/images/sous-chef/recipe-structure.jpg",
+  "/images/sous-chef/pantry-inventory.jpg",
+  "/images/sous-chef/assistant-in-context.jpg",
+  "/images/sous-chef/research-desk.jpg",
+];
+
+const readSousMain = async () => {
+  const markup = await readOutput("work/sous-chef/index.html");
+  const at = markup.indexOf('<main id="main"');
+  assert.notEqual(at, -1, "Sous Chef case study <main> landmark is missing");
+  const end = markup.indexOf("</main>", at);
+  assert.notEqual(end, -1, "Sous Chef case study <main> is never closed");
+  return markup.slice(at, end);
+};
+
+test("HOME carries Sous Chef directly below RSP, with the same prominence primitives", async () => {
+  const main = await readHomeMain();
+
+  assertOrder(main, [
+    'class="product-stage"',
+    'id="product-title"',
+    'class="product-stage sous-stage"',
+    'id="sous-title"',
+    'id="story-title"',
+  ]);
+
+  const sous = main.slice(main.indexOf('class="product-stage sous-stage"'), main.indexOf('class="home-bridge'));
+
+  // Flagship parity is STRUCTURAL: both products render their heading through the same
+  // .stage-head h2 selector and their mark through the same .stage-mark. If Sous Chef were
+  // given its own heading class the ranking test would stop measuring it and the two could
+  // drift apart silently.
+  const rsp = main.slice(main.indexOf('class="product-stage"'), main.indexOf('class="product-stage sous-stage"'));
+  for (const [label, stage] of [["RSP", rsp], ["Sous Chef", sous]]) {
+    assert.match(stage, /class="stage-head"/, `${label} stage must use the shared .stage-head`);
+    assert.match(stage, /class="stage-mark product-stage-mark"/, `${label} stage must use the shared mark treatment`);
+    assert.match(stage, /class="product-evidence-slot"/, `${label} stage must use the shared evidence slot`);
+  }
+
+  // The official app icon is the product mark, delivered through the pinned derivative.
+  assert.match(sous, /src="\/images\/sous-chef\/mark-336\.png"/);
+  assert.match(sous, /<h2 id="sous-title">Sous Chef<\/h2>/);
+  assert.match(sous, /Working product\. Public source\./);
+  assert.match(sous, /class="stage-cta is-ink"[^>]*href="\/work\/sous-chef\/"|href="\/work\/sous-chef\/"[^>]*class="stage-cta is-ink"/);
+
+  // One mark and exactly one capture, matching RSP's composition. HOME leads with the
+  // recipe library rather than the app's dashboard: the stage is a shop window, so it
+  // shows the food. The dashboard still opens the case study.
+  assert.equal((sous.match(/<img/g) ?? []).length, 2, "Sous Chef stage contains one project mark and exactly one screenshot");
+  assert.match(sous, /\/images\/sous-chef\/recipe-library\.jpg/);
+
+  // HOME carries no figcaption by design, so the alt is the only description a screen
+  // reader gets — the same rule the RSP stage is held to.
+  const evidence = sous.match(/<figure class="product-evidence-slot"[\s\S]*?<\/figure>/);
+  assert.ok(evidence, "the Sous Chef evidence slot is missing");
+  const alt = evidence[0].match(/alt="([^"]*)"/);
+  assert.ok(alt && alt[1].trim().length > 20, "the Sous Chef evidence image needs descriptive alt text");
+  assert.doesNotMatch(alt[1], /^(?:a\s+|the\s+)?(?:screenshot|image|photo)\b/i,
+    "alt must describe the capture, not label it");
+
+  // Loft OS remains the single flagship; adding a second product must not create a second.
+  assert.equal((main.match(/Flagship work/g) ?? []).length, 1, "exactly one flagship claim on HOME");
+});
+
+test("the Sous Chef case study runs the seven evidence moments in narrative order", async () => {
+  const main = await readSousMain();
+
+  assertOrder(main, [
+    "01 · Operator",
+    "02 · Domain model",
+    "03 · The record",
+    "04 · Deterministic logic",
+    "05 · Bounded AI",
+    "06 · Architecture &amp; security",
+    "07 · Planned direction",
+    "08 · Public boundary",
+  ]);
+
+  // Each capture appears exactly once and in the order the story needs it.
+  assertOrder(main, sousEvidenceOrder);
+
+  const frames = main.match(/class="sous-proof-frame/g) ?? [];
+  assert.equal(frames.length, sousEvidenceOrder.length, "every Sous Chef evidence frame is accounted for");
+
+  // The retired binaries stay retired, on every surface.
+  assert.doesNotMatch(main, /\/images\/sous-chef\/(?:desktop|mobile|banner)\.png/);
+  assert.doesNotMatch(main, /class="sous-visual"|class="sous-desktop"|class="sous-mobile"/);
+});
+
+test("the approved Sous Chef product principle is pinned verbatim", async () => {
+  const main = await readSousMain();
+  assert.ok(
+    main.includes("The recipe is the operational source of truth for the kitchen."),
+    "the approved product principle must appear exactly as approved",
+  );
+});
+
+test("Sous Chef separates the current product from the planned Pro direction", async () => {
+  const main = await readSousMain();
+
+  // Pro is labelled unambiguously and is prose in a panel — never a product surface.
+  const pro = main.slice(main.indexOf("07 · Planned direction"), main.indexOf("08 · Public boundary"));
+  assert.match(pro, /class="sous-pro"/);
+  assert.match(pro, /Planned · not built/);
+  assert.equal((pro.match(/<img/g) ?? []).length, 0, "the planned Pro direction must never be shown as a product screen");
+  assert.equal((pro.match(/class="sous-proof-frame/g) ?? []).length, 0, "no evidence frame may sit inside the planned section");
+  for (const capability of [
+    "Recipe costing", "Menu builder", "Live menu economics",
+    "Inventory management", "Prep lists",
+    "Purchasing and cost monitoring", "Vendor management", "Scheduling",
+  ]) {
+    assert.ok(pro.includes(capability), `planned capability missing: ${capability}`);
+  }
+  // Grouped by operating domain rather than listed flat — the grouping is the argument.
+  for (const group of ["The plate", "The kitchen", "The back office"]) {
+    assert.ok(pro.includes(group), `planned-direction group missing: ${group}`);
+  }
+  // Recipe Library ships today, so it must not be listed as a planned Pro capability.
+  assert.doesNotMatch(pro, /Recipe library/i);
+  assert.match(pro, /Nothing on this list is built\./);
+
+  // Nothing anywhere may present Pro as delivered.
+  for (const banned of [
+    "Sous Chef Pro is available", "Pro is live", "launched Pro", "Pro customers",
+    "now shipping", "generally available",
+  ]) {
+    assert.ok(!main.includes(banned), `Pro must not be presented as shipped: ${banned}`);
+  }
+});
+
+test("Sous Chef security wording stays inside what the source can show", async () => {
+  const main = await readSousMain();
+
+  // What IS claimed, and survives an adversarial read: a change made on a branch.
+  assert.match(main, /No module in the client reads a provider credential today\./);
+  assert.match(main, /signed-in user&#x27;s access token/);
+
+  // DO NOT CLAIM — the credential's status is unresolved and is claimed neither way.
+  for (const banned of [
+    "credential was revoked", "credential was retired", "key was rotated", "key has been revoked",
+    "credential is invalid", "no longer valid",
+  ]) {
+    assert.ok(!main.includes(banned), `unresolved credential status must not be claimed: ${banned}`);
+  }
+
+  // DO NOT CLAIM — no authenticated post-containment end-to-end test has passed.
+  for (const banned of [
+    "verified end to end", "end-to-end verified", "tested end to end", "e2e test passed",
+    "proven in production", "verified in production",
+  ]) {
+    assert.ok(!main.includes(banned), `unproven runtime verification must not be claimed: ${banned}`);
+  }
+  // The open half of the story is present, not merely the fix.
+  assert.match(main, /has not been proven end to end/);
+  assert.match(main, /not declared in the repository/);
+
+  // Eleven sentences on this page were walked back after an independent review checked
+  // each against the application source and found them stronger than the code supports.
+  // They are pinned here by their exact retracted wording so they cannot drift back in.
+  for (const retracted of [
+    "dropped, not guessed at",                    // the applicator coerces loose op names by shape
+    "every transition that could lose work",      // the plain editor save writes no snapshot
+    "inlined it into every browser chunk",        // Vite define substitutes per reference, not per chunk
+    "it shipped",                                 // no deployed artifact was ever inspected
+    "and restock signals",                        // no restock signal type is emitted
+    "stays picked up where it was left",          // no resumption state exists
+    "refused before any model call is made",      // the pre-call guard is one surface's keyword regex
+    "does not depend on a network call",          // two of the six engines are database round-trips
+    "rather than an open-ended prompt",           // both captures visibly show a free-text input
+    "rather than a blank box",                    // same
+    "⅓ ⅔",                                        // the rounding grid emits no thirds
+  ]) {
+    assert.ok(!main.includes(retracted), `retracted claim must not return: ${retracted}`);
+  }
+});
+
+test("Sous Chef claims no adoption, customers, savings, or scale", async () => {
+  const html = await readOutput("work/sous-chef/index.html");
+  // These words are forbidden as claims about the CURRENT product. The planned-direction
+  // panel is excluded and gated separately: it is allowed to name a costing capability
+  // precisely because it is labelled "Planned · not built" and carries no product surface.
+  const sousMain = await readSousMain();
+  const planned = sousMain.slice(sousMain.indexOf("07 · Planned direction"), sousMain.indexOf("08 · Public boundary"));
+  const current = sousMain.replace(planned, "");
+  for (const banned of [
+    "plate cost", "recipe costing", "menu builder", "live menu economics",
+    "prep list", "vendor management", "par level",
+  ]) {
+    assert.ok(!new RegExp(`\\b${banned}\\b`, "i").test(current),
+      `a planned capability must not be named outside the planned section: ${banned}`);
+  }
+  for (const banned of [
+    "customers", "downloads", "revenue", "saved us", "cost savings",
+    "restaurants use", "adoption", "MAU", "signups", "sign-ups", "waitlist",
+    "margin improvement", "trusted by", "used by",
+  ]) {
+    assert.ok(!new RegExp(`\\b${banned}\\b`, "i").test(html), `unsupported claim on the Sous Chef page: ${banned}`);
+  }
+  assert.ok(planned.length > 200, "the planned-direction slice must actually have been found");
+  // The Pantry figure shows a personal grocery total; it must not be dressed as economics.
+  assert.doesNotMatch(html, /restaurant economics|costing authority|food-cost authority/i);
+
+  // "food cost" may appear ONLY inside a denial. The page says the pantry total is *not*
+  // a food cost, which is exactly the disclaimer that keeps the capture honest — so a
+  // blanket word ban would delete the safeguard instead of the risk.
+  for (const hit of [...sousMain.matchAll(/food[ -]cost/gi)]) {
+    const before = sousMain.slice(Math.max(0, hit.index - 60), hit.index);
+    assert.match(before, /\bnot\b|\bnever\b|\bis not\b/i,
+      `"food cost" may only appear in a denial, found: ${sousMain.slice(Math.max(0, hit.index - 60), hit.index + 30)}`);
+  }
+});
+
+test("Sous Chef HOME evidence is described as interface, not as live telemetry", async () => {
+  const main = await readSousMain();
+  // The Home tiles are hard-coded display strings in the application source. A caption
+  // presenting them as computed state would be false, and no test can read a caption's
+  // truth — so the specific false framings are banned by name.
+  for (const banned of [
+    "live inventory", "real-time inventory", "live telemetry", "tracks your pantry in real time",
+    "live cooking state", "live kitchen status",
+  ]) {
+    assert.ok(!main.includes(banned), `HOME tiles must not be presented as live state: ${banned}`);
+  }
+  // The Pantry tiles ARE computed, and the page says so.
+  assert.match(main, /computed from the inventory itself/);
+});
+
+test("the Sous Chef architecture diagram is explanatory, never evidence", async () => {
+  const main = await readSousMain();
+  const source = await readFile(new URL("components/KitchenPass.tsx", root), "utf8");
+
+  const svg = main.match(/<svg class="pass-art"[\s\S]*?<\/svg>/);
+  assert.ok(svg, "the Sous Chef diagram is missing from the export");
+  assert.match(svg[0], /aria-hidden="true"/, "a decorative diagram must be hidden from assistive tech");
+  assert.doesNotMatch(svg[0], /<text|<foreignObject/i, "the diagram must carry no readable label that could read as UI");
+  // It sits in its own panel, not in an evidence frame, so it cannot be taken for a capture.
+  assert.match(main, /class="sous-diagram"/);
+  assert.doesNotMatch(main, /class="sous-proof-frame[^"]*"[^>]*>\s*<svg/);
+  assert.match(source, /not evidence/i, "the component must record what it is and is not");
+});
+
+test("every published Sous Chef binary is vouched for, and no withheld capture ships", async () => {
+  const provenance = await readFile(new URL("sous-chef-evidence-provenance.md", root), "utf8");
+
+  // Published + mark md5s form the allowlist; the withheld and removed tables form the denylist.
+  const rows = [...provenance.matchAll(/^\|\s*`([^`]+)`\s*\|(.+)$/gm)];
+  const allow = new Set();
+  const deny = new Map();
+  let section = "";
+  for (const line of provenance.split("\n")) {
+    if (line.startsWith("## ") || line.startsWith("### ")) section = line;
+    const row = line.match(/^\|\s*`([^`]+)`\s*\|(.+)$/);
+    if (!row) continue;
+    const digests = [...row[2].matchAll(/`([0-9a-f]{32})`/g)].map((m) => m[1]);
+    if (/Withheld captures|earlier binaries removed|Why not published/i.test(section) || /Reason withheld|Why not published/.test(row[2])) {
+      for (const d of digests) deny.set(d, row[1]);
+    } else {
+      for (const d of digests) allow.add(d);
+    }
+  }
+  assert.ok(allow.size >= 10, `expected the mark pair plus 8 published derivatives in the allowlist, got ${allow.size}`);
+  assert.ok(deny.size >= 6, `expected the withheld and removed captures in the denylist, got ${deny.size}`);
+  assert.ok(rows.length > 0);
+
+  const walk = async (dir) => {
+    const { readdir } = await import("node:fs/promises");
+    const found = [];
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const child = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, dir);
+      if (entry.isDirectory()) found.push(...await walk(child));
+      else found.push(child);
+    }
+    return found;
+  };
+
+  for (const base of ["public/", "out/"]) {
+    for (const file of await walk(new URL(base, root))) {
+      const path = decodeURIComponent(file.pathname);
+      const name = path.split("/").pop();
+      const bytes = await readFile(file);
+      const md5 = createHash("md5").update(bytes).digest("hex");
+      assert.ok(!deny.has(md5), `withheld or removed capture ${deny.get(md5)} is published as ${base}…/${name}`);
+      // Allowlist EVERY file at or below the Sous Chef asset directory, subdirectories included.
+      if (/images\/sous-chef\/.+$/i.test(path)) {
+        assert.ok(allow.has(md5),
+          `unvouched binary ${base}…/${name} (md5 ${md5}) — record it in sous-chef-evidence-provenance.md or remove it`);
+      }
+      assert.doesNotMatch(name, /^IMG_/i, `raw camera-roll capture must not ship: ${base}…/${name}`);
+    }
+  }
+
+  // Every referenced binary exists, and none is inlined as a data: URI.
+  for (const src of sousEvidenceOrder) {
+    await assert.doesNotReject(access(new URL(`out${src}`, root)), `referenced evidence binary is missing from the export: ${src}`);
+  }
+
+  // Vouch by REFERENCE, not only by directory. The walk above hashes everything under
+  // images/sous-chef/, so a binary dropped in a SIBLING directory and referenced from the
+  // page was never hashed against the allowlist at all.
+  const page = await readOutput("work/sous-chef/index.html");
+  for (const [, src] of page.matchAll(/<img[^>]+src="(\/[^"]+\.(?:jpe?g|png|webp|avif|gif|svg))"/gi)) {
+    const bytes = await readFile(new URL(`out${src}`, root));
+    const md5 = createHash("md5").update(bytes).digest("hex");
+    assert.ok(allow.has(md5),
+      `the page references an unvouched binary ${src} (md5 ${md5}) — record it in sous-chef-evidence-provenance.md or remove it`);
+  }
+  const html = await readOutput("work/sous-chef/index.html");
+  assert.doesNotMatch(html, /<img[^>]+src="data:/i, "an evidence image must not be inlined as a data: URI");
+});
+
+test("each Sous Chef evidence figure carries a label, a caption, and describing alt text", async () => {
+  const main = await readSousMain();
+
+  const frames = [...main.matchAll(/<figure class="sous-proof-frame[^"]*"[\s\S]*?<\/figure>/g)].map((m) => m[0]);
+  assert.equal(frames.length, sousEvidenceOrder.length);
+
+  for (const frame of frames) {
+    // The no-crop-surface contract: a frame holds exactly an <img> and a <figcaption>,
+    // the image is the first child, and it carries no class of its own.
+    assert.equal((frame.match(/<img/g) ?? []).length, 1, "an evidence figure holds exactly one image");
+    assert.match(frame, /^<figure class="sous-proof-frame[^"]*"><img/, "the image must be the figure's first child");
+    assert.doesNotMatch(frame, /<img[^>]+class=/, "an evidence image carries no class of its own");
+
+    const alt = frame.match(/alt="([^"]*)"/);
+    assert.ok(alt && alt[1].trim().length > 30, `evidence image needs descriptive alt text: ${frame.slice(0, 90)}`);
+    assert.doesNotMatch(alt[1], /^(?:a\s+|the\s+)?(?:screenshot|image|photo)\b|screenshot number/i,
+      "alt must describe the capture, not label it");
+
+    const label = frame.match(/<figcaption><span>([^<]+)<\/span>/);
+    assert.ok(label && label[1].trim().length > 2, "evidence figure needs a label");
+    const caption = frame.match(/<\/span><p>([\s\S]*?)<\/p>/);
+    assert.ok(caption && caption[1].trim().length > 40, "evidence figure needs a describing caption");
+
+    // An inline style is a crop surface. RSP pins its evidence images to exactly the one
+    // next/image emits; the same rule has to hold here, because THIS is the page that
+    // promises every capture is the whole screen.
+    const style = frame.match(/<img[^>]+style="([^"]*)"/);
+    assert.ok(!style || style[1] === "color:transparent",
+      `an evidence image carries no inline style but the one next/image emits — found: ${style?.[1]}`);
+  }
+
+  // The loop above can only inspect images it already found INSIDE a frame. An <img> placed
+  // anywhere else in <main> — a fabricated Pro screen, say — was invisible to every
+  // assertion on this page. No directory filter here on purpose: RSP's equivalent guard
+  // short-circuits on "/images/rsp/", which a sibling directory walks straight past.
+  const inside = frames.join("");
+  for (const [, tag] of main.matchAll(/(<img\b[^>]*>)/g)) {
+    const src = tag.match(/src="([^"]*)"/)?.[1] ?? "";
+    if (src.endsWith("/images/sous-chef/mark-336.png")) continue;
+    assert.ok(inside.includes(tag),
+      `screenshot rendered outside an evidence figure: ${src}`);
+  }
+
+  // No inline <style> may reach this page either — it is the other way a crop arrives
+  // without touching the stylesheet the tripwire scans.
+  const html = await readOutput("work/sous-chef/index.html");
+  assert.doesNotMatch(html, /<style[^>]*>[\s\S]*?<\/style>/i,
+    "an inline <style> block can crop an evidence image without appearing in globals.css");
+});
+
+test("each Sous Chef capture is bound to the label that describes it", async () => {
+  const main = await readSousMain();
+  // The evidence tests prove each capture appears once, in order, inside a well-formed
+  // figure. None of them notices if two allowlisted captures swap places WITH their
+  // captions — the order assertion would still hold and every figure would still be
+  // well-formed. Pinning the pairing closes that: a swap now has to survive this table.
+  // It still cannot prove a caption is TRUE of its image; that stays a human reading
+  // responsibility, recorded in sous-chef-evidence-provenance.md.
+  const expected = [
+    ["home-command-center.jpg", "Home"],
+    ["recipe-library.jpg", "Library"],
+    ["collections.jpg", "Home · collections"],
+    ["recipe-record.jpg", "The record · identity"],
+    ["recipe-structure.jpg", "The record · structure"],
+    ["pantry-inventory.jpg", "Pantry"],
+    ["assistant-in-context.jpg", "Assistant · in context"],
+    ["research-desk.jpg", "Assistant · research"],
+  ];
+  const actual = [...main.matchAll(/<img[^>]+src="[^"]*sous-chef\/([^"]+)"[\s\S]{0,900}?<figcaption><span>([^<]+)<\/span>/g)]
+    .map((m) => [m[1], m[2]]);
+  assert.deepEqual(actual, expected, "an evidence capture is paired with the wrong label");
+});
+
+test("Sous Chef states no adoption figure", async () => {
+  const main = await readSousMain();
+  // The only numerals the page carries are its section numbers and the scaling engine's
+  // correction factors. A numeral attached to a scale noun would be an adoption claim, and
+  // there is no evidence for one — no user count, no install count, no saved hours.
+  const scale = /\b\d[\d,.]*\+?\s*(?:k|m|million|thousand)?\s*(?:users?|customers?|restaurants?|kitchens?|chefs?|downloads?|installs?|sign-?ups?|teams?|businesses|stars?|hours?\s+saved)\b/i;
+  const hit = main.replace(/<[^>]+>/g, " ").match(scale);
+  assert.equal(hit, null, `an adoption figure must not appear: ${hit?.[0]}`);
+  assert.doesNotMatch(main, /\b\d[\d,.]*\s*%\s*(?:faster|cheaper|savings|reduction|growth)\b/i);
+});
+
+test("the Sous Chef route links the public repository and never a private surface", async () => {
+  const html = await readOutput("work/sous-chef/index.html");
+  assert.match(html, /href="https:\/\/github\.com\/avergara13\/sous-chef-app"/);
+  // No live application, deployment host, or credential surface may be advertised.
+  for (const banned of ["railway.app", "supabase.co", "localhost", ".env", "GEMINI_API_KEY", "ANTHROPIC_API_KEY", "service_role"]) {
+    assert.ok(!html.includes(banned), `private surface must not be advertised: ${banned}`);
+  }
+});
+
 test("RSP case study tells the evidence story in capability order, once each", async () => {
   const main = await readRspMain();
 
@@ -1535,9 +1957,13 @@ test("no stylesheet rule crops an evidence frame", async () => {
   let sawRatio = false, sawSegmentedRule = false;
   for (const seg of segments) {
     for (const [, selector, body] of seg.body.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
-      // Match the whole rsp- family: a rule can reach an evidence image through the layout
-      // wrappers (.rsp-decision-feature img), not only through a .rsp-proof-* class.
-      if (!/\brsp-[a-z-]+/.test(selector)) continue;
+      // Match the whole rsp- AND sous- families: a rule can reach an evidence image through
+      // the layout wrappers (.rsp-decision-feature img, .sous-record-spread img), not only
+      // through a .rsp-proof-* / .sous-proof-* class. Scoping this to rsp- alone left every
+      // Sous Chef rule unread — the tripwire could not see a crop on eight of the site's
+      // sixteen evidence images, which is precisely the blind spot it exists to close.
+      const family = selector.match(/\b(rsp|sous)-[a-z-]+/);
+      if (!family) continue;
       if (!seg.plain || seg.max < Infinity) sawSegmentedRule = true;
       const where = `${selector.trim()}${seg.condition ? ` in ${seg.condition}` : ""}`;
 
@@ -1557,10 +1983,19 @@ test("no stylesheet rule crops an evidence frame", async () => {
       // `aspect-ratio:0.72` through.
       const ratio = body.match(/aspect-ratio\s*:\s*([\d.]+)(?:\s*\/\s*([\d.]+))?/);
       if (ratio) {
-        sawRatio = true;
         const value = ratio[2] ? Number(ratio[1]) / Number(ratio[2]) : Number(ratio[1]);
-        assert.ok(Math.abs(value - 900 / 1950) < 1e-4,
-          `evidence frames must keep the capture's own ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        if (family[1] === "rsp") {
+          // Every RSP capture shares one ratio, so the frame pins it.
+          sawRatio = true;
+          assert.ok(Math.abs(value - 900 / 1950) < 1e-4,
+            `evidence frames must keep the capture's own ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        } else {
+          // The Sous Chef captures do NOT share a ratio (900x1815, 900x1827 and 900x1851
+          // all appear), so any pinned ratio would letterbox or distort at least one of
+          // them. next/image supplies each file's own dimensions instead; declaring a
+          // ratio here is the defect, whatever value it carries.
+          assert.fail(`Sous Chef evidence frames must declare no aspect-ratio — ${where} sets ${ratio[0].split(":").pop().trim()}`);
+        }
       }
     }
   }

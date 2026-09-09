@@ -46,3 +46,10 @@ next-env.d.ts
 
 # typescript incremental build artifact
 tsconfig.tsbuildinfo
+
+# python bytecode from the build/verification scripts
+__pycache__/
+*.py[cod]
+
+# local Claude Code session state (worktrees, launch config)
+/.claude/

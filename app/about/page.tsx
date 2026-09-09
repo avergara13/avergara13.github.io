@@ -29,7 +29,10 @@ const approach = [
 const proof = [
   { title: "🛋️ Loft OS", label: "Flagship systems work", href: "/work/loft-os/", copy: "A governed multi-agent workflow system that shows how I approach scope, authority, workflow design, human oversight, independent review, and verified closeout.", cta: "View Loft OS" },
   { title: "📱 Resale Scanner Pro", label: "Working product", href: "/work/resale-scanner-pro/", copy: "A mobile decision system built around a real operating workflow, combining market evidence and AI-assisted research with human judgment.", cta: "View Resale Scanner Pro" },
-  { title: "Hospitality-domain work", label: "Applied range", href: "/work/", copy: "Additional projects show how the same systems thinking can be applied back into hospitality operations and other practical business workflows.", cta: "View portfolio" },
+  // TSK-570: Sous Chef is now a working product on HOME and card 03 of the chooser, so the
+  // third slot names it rather than filing the hospitality work under "additional projects" —
+  // which would contradict the ranking a reader has just come from.
+  { title: "🍍 Sous Chef", label: "Working product", href: "/work/sous-chef/", copy: "A culinary workspace that turns kitchen operating experience into a product: the recipe is a protected, versioned record, and the assistant proposes changes a person accepts.", cta: "View Sous Chef" },
 ];
 
 function Points({ id, eyebrow, heading, items }: { id: string; eyebrow: string; heading: string; items: string[][] }) {

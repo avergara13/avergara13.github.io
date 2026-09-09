@@ -22,7 +22,12 @@ let cards = [
     // entry on /lab/, so its card remains worth reproducing.
     SocialCard(filename: "og-resale-scanner-pro.png", label: "SANITIZED CASE STUDY", title: "Resale Scanner Pro", subtitle: "A working decision-support workflow used in a real family resale operation.", accent: NSColor(calibratedRed: 0.05, green: 0.50, blue: 0.30, alpha: 1)),
     SocialCard(filename: "og-loft-os.png", label: "SANITIZED ARCHITECTURE", title: "Loft OS", subtitle: "A governed operating pattern for scope, authority, evidence, repair, and accountable closeout.", accent: NSColor(calibratedRed: 0.71, green: 0.23, blue: 0.12, alpha: 1)),
-    SocialCard(filename: "og-sous-chef.png", label: "PUBLIC SOURCE CASE STUDY", title: "Sous Chef", subtitle: "Hospitality-domain judgment translated into recipes, pantry signals, cookbooks, and session continuity.", accent: NSColor(calibratedRed: 0.04, green: 0.30, blue: 1.0, alpha: 1)),
+    // TSK-570: Sous Chef is a working product with public source, not a case study about
+    // one, and the card is the pre-click impression a recruiter gets from a shared link --
+    // so it carries the page's own positioning. "Session continuity" is gone: the app reads
+    // real session records, but nothing resumes where a cook left off, and that phrasing was
+    // walked back on the page itself. The accent matches the route's saffron identity rule.
+    SocialCard(filename: "og-sous-chef.png", label: "WORKING PRODUCT · PUBLIC SOURCE", title: "Sous Chef", subtitle: "A culinary workspace where the recipe is a protected, versioned record, and the assistant proposes changes a person accepts.", accent: NSColor(calibratedRed: 0.878, green: 0.545, blue: 0.200, alpha: 1)),
     SocialCard(filename: "og-office-chef.png", label: "CONCEPT · SIMULATED DATA", title: "The Office Chef", subtitle: "Restaurant back-office discovery and requirements made tangible without inflated delivery claims.", accent: NSColor(calibratedRed: 0.71, green: 0.23, blue: 0.12, alpha: 1)),
 ]
 

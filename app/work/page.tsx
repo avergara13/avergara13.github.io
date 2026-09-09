@@ -9,11 +9,14 @@ export const metadata: Metadata = { title: "Portfolio — Angel Vergara", descri
 const primary = [
   { number: "01", title: "🛋️ Loft OS", href: "/work/loft-os/", label: "Flagship · Governed Multi-Agent Workflow System", summary: "A system for moving AI-assisted work from request to verified closeout with controlled authority, independent review, and evidence.", cta: "View case study", image: "/images/loft-os/logo-336.png", alt: "", mark: true },
   { number: "02", title: "📱 Resale Scanner Pro", href: "/work/resale-scanner-pro/", label: "Working product · In operating use", summary: "A mobile workflow for evaluating resale finds with market evidence, AI-assisted research, and human judgment.", cta: "View case study", image: "/images/rsp/mark-336.png", alt: "", mark: true },
+  // Sous Chef joins the primary list because HOME now carries it as the second working
+  // product. A chooser that still filed it under "Additional work" would contradict the
+  // page a recruiter has just come from.
+  { number: "03", title: "🍍 Sous Chef", href: "/work/sous-chef/", label: "Working product · Public source", summary: "A culinary workspace built from kitchen operating experience, where the recipe is the source of truth and the AI proposes edits a person accepts.", cta: "View case study", image: "/images/sous-chef/mark-336.png", alt: "", mark: true },
 ];
 
 const additional = [
   { title: "Assistant Recruiter Pro", href: "/work/assistant-recruiter-pro/", label: "AI workflow", summary: "A workflow for refining job-search strategy from role constraints and human relevance feedback.", cta: "View project" },
-  { title: "Sous Chef", href: "/work/sous-chef/", label: "AI-assisted domain workflow", summary: "A workspace that translates culinary operating knowledge into a practical AI-assisted workflow.", cta: "View project" },
 ];
 
 export default function WorkIndex() {
