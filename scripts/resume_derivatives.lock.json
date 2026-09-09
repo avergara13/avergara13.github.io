@@ -3,24 +3,24 @@
   "note": "Written by scripts/generate_resumes.py when it builds the PDFs. This is an unsigned record, not a tamper-proof one: anyone can recompute these hashes with the standard library. It defends against ACCIDENTAL drift -- the content edit that forgets the PDFs -- not against a determined forger.",
   "entries": {
     "Angel_Vergara_Resume_General.pdf": {
-      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
-      "source_sha256": "f75ec166366c47ea7d4820c9d22fd32a68eba4ce20fea6f237da9f546fba206e",
-      "pdf_sha256": "efe9156e005d14adcb9a7d8ab83a882dce9ada417fae1bf0836ae49a9a425524"
+      "generator_sha256": "a1d1ade73cf8fd11850f64b1b53417dddde42b16df57f32f546e39cc83d83c8b",
+      "source_sha256": "5516f0cef30bcb7cd8a11776c7f8e93996e9afc1b4fe89d4ff4ce7a74eec6229",
+      "pdf_sha256": "022187a9c8c2ee4d5ff36d4e267b876a67e384ad636b75bfd795ae10748cab0c"
     },
     "Angel_Vergara_Resume_Implementation_Onboarding.pdf": {
-      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
-      "source_sha256": "e01ad8ae0a78684a2b2d5c1a57f6b94f4a1a042c1ca90250a41cd7b41173511d",
-      "pdf_sha256": "72851ffa5846684127f4dcb84df211cdc292d63a30e88d6cac4374b743f453ce"
+      "generator_sha256": "a1d1ade73cf8fd11850f64b1b53417dddde42b16df57f32f546e39cc83d83c8b",
+      "source_sha256": "8b92a60c16c66d276a531578ed28939f6fd0a91e90122009ea4a5f8afed70b49",
+      "pdf_sha256": "ae6f7e122968ea29b38adfd76d987b4490c98dac9351b6fda036c9b3f63bfd14"
     },
     "Angel_Vergara_Resume_Business_Systems_Operations.pdf": {
-      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
-      "source_sha256": "8c5b3cdbb7f37df119864f4a10801ee20b15ffbb9d8e892e04ec7e91537ea0a5",
-      "pdf_sha256": "5fead60beb8006fd9f35cb3e975e712bb730bdb37be4b53a9f1685ecf483dfc7"
+      "generator_sha256": "a1d1ade73cf8fd11850f64b1b53417dddde42b16df57f32f546e39cc83d83c8b",
+      "source_sha256": "d8fae0bb685459d822a209a9d0a46c212ad0906c8cff2b72a8b683da771adcef",
+      "pdf_sha256": "dd1e9763070d797d92685e5b4b0e91e3570c66bc8b7e688f25af5e658f00b6f7"
     },
     "Angel_Vergara_Resume_AI_Workflow_Automation.pdf": {
-      "generator_sha256": "d168fac7c54e84a315d85fd5542118d379730ccdc7ba76e358cf15358351b637",
-      "source_sha256": "62b8b3f126cc17027fb9292469e383b84b45f116e2b1240a8c485ffc7223ecdb",
-      "pdf_sha256": "f52ce7bf03925179a4f0bf376034fb792dad3c332514ce19df1f3a9dddb6a1f2"
+      "generator_sha256": "a1d1ade73cf8fd11850f64b1b53417dddde42b16df57f32f546e39cc83d83c8b",
+      "source_sha256": "a28f1b5765c6c189cbaa847d9ef2120473acbba83103290950d072c0143878f4",
+      "pdf_sha256": "93c6cb9fd5d6ddc46e7fb1144e1f20cd7b7e95be6f02cd03db4cb9727dcc7e7a"
     }
   }
 }
