@@ -81,8 +81,8 @@ export default function Home() {
         <div className="flagship-copy">
           <Image className="stage-mark" src="/images/loft-os/logo-336.png" alt="" width={336} height={336} sizes="(max-width:960px) 64px, 56px" />
           <p className="eyebrow light-eyebrow">Flagship work</p>
-          <h2 id="flagship-title">Loft OS<span className="stage-sub">Governed multi-agent workflow system</span></h2>
-          <p className="stage-lede">Scoped work. Independent review. Verified closeout.</p>
+          <h2 id="flagship-title">Loft OS{" "}<span className="stage-sub">Governed Multi-Agent Workflow System</span></h2>
+          <p className="stage-lede">An execution harness for coordinating AI agents, approvals, evidence, and controlled handoffs.</p>
           <Link className="stage-cta" href="/work/loft-os/">View case study <span aria-hidden="true">→</span></Link>
         </div>
         <div className="flagship-visual">

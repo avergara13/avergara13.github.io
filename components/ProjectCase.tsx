@@ -316,7 +316,7 @@ function LoftOsCase({ project }: { project: Project }) {
           <div>
           <p className="eyebrow">{project.eyebrow}</p>
           <h1>🛋️ Loft OS</h1>
-          <p className="case-descriptor">Governed multi-agent workflow system</p>
+          <p className="case-descriptor">Governed Multi-Agent Workflow System</p>
           <p className="lede">{project.dek}</p>
           <p className="case-support">Agents can keep work moving autonomously without gaining unchecked authority.</p>
           </div>

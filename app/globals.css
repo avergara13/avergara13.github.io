@@ -668,7 +668,7 @@ main[data-section="home"]::before,main[data-section="work-index"]::before,main[d
 .flagship-grid { display:grid; grid-template-columns:1.06fr .94fr; gap:clamp(34px,5vw,68px); align-items:center; }
 .flagship-copy h2 { margin:14px 0 0; font-size:clamp(2.1rem,3.9vw,3.3rem); line-height:1.03; letter-spacing:-.028em; }
 .flagship-copy .stage-sub { color:var(--on-dark-muted); }
-.flagship-copy .stage-lede { color:var(--copper-on-dark); }
+.flagship-copy .stage-lede { color:var(--copper-on-dark); text-transform:none; }
 .flagship-visual { position:relative; min-width:0; }
 .flagship-visual .lattice-art { display:block; width:100%; height:auto; }
 .stage-mark { display:block; width:56px; height:auto; margin-bottom:20px; border-radius:var(--r-card); }
